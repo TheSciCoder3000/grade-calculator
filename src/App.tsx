@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
+import Auth from './components/Auth/Auth';
+import Calculator from './components/Calculator/Calculator';
+import Header from './components/Header/Header';
+import { useFirebaseAuth } from './Firebase';
 
 function App() {
+  const { AuthStatus, AuthFunctions } = useFirebaseAuth()
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header IsSignedIn={AuthStatus} onSignOut={AuthFunctions.AuthSignOut} />
+      
+      <Switch>
+        <Route exact path="/">
+          <Redirect to="/calculator/assessments"/>
+        </Route>
+        <Route path="/calculator/:tabName">
+          <Calculator />
+        </Route>
+        <Route path="/auth">
+          <Auth AuthFunctions={AuthFunctions} />
+        </Route>
+      </Switch>
     </div>
   );
 }
