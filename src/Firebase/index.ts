@@ -3,6 +3,7 @@ import { User } from 'firebase/auth'
 import { getAnalytics } from "firebase/analytics";
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { useEffect, useState } from "react";
+import { initializeFirestore } from "./FirebaseDb";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,7 +23,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
-const FirebaseAuth = InitializeAuthentication(app)
+const FirebaseDb = initializeFirestore(app)
+const FirebaseAuth = InitializeAuthentication(app, FirebaseDb.createUserDb)
 
 
 // ===================================== Firebase Hooks =====================================

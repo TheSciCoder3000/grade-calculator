@@ -4,8 +4,8 @@ import React from 'react'
 
 
 // ================================== Type Definitions ==================================
-export function InitializeAuthentication(app: FirebaseApp) {
-    const auth = getAuth()
+export function InitializeAuthentication(app: FirebaseApp, createUserDb: (userUid: string) => Promise<void>) {
+    const auth = getAuth(app)
 
     const AuthStatusListener = (setUserStatus: React.Dispatch<React.SetStateAction<User | null>>) => auth.onAuthStateChanged(user => setUserStatus(user))
 
@@ -14,6 +14,9 @@ export function InitializeAuthentication(app: FirebaseApp) {
             .then((userCredential) => {
                 console.log(userCredential)
                 return userCredential
+            })
+            .then(user => {
+                createUserDb(user.user.uid)
             })
             .catch((error) => {
                 const errorCode = error.code;
