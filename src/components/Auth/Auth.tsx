@@ -5,6 +5,8 @@ import Login from './AuthActions/Login'
 import LogOut from './AuthActions/LogOut'
 import SignUp from './AuthActions/SignUp'
 
+import './css/Auth.css'
+
 interface AuthProps {
     AuthFunctions: FirebaseAuthType['AuthFunctions']
 }
@@ -14,7 +16,6 @@ const Auth: React.FC<AuthProps> = ({ AuthFunctions }) => {
 
     return (
         <div className="auth">
-            auth page
                 <Route path={`${path}/login`}>
                     <Login onLogIn={AuthFunctions.AuthLogIn} />
                 </Route>

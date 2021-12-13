@@ -1,4 +1,8 @@
 * {
   margin: none;
 }
+
+html {
+  overflow-x: hidden;
+}
 /*# sourceMappingURL=App.css.map */
