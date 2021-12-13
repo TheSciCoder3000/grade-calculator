@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { FirebaseAuthType } from '../../Firebase'
+
+import AccountIcon from './account_circle.svg'
+import './css/Header.css'
 
 interface HeaderProps {
     IsSignedIn: FirebaseAuthType['AuthStatus']
@@ -9,6 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
     const history = useHistory()
+    const [toggleProfileMenu, setToggleProfileMenu] = useState(false)
+
     return (
         <div className="header">
             <div className="header-cont">
@@ -16,7 +21,14 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
                 <div className="header-menu">
                     {IsSignedIn ?
                         <>
-                            <div className="header-avatar" onClick={onSignOut}>LogOut</div>
+                            <div className="header-avatar" onClick={() => setToggleProfileMenu(state => !state)}>
+                                <img src={AccountIcon} alt="" className="avatar-icon" />
+                                {toggleProfileMenu &&
+                                    <div className="profile-menu">
+                                        <div className="sign-out-menu menu-item" onClick={onSignOut}>Sign Out</div>
+                                    </div>
+                                }
+                            </div>
                         </>
                         :
                         <ul>
