@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Switch, useRouteMatch } from 'react-router-dom'
-import { FirebaseAuthType } from '../../Firebase'
+import { FirebaseAuthType } from '@useFirebase'
 import Login from './AuthActions/Login'
 import LogOut from './AuthActions/LogOut'
 import SignUp from './AuthActions/SignUp'

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { FirebaseAuthType } from '../../../Firebase';
+import { FirebaseAuthType } from '@useFirebase';
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface SignUpProps {

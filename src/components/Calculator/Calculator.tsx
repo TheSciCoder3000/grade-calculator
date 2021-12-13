@@ -1,19 +1,26 @@
 import React from 'react'
-import { Switch, Route, Redirect, useParams } from 'react-router-dom'
+import { Switch, Route, Redirect, useParams, useRouteMatch } from 'react-router-dom'
 import Assessment from './Tabs/Assessment'
 import GPA from './Tabs/GPA'
 import Semesteral from './Tabs/Semesteral'
+import './css/Calculator.css'
 
 function Calculator() {
     const { tabName } = useParams<{ tabName: string }>()
+    const { path }= useRouteMatch()
 
     return (
-        <div>
+        <div className="calculator-app">
+            <div className="calculator-tabs">
+                <div className="tab-item">Assessments</div>
+                <div className="tab-item">Semesteral</div>
+                <div className="tab-item">GPA</div>
+            </div>
             <Switch>
                 <Route exact path="/">
                     <Redirect to="/assessments"/>
                 </Route>
-                <Route path="/assessments">
+                <Route path={`${path}/assessments`}>
                     <Assessment />
                 </Route>
                 <Route path="/semesteral">

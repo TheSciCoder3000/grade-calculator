@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { FirebaseAuthType } from '../../Firebase'
+import { FirebaseAuthType } from '@useFirebase'
 
 import AccountIcon from './account_circle.svg'
 import './css/Header.css'

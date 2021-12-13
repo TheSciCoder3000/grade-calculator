@@ -1,0 +1,10 @@
+.calculator-app .calculator-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.calculator-app .calculator-tabs .tab-item {
+  padding: 10px 20px;
+}
+/*# sourceMappingURL=Calculator.css.map */
