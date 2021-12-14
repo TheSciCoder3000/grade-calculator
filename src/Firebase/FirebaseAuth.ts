@@ -13,15 +13,14 @@ export function InitializeAuthentication(app: FirebaseApp, createUserDb: (userUi
         return createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log(userCredential)
-                return userCredential
-            })
-            .then(user => {
-                createUserDb(user.user.uid)
+                createUserDb(userCredential.user.uid)
+                return userCredential.user
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.error(`${errorCode}: ${errorMessage}`)
+                return null
             });
     }
 
@@ -34,11 +33,13 @@ export function InitializeAuthentication(app: FirebaseApp, createUserDb: (userUi
         return signInWithEmailAndPassword(auth, email, password)
             .then((userCredentials) => {
                 console.log('User has successfuly logged in')
+                return userCredentials.user
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.error(`${errorCode}: ${errorMessage}`)
+                return null
             })
     }
 
