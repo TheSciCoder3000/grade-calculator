@@ -1,13 +1,12 @@
 import React from 'react'
-import { Switch, Route, Redirect, useParams, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import Assessment from './Tabs/Assessment'
 import GPA from './Tabs/GPA'
 import Semesteral from './Tabs/Semesteral'
 import './css/Calculator.css'
 
 function Calculator() {
-    const { tabName } = useParams<{ tabName: string }>()
-    const { path }= useRouteMatch()
+    const { path } = useRouteMatch()
 
     return (
         <div className="calculator-app">

@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { FirebaseAuthType } from '@useFirebase';
+import { FirebaseType, useFirebase } from '@useFirebase';
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface SignUpProps {
-    onSignUp: FirebaseAuthType['AuthFunctions']['AuthSignUp']
+    onSignUp: FirebaseType['Auth']['AuthFunctions']['AuthSignUp']
 }
 
 
@@ -19,7 +19,9 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp }) => {
         console.log('checking if email and pass is good', email.current)
         if (email.current && password.current && email.current.value !== '' && password.current.value !== '') {
             console.log('authenticating user')
-            onSignUp(email.current.value, password.current.value).then(() => history.push('/'))
+            onSignUp(email.current.value, password.current.value).then(user => {
+                history.push('/')
+            })
         }
     }
 

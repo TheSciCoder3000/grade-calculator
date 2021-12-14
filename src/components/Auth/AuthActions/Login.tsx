@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { FirebaseAuthType } from '@useFirebase'
+import { FirebaseType, useFirebase } from '@useFirebase'
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface LoginProps {
-    onLogIn: FirebaseAuthType['AuthFunctions']['AuthLogIn']
+    onLogIn: FirebaseType['Auth']['AuthFunctions']['AuthLogIn']
 }
 const Login: React.FC<LoginProps> = ({ onLogIn }) => {
     const history = useHistory()
@@ -14,9 +14,13 @@ const Login: React.FC<LoginProps> = ({ onLogIn }) => {
     // on Log In Event
     const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        console.log('re-authenticating user')
         if (email.current && password.current && email.current.value !== '' && password.current.value !== '') {
             console.log('authenticating user')
-            onLogIn(email.current.value, password.current.value).then(() => history.push('/'))
+            onLogIn(email.current.value, password.current.value).then(user => {
+                console.log('adding subscriber', user)
+                history.push('/')
+            })
         }
     }
     return (

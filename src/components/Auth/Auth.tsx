@@ -1,6 +1,6 @@
 import React from 'react'
-import { Route, Switch, useRouteMatch } from 'react-router-dom'
-import { FirebaseAuthType } from '@useFirebase'
+import { Route, useRouteMatch } from 'react-router-dom'
+import { FirebaseType } from '@useFirebase'
 import Login from './AuthActions/Login'
 import LogOut from './AuthActions/LogOut'
 import SignUp from './AuthActions/SignUp'
@@ -8,7 +8,7 @@ import SignUp from './AuthActions/SignUp'
 import './css/Auth.css'
 
 interface AuthProps {
-    AuthFunctions: FirebaseAuthType['AuthFunctions']
+    AuthFunctions: FirebaseType['Auth']['AuthFunctions']
 }
 
 const Auth: React.FC<AuthProps> = ({ AuthFunctions }) => {
