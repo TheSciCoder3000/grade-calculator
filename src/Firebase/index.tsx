@@ -5,7 +5,8 @@ import { User } from 'firebase/auth'
 // import { getAnalytics } from "firebase/analytics";
 
 import { InitializeAuthentication } from "./FirebaseAuth";
-import { initializeFirestore } from "./FirebaseDb";
+import { initializeFirestore, IUserDoc } from "./FirebaseDb";
+import { unstable_batchedUpdates } from "react-dom";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,23 +37,14 @@ const useAuthContext = () => {
   const [AuthStatus, setAuthStatus] = useState<User | null>(null)
 
   // Add auth status listener after rendering component
-  useEffect(() => {
-    FirebaseAuth.AuthStatusListener(user => {
-      setAuthStatus(user)
+  useEffect(() => FirebaseAuth.AuthStatusListener(setAuthStatus), [])
 
-    })
-  }, [])
-
-  const onFirebaseLogOut = () => {
-    console.log('unsubscribing db events')
-    FirebaseAuth.AuthSignOut()
-  }
 
   return {
     AuthStatus,
     AuthFunctions: {
       AuthSignUp: FirebaseAuth.AuthSignUp,
-      AuthSignOut: onFirebaseLogOut,
+      AuthSignOut: FirebaseAuth.AuthSignOut,
       AuthLogIn: FirebaseAuth.AuthLogIn,
       AuthListener: FirebaseAuth.AuthStatusListener
     }
@@ -61,33 +53,43 @@ const useAuthContext = () => {
 
 // Firestore Values
 const useFirestoreContext = () => {
-  type $fixMe = any
   // Firestore module state
-  const [FirestoreDb, setFirestoreDb] = useState<$fixMe>(null)
+  const [FirestoreDb, setFirestoreDb] = useState<IUserDoc>({} as IUserDoc)
   
-  useEffect(() => {
-    
-  }, [])
 
-  return {
-    Firestore: FirestoreDb,
-    FirestoreFunctions: {
-      AddDocs: null,
-      RemoveDocs: null,
-      UpdateDocs: null,
-      onDocsChange: null
-    }
+  const updateFirestoreDb = (userUid: string) => {
+    return FirebaseDb.onDbChanges(userUid, setFirestoreDb)
   }
+
+  return [
+    {
+      Firestore: FirestoreDb,
+      FirestoreFunctions: {
+        AddDocs: null,
+        RemoveDocs: null,
+        UpdateDocs: null,
+        onDocsChange: null
+      }
+    },
+    updateFirestoreDb
+  ] 
+  
 }
 
 // ===================================== Firebase Context Creation =====================================
+type FireContextReturnType = ReturnType<typeof useFirestoreContext>
+type RawFireContextType = FireContextReturnType[1]
+type FireFunc = Extract<RawFireContextType, Function>
+type FireObj = Exclude<RawFireContextType, Function>
+type FirestoreContextType = [FireObj, FireFunc]
+
 interface IFirebaseContext {
   Auth: ReturnType<typeof useAuthContext>
-  Firestore: ReturnType<typeof useFirestoreContext>
+  Firestore: FirestoreContextType[0]
 }
 const FirebaseContext = createContext<IFirebaseContext>({
   Auth: {} as ReturnType<typeof useAuthContext>,
-  Firestore: {} as ReturnType<typeof useFirestoreContext>
+  Firestore: {} as FirestoreContextType[0]
 })
 
 
@@ -97,7 +99,11 @@ interface IFirebaseContextProvider {
 // Firebase Context Provider
 export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ children }) => {
   const FirebaseAuth = useAuthContext()
-  const Firestore = useFirestoreContext()
+  const [Firestore, updateFirestore] = useFirestoreContext() as FirestoreContextType
+
+  useEffect(() => {
+    if (FirebaseAuth.AuthStatus && typeof updateFirestore == 'function') return updateFirestore(FirebaseAuth.AuthStatus.uid)
+  }, [FirebaseAuth.AuthStatus])
   return (
     <FirebaseContext.Provider value={{
       Auth: FirebaseAuth,
@@ -108,9 +114,70 @@ export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ ch
   )
 }
 
-// Firebase Hook
+export type FirebaseType = ReturnType<typeof useFirebase>
+
+
+// ============================ Firebase Hooks ============================
+
 export const useFirebase = () => useContext(FirebaseContext)
 
 export const useFirebaseAuth = () => useFirebase().Auth
 
-export type FirebaseType = ReturnType<typeof useFirebase>
+
+
+interface IAssessmentSubjects {
+  name: string,
+  assessments: {
+    name: string
+    sem: string
+    items: {
+      name: string
+      grade: number
+      term: string
+      [x: string]: string | number
+    }[]
+  }[]
+}
+interface IAssessmentSemesteral {
+  
+}
+
+
+export const useFirestore = () => useFirebase().Firestore
+
+interface IAssessmentDoc {
+  subjects: {
+    name: string
+    assessments: {
+      name: string
+      items: {
+        name: string
+        grade: number | null
+        [x: string]: number | string | null
+      }[]
+    }[]
+  }[]
+}
+export const useAssessmentDb = () => {
+  const unStructuredDoc = useFirebase().Firestore.Firestore
+  if (!unStructuredDoc.subjects) return
+  console.log('unsturctured doc 1', unStructuredDoc )
+  console.log('unstructured doc', unStructuredDoc.subjects)
+  const structured: IAssessmentDoc['subjects'] = unStructuredDoc.subjects.map(subject => {
+    let AssessmentTypes = subject.assessments.reduce((prev, item) => {
+      if (prev.includes(item.type)) return prev
+      prev.push(item.type)
+      return prev
+    }, [] as string[])
+    return {
+      name: subject.name,
+      assessments: AssessmentTypes.map(AssessmentType => {
+        return {
+          name: AssessmentType,
+          items: subject.assessments.filter(item => item.type == AssessmentType)
+        }
+      })
+    }
+  })
+  console.log('restructuring data: ', structured)
+}

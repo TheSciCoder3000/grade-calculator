@@ -1,18 +1,20 @@
 import React from 'react'
 
-
+// Table row object type
 export type AssessmentType = {
     [key: string]: string | number;
     name: string;
     grade: number;
 }
+// Table component prop type
 interface ITableProps {
     docs: AssessmentType[]
 }
+
 const Table: React.FC<ITableProps> = ({ docs }) => {
-    const mapRemainingFields = (doc: AssessmentType) => {
-        return Object.keys(doc)
-    }
+    // internal function to map the keys of the object
+    const mapRemainingFields = (doc: AssessmentType) => Object.keys(doc)
+    
     return (
         <table>
             <thead>

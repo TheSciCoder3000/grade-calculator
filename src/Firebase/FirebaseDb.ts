@@ -1,27 +1,23 @@
 import { getFirestore, doc, setDoc, getDoc, onSnapshot, Unsubscribe, query, collection, where } from 'firebase/firestore'
 import { FirebaseApp } from 'firebase/app'
+import React from 'react'
 
-interface ISubject {
-    name: string
-    score: number
-    totalScore: number
-    percent: number
-}
-interface IGradingSys {
-    name: string
-    category: {
-        name: string
-        percent: number
-        variation: {
-            name: string
-            percent: number
-        }[]
+type $fixMe = any
+type ReactSetState = React.Dispatch<React.SetStateAction<$fixMe>>
+export interface ISubject {
+    name: string // coourse name
+    assessments: {
+        name: string // Assessment name (ex. Enabling Assessment)
+        sem: string
+        term: string
+        grade: number | null
+        type: string
+        [x: string]: string | number | null
     }[]
 }
-interface IUserDoc {
+export interface IUserDoc {
     userUid: string
     subjects: ISubject[]
-    gradingSys: IGradingSys[]
 }
 
 export type DbUnsubscribe = Unsubscribe
@@ -36,8 +32,7 @@ export function initializeFirestore(app: FirebaseApp) {
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
-            subjects: [],
-            gradingSys: []
+            subjects: []
         }
 
         return setDoc(dbDocRef(userUid), docData)
@@ -56,14 +51,16 @@ export function initializeFirestore(app: FirebaseApp) {
     // subscribe to changes in document
     // TODO: Fix setDbData data type
     const onDbChanges = (userUid: string, setDbData: any) => {
-        console.log('running listener')
-        onSnapshot(query(collection(db, 'users'), where('userUid', '==', userUid)), (snapshot) => {
-            setDbData(snapshot)
-            console.log('db change detected ver 1')
-            console.log('changes: ', snapshot.docChanges())
-        })
+        // console.log('running listener')
+        // onSnapshot(query(collection(db, `/users/${userUid}/subjects/T-CPET111/assessments`), where('sem', '==', '1')), (snapshot) => {
+        //     // setDbData(snapshot)
+        //     console.log('db change detected ver 1')
+        //     console.log('changes: ', snapshot.forEach(doc => console.log('doc', doc.data())))
+        //     console.log('snapshot', snapshot.docs)
+        // })
         return onSnapshot(dbDocRef(userUid), (snapshot) => {
-            setDbData(snapshot)
+            const docData = snapshot.data() as IUserDoc
+            setDbData(docData)
             console.log('db change detected')
             console.log('new data: ', snapshot.data())
         })
