@@ -7,6 +7,7 @@ import { User } from 'firebase/auth'
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { initializeFirestore, IUserDoc } from "./FirebaseDb";
 import { unstable_batchedUpdates } from "react-dom";
+import { stringify } from "querystring";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -125,59 +126,56 @@ export const useFirebaseAuth = () => useFirebase().Auth
 
 
 
-interface IAssessmentSubjects {
-  name: string,
-  assessments: {
-    name: string
-    sem: string
-    items: {
-      name: string
-      grade: number
-      term: string
-      [x: string]: string | number
-    }[]
-  }[]
-}
-interface IAssessmentSemesteral {
-  
-}
-
 
 export const useFirestore = () => useFirebase().Firestore
 
-interface IAssessmentDoc {
-  subjects: {
+export interface IAssessmetItem {
+  name: string
+  items: {
     name: string
-    assessments: {
-      name: string
-      items: {
-        name: string
-        grade: number | null
-        [x: string]: number | string | null
-      }[]
-    }[]
+    grade: number | null
+    type: string
+    term: string          // key that's going to be filtered
+    [x: string]: number | string | null
   }[]
 }
-export const useAssessmentDb = () => {
+interface IAssessmentDoc {
+  sems: string[]
+  terms: string[]
+  subjects: {
+    name: string
+    sem: string         // key that's going to be filtered 
+    assessments: IAssessmetItem[]
+  }[]
+}
+export const useAssessmentDb = (): IAssessmentDoc => {
   const unStructuredDoc = useFirebase().Firestore.Firestore
-  if (!unStructuredDoc.subjects) return
-  console.log('unsturctured doc 1', unStructuredDoc )
-  console.log('unstructured doc', unStructuredDoc.subjects)
-  const structured: IAssessmentDoc['subjects'] = unStructuredDoc.subjects.map(subject => {
-    let AssessmentTypes = subject.assessments.reduce((prev, item) => {
-      if (prev.includes(item.type)) return prev
-      prev.push(item.type)
-      return prev
-    }, [] as string[])
-    return {
-      name: subject.name,
-      assessments: AssessmentTypes.map(AssessmentType => {
-        return {
-          name: AssessmentType,
-          items: subject.assessments.filter(item => item.type == AssessmentType)
-        }
-      })
-    }
-  })
-  console.log('restructuring data: ', structured)
+  // return an empty array if the firestore context is null or undefined
+  if (!unStructuredDoc) return {} as IAssessmentDoc
+
+  // initialize an array of sems
+  let sems = unStructuredDoc.sems
+
+  // initialize an array of terms
+  let terms = unStructuredDoc.terms
+
+  return {
+    sems,
+    terms,
+    subjects: unStructuredDoc.subjects?.map(subject => {
+      return {
+        name: subject.name,
+        sem: subject.sem,
+        assessments: terms.map(termName => {
+          return {
+            name: termName,
+            items: subject.assessments.filter(assessment => assessment.term == termName).map(assessment => {
+              let { type, ...copy } = assessment
+              return assessment
+            })
+          }
+        })
+      }
+    })
+  }
 }
