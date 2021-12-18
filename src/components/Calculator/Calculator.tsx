@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import Assessment from './Tabs/Assessment'
 import GPA from './Tabs/GPA'
