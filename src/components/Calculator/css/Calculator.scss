@@ -6,4 +6,81 @@
             padding: 10px 20px;
         }
     }
+    .assessment-calculator {
+        padding: 10px 20px;
+
+        .sem-selection {
+            display: inline-flex;
+            border: 1px solid black;
+            border-radius: 20px;
+            
+            .sem-select {
+                padding: 7px 15px;
+                border-radius: 20px;
+                cursor: pointer;
+
+                &.active-select {
+                    cursor: default;
+                    border-radius: 20px;
+                    background-color: green;
+                    color: white;
+                }
+            }
+        }
+        .subject-details {
+            margin-left: 20px;
+
+            .term-selection {
+                border-radius: 20px;
+                border: 1px solid black;
+                display: inline-flex;
+                font-size: 0.85em;
+
+                .term-select {
+                    padding: 4px 10px;
+                    cursor: pointer;
+
+                    &.active-select {
+                        cursor: default;
+                        border-radius: 20px;
+                        background-color: green;
+                        color: white;
+                    }
+                }
+            }
+        }
+        .assessment-tables {
+            .table-data {
+                .table-title {
+                    margin: 10px 0;
+                    font-weight: normal;
+                    font-size: 1.5em;
+                }
+                table {
+                    border-collapse: collapse;
+                    width: 70%;
+                    max-width: 1080px;
+                    margin-bottom: 30px;
+
+                    thead {
+                        background-color: green;
+                        color: white;
+
+                        th {
+                            text-align: left;
+                            padding: 7px 0;
+                        }
+                    }
+                    tbody {
+                        border: 1px solid #cccccc;
+
+                        td {
+                            padding: 7px 0;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
 }
