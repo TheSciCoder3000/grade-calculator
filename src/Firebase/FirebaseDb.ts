@@ -6,9 +6,9 @@ type $fixMe = any
 type ReactSetState = React.Dispatch<React.SetStateAction<$fixMe>>
 export interface ISubject {
     name: string // coourse name
+    sem: string
     assessments: {
         name: string // Assessment name (ex. Enabling Assessment)
-        sem: string
         term: string
         grade: number | null
         type: string
@@ -18,6 +18,8 @@ export interface ISubject {
 export interface IUserDoc {
     userUid: string
     subjects: ISubject[]
+    sems: string[]
+    terms: string[]
 }
 
 export type DbUnsubscribe = Unsubscribe
@@ -32,7 +34,9 @@ export function initializeFirestore(app: FirebaseApp) {
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
-            subjects: []
+            subjects: [],
+            sems: [] as string[],
+            terms: [] as string[]
         }
 
         return setDoc(dbDocRef(userUid), docData)
