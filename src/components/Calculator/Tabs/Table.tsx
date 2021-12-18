@@ -2,9 +2,9 @@ import React from 'react'
 
 // Table row object type
 export type AssessmentType = {
-    [key: string]: string | number;
+    [key: string]: string | number | null;
     name: string;
-    grade: number;
+    grade: number | null;
 }
 // Table component prop type
 interface ITableProps {
@@ -13,7 +13,10 @@ interface ITableProps {
 
 const Table: React.FC<ITableProps> = ({ docs }) => {
     // internal function to map the keys of the object
-    const mapRemainingFields = (doc: AssessmentType) => Object.keys(doc)
+    const mapRemainingFields = (doc: AssessmentType) => {
+        console.log('doc', doc)
+        return doc ? Object.keys(doc) : [] as string[]
+    }
     
     return (
         <table>
@@ -33,9 +36,9 @@ const Table: React.FC<ITableProps> = ({ docs }) => {
                     <tr key={indx} className="table-data">
                         <td className="checkbox-cont"><input type="checkbox" className="checkbox" /></td>
                         <td className="assessment-name">{doc.name}</td>
-                        {mapRemainingFields(doc).filter(field => !['name', 'grade'].includes(field)).map((field: string) => 
+                        {doc ? mapRemainingFields(doc).filter(field => !['name', 'grade'].includes(field)).map((field: string) => 
                             <td key={field} className="assessment-custom">{doc[field]}</td>
-                        )}
+                        ) : undefined}
                         <td className="assessment-grade">{doc.grade}</td>
                     </tr>
                 )}
