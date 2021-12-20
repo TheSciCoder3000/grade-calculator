@@ -27,6 +27,55 @@
                 }
             }
         }
+        .subject-dropdown {
+            margin: 20px 0;
+            .dropdown-selected {
+                display: inline-flex;
+                align-items: center;
+                height: 32px;
+                border: 1px solid gray;
+
+                .selected-title {
+                    padding: 5px 10px;
+                }
+                .dropdown-toggle-btn {
+                    width: 25px;
+                    height: 100%;
+                    border: none;
+                    background-color: white;
+
+                    &:hover {
+                        background-color: #f5f5f5;
+                        cursor: pointer;
+                    }
+                }
+                .add-selection-btn {
+                    border: none;
+                    background-color: white;
+                    height: 100%;
+                    width: 25px;
+
+                    &:hover {
+                        background-color: #f5f5f5;
+                        cursor: pointer;
+                    }
+                }
+            }
+            .dropdown-menu {
+                position: absolute;
+                background-color: white;
+                border: 1px solid #dddddd;
+
+                .dropdown-menu-item {
+                    padding: 5px 10px;
+
+                    &:hover {
+                        background-color: #f9f9f9;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
         .subject-details {
             margin-left: 20px;
 
