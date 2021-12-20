@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { FirebaseType, useFirebase } from '@useFirebase';
+import { IFirebaseContext } from '@useFirebase';
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface SignUpProps {
-    onSignUp: FirebaseType['Auth']['AuthFunctions']['AuthSignUp']
+    onSignUp: IFirebaseContext['Auth']['AuthFunctions']['AuthSignUp']
 }
 
 

@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { FirebaseType, useFirebase } from '@useFirebase'
+import { IFirebaseContext } from '@useFirebase'
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface LoginProps {
-    onLogIn: FirebaseType['Auth']['AuthFunctions']['AuthLogIn']
+    onLogIn: IFirebaseContext['Auth']['AuthFunctions']['AuthLogIn']
 }
 const Login: React.FC<LoginProps> = ({ onLogIn }) => {
     const history = useHistory()

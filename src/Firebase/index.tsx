@@ -32,7 +32,14 @@ const FirebaseAuth = InitializeAuthentication(app, FirebaseDb.createUserDb)
 
 
 // ===================================== Firebase Context Values =====================================
-// Auth Values
+/**
+ * creates a dictionary of the user's authentication with auth-related functions
+ * Functions include:
+ * - signing up
+ * - signing out
+ * - loging in
+ * - listening to authentication changes
+ */
 const useAuthContext = () => {
   // auth module states
   const [AuthStatus, setAuthStatus] = useState<User | null>(null)
@@ -52,7 +59,13 @@ const useAuthContext = () => {
   }
 }
 
-// Firestore Values
+/**
+ * creates a dictionary of the data from the database and database-related functions such as:
+ * - Adding documents
+ * - removing documents
+ * - updating documents
+ * - listening to changes
+ */
 const useFirestoreContext = () => {
   // Firestore module state
   const [FirestoreDb, setFirestoreDb] = useState<IUserDoc>({} as IUserDoc)
@@ -79,15 +92,19 @@ const useFirestoreContext = () => {
 
 // ===================================== Firebase Context Creation =====================================
 type FireContextReturnType = ReturnType<typeof useFirestoreContext>
-type RawFireContextType = FireContextReturnType[1]
-type FireFunc = Extract<RawFireContextType, Function>
-type FireObj = Exclude<RawFireContextType, Function>
+type FireContextItemArrayType = FireContextReturnType[1]
+type FireFunc = Extract<FireContextItemArrayType, Function>
+type FireObj = Exclude<FireContextItemArrayType, Function>
 type FirestoreContextType = [FireObj, FireFunc]
 
-interface IFirebaseContext {
+export interface IFirebaseContext {
   Auth: ReturnType<typeof useAuthContext>
   Firestore: FirestoreContextType[0]
 }
+
+/**
+ * firebase context for providing states across nested components
+ */
 const FirebaseContext = createContext<IFirebaseContext>({
   Auth: {} as ReturnType<typeof useAuthContext>,
   Firestore: {} as FirestoreContextType[0]
@@ -97,7 +114,10 @@ const FirebaseContext = createContext<IFirebaseContext>({
 interface IFirebaseContextProvider {
   children: JSX.Element
 }
-// Firebase Context Provider
+
+/**
+ * Firebase Context provideer component
+ */
 export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ children }) => {
   const FirebaseAuth = useAuthContext()
   const [Firestore, updateFirestore] = useFirestoreContext() as FirestoreContextType
@@ -115,20 +135,38 @@ export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ ch
   )
 }
 
-export type FirebaseType = ReturnType<typeof useFirebase>
-
 
 // ============================ Firebase Hooks ============================
 
-export const useFirebase = () => useContext(FirebaseContext)
+const useFirebase = () => useContext(FirebaseContext)
 
+/**
+ * Firebase auth hook for accessing the data stored in the FirebaseContext Provider
+ * @returns Auth object containing the user credentials and auth-related functions
+ */
 export const useFirebaseAuth = () => useFirebase().Auth
 
-
-
-
+/**
+ * Firebase firestore hook for accessing the data stored in the FirebaseContext Provider
+ * @returns Firestore object containing the database data and database-related functions
+ */
 export const useFirestore = () => useFirebase().Firestore
 
+/**
+ * interface of the object returned from the useAssessmentDb hook
+ */
+interface IAssessmentDoc {
+  sems: string[]
+  terms: string[]
+  subjects: {
+    name: string
+    sem: string         // key that's going to be filtered 
+    assessments: IAssessmetItem[]
+  }[]
+}
+/**
+ * an assessment item type interface of the type/category of the assessment and the items under it
+ */
 export interface IAssessmetItem {
   name: string
   items: {
@@ -139,15 +177,11 @@ export interface IAssessmetItem {
     [x: string]: number | string | null
   }[]
 }
-interface IAssessmentDoc {
-  sems: string[]
-  terms: string[]
-  subjects: {
-    name: string
-    sem: string         // key that's going to be filtered 
-    assessments: IAssessmetItem[]
-  }[]
-}
+
+/**
+ * Assessment db hook used to access and restructure the data from the firestore into a component usable object
+ * @returns object that is compatible to be used by the assessment component
+ */
 export const useAssessmentDb = (): IAssessmentDoc => {
   const unStructuredDoc = useFirebase().Firestore.Firestore
   // return an empty array if the firestore context is null or undefined
