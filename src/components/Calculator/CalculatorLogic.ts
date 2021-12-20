@@ -1,7 +1,7 @@
 // import ls from 'local-storage'
 
-import { IAssessmetItem, useFirebaseAuth, useFirestore } from "@useFirebase";
-import { useState } from "react";
+import { IAssessmetItem } from "@useFirebase";
+import { useEffect, useState } from "react";
 
 export function useCalculatorDb() {
 
@@ -51,4 +51,27 @@ export const mapAssessmentsByType = (doc: IAssessmetItem[] | null, term: string,
 
     // map the assessments through the render function if there are subjects filtered
     if (AssessmentByType) return AssessmentByType.map(renderFunc)
+}
+
+/**
+ * toggler hook that returns a stateful boolean value and a function that toggles it to true. It automatically handles the 2nd click to toggle the state to false
+ * @returns stateful boolean value and a function that toggles the state to true
+ */
+export const useSubjToggler = () => {
+    const [toggleSubjDropdown, setToggleSubjDropdown] = useState(false)
+    const toggleDropdown = () => {
+        setToggleSubjDropdown(true)
+    }
+
+    useEffect(() => {
+        if (!toggleSubjDropdown) return
+        const closeDropdown = () => setToggleSubjDropdown(false)
+        window.addEventListener('click', closeDropdown)
+        
+        return () => window.removeEventListener('click', closeDropdown)
+
+    }, [toggleSubjDropdown])
+
+    return [toggleSubjDropdown, toggleDropdown] as [toggleSubjectDropdown: boolean, toggleDropdown: () => void]
+
 }

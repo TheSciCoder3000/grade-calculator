@@ -31,19 +31,29 @@ const Table: React.FC<ITableProps> = ({ docs }) => {
             </thead>
 
             <tbody>
-                {docs.map((doc, indx) => 
-                    <tr key={indx} className="table-data">
-                        <td className="checkbox-cont"><input type="checkbox" className="checkbox" /></td>
-                        <td className="assessment-name">{doc.name}</td>
-                        {doc ? mapRemainingFields(doc).filter(field => !['name', 'grade'].includes(field)).map((field: string) => 
-                            <td key={field} className="assessment-custom">{doc[field]}</td>
-                        ) : undefined}
-                        <td className="assessment-grade">{doc.grade}</td>
-                    </tr>
-                )}
+                {docs.map((doc, indx) => <TableDataRow key={indx} doc={doc} />)}
             </tbody>
             
         </table>
+    )
+}
+
+type IDataRow = { doc: AssessmentType }
+const TableDataRow: React.FC<IDataRow> = ({ doc }) => {
+    console.log(doc)
+    const mapRemainingFields = (doc: AssessmentType) => {
+        return doc ? Object.keys(doc) : [] as string[]
+    }
+
+    return (
+        <tr className="table-data">
+            <td className="checkbox-cont"><input type="checkbox" className="checkbox" /></td>
+            <td className="assessment-name">{doc.name}</td>
+            {doc ? mapRemainingFields(doc).filter(field => !['name', 'grade'].includes(field)).map((field: string) => 
+                <td key={field} className="assessment-custom">{doc[field]}</td>
+            ) : undefined}
+            <td className="assessment-grade">{doc.grade}</td>
+        </tr>
     )
 }
 

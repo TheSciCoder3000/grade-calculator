@@ -120,13 +120,13 @@ export const fakeDbData: IAssessmentDoc = {
                         {
                             name: 'Real life project',
                             grade: 3.0,
-                            type: 'class participation',
+                            type: 'Class participation',
                             term: 'Midterm'
                         },
                         {
                             name: 'Sample Exercises',
                             grade: 3.0,
-                            type: 'class participation',
+                            type: 'Class participation',
                             term: 'Midterm'
                         },
                     ]
@@ -135,25 +135,25 @@ export const fakeDbData: IAssessmentDoc = {
                     name: 'Final',
                     items: [
                         {
-                            name: 'selection',
+                            name: 'quiz game',
                             grade: 2.75,
                             type: 'Class Participation',
                             term: 'Midterm'
                         },
                         {
-                            name: 'selection',
+                            name: 'another research paper',
                             grade: 2.75,
                             type: 'Enabling Assessment',
                             term: 'Midterm'
                         },
                         {
-                            name: 'selection',
+                            name: 'teams activity',
                             grade: 2.75,
                             type: 'Enabling Assessment',
                             term: 'Midterm'
                         },
                         {
-                            name: 'selection',
+                            name: 'exam',
                             grade: 2.75,
                             type: 'Summative Assessment',
                             term: 'Midterm'
