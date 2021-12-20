@@ -1,6 +1,5 @@
-import { getFirestore, doc, setDoc, getDoc, onSnapshot, Unsubscribe, query, collection, where } from 'firebase/firestore'
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { FirebaseApp } from 'firebase/app'
-import React from 'react'
 
 
 /**

@@ -14,7 +14,6 @@ interface ITableProps {
 const Table: React.FC<ITableProps> = ({ docs }) => {
     // internal function to map the keys of the object
     const mapRemainingFields = (doc: AssessmentType) => {
-        console.log('doc', doc)
         return doc ? Object.keys(doc) : [] as string[]
     }
     

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 import { initializeApp } from "firebase/app";
 import { User } from 'firebase/auth'
@@ -6,8 +6,6 @@ import { User } from 'firebase/auth'
 
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { initializeFirestore, IUserDoc } from "./FirebaseDb";
-import { unstable_batchedUpdates } from "react-dom";
-import { stringify } from "querystring";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -71,9 +69,9 @@ const useFirestoreContext = () => {
   const [FirestoreDb, setFirestoreDb] = useState<IUserDoc>({} as IUserDoc)
   
 
-  const updateFirestoreDb = (userUid: string) => {
+  const updateFirestoreDb = useCallback((userUid: string) => {
     return FirebaseDb.onDbChanges(userUid, setFirestoreDb)
-  }
+  }, [])
 
   return [
     {
@@ -123,8 +121,8 @@ export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ ch
   const [Firestore, updateFirestore] = useFirestoreContext() as FirestoreContextType
 
   useEffect(() => {
-    if (FirebaseAuth.AuthStatus && typeof updateFirestore == 'function') return updateFirestore(FirebaseAuth.AuthStatus.uid)
-  }, [FirebaseAuth.AuthStatus])
+    if (FirebaseAuth.AuthStatus && typeof updateFirestore === 'function') return updateFirestore(FirebaseAuth.AuthStatus.uid)
+  }, [FirebaseAuth.AuthStatus, updateFirestore])
   return (
     <FirebaseContext.Provider value={{
       Auth: FirebaseAuth,
@@ -155,7 +153,7 @@ export const useFirestore = () => useFirebase().Firestore
 /**
  * interface of the object returned from the useAssessmentDb hook
  */
-interface IAssessmentDoc {
+export interface IAssessmentDoc {
   sems: string[]
   terms: string[]
   subjects: {
@@ -166,6 +164,10 @@ interface IAssessmentDoc {
 }
 /**
  * an assessment item type interface of the type/category of the assessment and the items under it
+ * - `name:` term name, must be found inside the term array
+ * - `items:` array of objects containing all the assessments that are under the term category/filter
+ * - - `name:` name of the assessment
+ * - - `grade:` score or grade received for the assessment
  */
 export interface IAssessmetItem {
   name: string
@@ -203,8 +205,8 @@ export const useAssessmentDb = (): IAssessmentDoc => {
         assessments: terms.map(termName => {
           return {
             name: termName,
-            items: subject.assessments.filter(assessment => assessment.term == termName).map(assessment => {
-              let { type, ...copy } = assessment
+            items: subject.assessments.filter(assessment => assessment.term === termName).map(assessment => {
+              // let { type, ...copy } = assessment
               return assessment
             })
           }
