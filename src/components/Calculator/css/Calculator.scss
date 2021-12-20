@@ -35,18 +35,23 @@
                 height: 32px;
                 border: 1px solid gray;
 
-                .selected-title {
-                    padding: 5px 10px;
-                }
-                .dropdown-toggle-btn {
-                    width: 25px;
+                .selected-cont {
+                    display: flex;
+                    align-items: center;
                     height: 100%;
-                    border: none;
-                    background-color: white;
-
-                    &:hover {
-                        background-color: #f5f5f5;
-                        cursor: pointer;
+                    .selected-title {
+                        padding: 5px 10px;
+                    }
+                    .dropdown-toggle-btn {
+                        width: 25px;
+                        height: 100%;
+                        border: none;
+                        background-color: white;
+    
+                        &:hover {
+                            background-color: #f5f5f5;
+                            cursor: pointer;
+                        }
                     }
                 }
                 .add-selection-btn {
