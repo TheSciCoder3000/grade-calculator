@@ -131,6 +131,19 @@
                         td {
                             padding: 7px 0;
                         }
+                        tr {
+                            position: relative;
+
+                            .save-row {
+                                display: flex;
+                                align-items: center;
+                                position: absolute;
+                                padding: 2px 10px;
+                                top: 0;
+                                bottom: 0;
+                                margin-left: 10px;
+                            }
+                        }
                     }
 
                 }

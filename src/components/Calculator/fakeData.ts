@@ -103,7 +103,8 @@ export const fakeDbData: IAssessmentDoc = {
                             name: 'research paper',
                             grade: 2.75,
                             type: 'Enabling Assessment',
-                            term: 'Midterm'
+                            term: 'Midterm',
+                            mode: 'dropbox'
                         },
                         {
                             name: 'while loop',

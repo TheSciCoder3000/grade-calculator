@@ -1,18 +1,40 @@
 // import { IAssessmetItem, useAssessmentDb } from '@useFirebase'
+import { IAssessmentDoc } from '@useFirebase'
 import { useState } from 'react'
 import { mapAssessmentsByType, useSubjToggler } from '../CalculatorLogic'
-import { fakeDbData } from './fakeData'
 import Table from './Table'
 
 
-const Assessment = () => {
-    const db = fakeDbData // useAssessmentDb()
+interface IAssessment {
+    db: IAssessmentDoc
+}
+const Assessment: React.FC<IAssessment> = ({ db }) => {
+    // TODO: replace indx method to a more secured reference such as the exact name or value
     const [subjectIndx, setSubjectIndx] = useState(0)
+
+    // initialize custom toggler hook states and function
     const [toggleSubjDropdown, toggleDropdown] = useSubjToggler()
+
     const [termIndx, setTermIndx] = useState(0)
     const [semIndx, setSemIndx] = useState(0)
     const subjects = db.subjects ? db.subjects.filter(subject => subject.sem === db.sems[semIndx]) : null
-    console.log('subjects', db.subjects[subjectIndx])
+
+    // function that updates the database by subject, and task name
+
+    interface IRefObject {
+        subjectName: string
+        term: string
+        assName: string
+    }
+    const updateDb = (RefObj: IRefObject, fieldName: string, newValue: string ) => {
+        let { subjectName, term, assName } = RefObj
+        let dbRef = db.subjects
+            .find(subject => subject.name === subjectName)?.assessments
+            .find(ass => ass.name === term)?.items
+            .find(item => item.name === assName)
+
+        if (dbRef) dbRef[fieldName] = newValue
+    }
 
 
 
@@ -34,7 +56,7 @@ const Assessment = () => {
                 {toggleSubjDropdown &&
                     <div className="dropdown-menu">
                         {subjects?.map((subject, indx) => indx !== subjectIndx &&
-                            <div className="dropdown-menu-item" onClick={() => setSubjectIndx(indx)}>{subject.name}</div>    
+                            <div key={indx} className="dropdown-menu-item" onClick={() => setSubjectIndx(indx)}>{subject.name}</div>    
                         )}
                     </div>
                 }
@@ -49,7 +71,7 @@ const Assessment = () => {
                     {subjects && mapAssessmentsByType(subjects[subjectIndx]?.assessments, db.terms[termIndx], assDoc => 
                         <div className="table-data">
                             <h3 className="table-title">{assDoc.name}</h3>
-                            <Table docs={assDoc.items} />
+                            <Table docs={assDoc.items} updateDb={updateDb} />
                         </div>
                     )}
                 </div>

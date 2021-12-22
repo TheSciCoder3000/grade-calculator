@@ -66,7 +66,8 @@ const useAuthContext = () => {
  */
 const useFirestoreContext = () => {
   // Firestore module state
-  const [FirestoreDb, setFirestoreDb] = useState<IUserDoc>({} as IUserDoc)
+  const [FirestoreDb, setFirestoreDb] = useState<IUserDoc | undefined>({} as IUserDoc)
+  console.log('testing usefirestore', FirestoreDb)
   
 
   const updateFirestoreDb = useCallback((userUid: string) => {
@@ -121,7 +122,7 @@ export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ ch
   const [Firestore, updateFirestore] = useFirestoreContext() as FirestoreContextType
 
   useEffect(() => {
-    if (FirebaseAuth.AuthStatus && typeof updateFirestore === 'function') return updateFirestore(FirebaseAuth.AuthStatus.uid)
+    if (FirebaseAuth.AuthStatus) return updateFirestore(FirebaseAuth.AuthStatus.uid)
   }, [FirebaseAuth.AuthStatus, updateFirestore])
   return (
     <FirebaseContext.Provider value={{
@@ -186,6 +187,7 @@ export interface IAssessmetItem {
  */
 export const useAssessmentDb = (): IAssessmentDoc => {
   const unStructuredDoc = useFirebase().Firestore.Firestore
+  
   // return an empty array if the firestore context is null or undefined
   if (!unStructuredDoc) return {} as IAssessmentDoc
 
