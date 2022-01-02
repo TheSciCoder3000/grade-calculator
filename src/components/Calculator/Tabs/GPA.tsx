@@ -1,8 +1,8 @@
 import React from 'react'
 
-function GPA() {
+const GPA = () => {
     return (
-        <div>
+        <div className="gpa-calculator">
             
         </div>
     )

@@ -1,22 +1,88 @@
-// import ls from 'local-storage'
-
 import { IAssessmentDoc, IAssessmetItem, useFirebaseAuth } from "@useFirebase";
 import { useEffect, useState } from "react";
 import { AssessmentType } from "./Tabs/Table";
+
+var store = require('store')
+
+export interface IDbFunc {
+    addSem: ((semName: string) => void) | null
+    removeSem: ((semName: string) => void) | null
+    addTerm: ((termName: string) => void) | null
+    removeTerm: ((termName: string) => void) | null
+    addSubject: ((subjectName: string, semName: string) => void) | null
+    removeSubject: ((subject: string) => void) | null
+    addAssessment: ((subjectName: string, termName: string, assessmentName: string, grade?: number) => void) | null
+    removeAssessment: ((subjectName: string, assessmentName: string) => void) | null
+}
 
 /**
  * returns a database object and a set of CRUD functions to manipulate the database.
  * It automatically decides wether to use the firestore or the user's local storage.
  */
-export const useCalculatorDb = (): [IAssessmentDoc | null] => {
-    const [db, setDb] = useState<IAssessmentDoc | null>(null)
+export const useCalculatorDb = (): [IAssessmentDoc, IDbFunc] => {
+    const [db, setDb] = useState<IAssessmentDoc>({} as IAssessmentDoc)
+
+    const [dbFunctions, setDbFunctions] = useState<IDbFunc>({
+        addSem: null,
+        removeSem: null,
+        addTerm: null,
+        removeTerm: null,
+        addSubject: null,
+        removeSubject: null,
+        addAssessment: null,
+        removeAssessment: null
+    })
     const authStatus = useFirebaseAuth()
 
     useEffect(() => {
+        // if user is not authenticated and the database is empty
+        if (Object.keys(db).length === 0 && !authStatus.AuthStatus) {
+            // check if sems and terms are initialized(new anonymous user)
+            !store.get('sems') && store.set('sems', ['1st Semester'])
+            !store.get('terms') && store.set('terms', ['Midterm'])
 
-    }, [])
+            // update the db state
+            setDb({
+                sems: store.get('sems'),
+                terms: store.get('terms'),
+                subjects: store.get('subjects')
+            })
 
-    return [db]
+            const addSubject = (subjectName: string, semName: string) => {
+                !store.get('subjects') && store.set('subjects', [])
+                let subjects = store.get('subjects')
+
+                subjects.push({
+                    name: subjectName,
+                    sem: semName,
+                    assessments: []
+                })
+
+                setDb(dbState => {
+                    let dbCopy = {...dbState}
+                    dbCopy.subjects.push({
+                        name: subjectName,
+                        sem: semName,
+                        assessments: []
+                    })
+                    return dbCopy
+                })
+            }
+
+            setDbFunctions({
+                addSem: (semName: string) => store.set('sems', store.get('sems').push(semName)),
+                removeSem: (semName: string) => store.set('sems', store.get('sems').filter((sem: string) => sem !== semName)),
+                addTerm: (termName: string) => store.set('terms', store.get('terms').push(termName)),
+                removeTerm: (termName: string) => store.set('terms', store.get('terms').filter((term: string) => term !== termName)),
+                addSubject: addSubject,
+                removeSubject: null,
+                addAssessment: null,
+                removeAssessment: null
+            })
+        }
+    }, [authStatus])
+
+    return [db, dbFunctions]
 }
 
 
@@ -40,7 +106,7 @@ interface IAssessmentByType {
  * @param renderFunc jsx components that maps the restructured doc into a jsx element
  * @returns a jsx element with the mapped values
  */
-export const mapAssessmentsByType = (doc: IAssessmetItem[] | null, term: string, renderFunc: (doc: IAssessmentByType) => JSX.Element) => {
+export const mapAssessmentsByType = (doc: IAssessmetItem[] | null, term: string, renderFunc: (doc: IAssessmentByType, indx?: number) => JSX.Element) => {
     // if doc is null (there is no subject at indx) then return empty array
     if (!doc) return []
 

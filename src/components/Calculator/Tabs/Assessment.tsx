@@ -1,14 +1,15 @@
 // import { IAssessmetItem, useAssessmentDb } from '@useFirebase'
 import { IAssessmentDoc } from '@useFirebase'
 import { useState } from 'react'
-import { mapAssessmentsByType, useSubjToggler } from '../CalculatorLogic'
+import { IDbFunc, mapAssessmentsByType, useSubjToggler } from '../CalculatorLogic'
 import Table from './Table'
 
 
 interface IAssessment {
     db: IAssessmentDoc
+    dbFunc: IDbFunc
 }
-const Assessment: React.FC<IAssessment> = ({ db }) => {
+const Assessment: React.FC<IAssessment> = ({ db, dbFunc }) => {
     // TODO: replace indx method to a more secured reference such as the exact name or value
     const [subjectIndx, setSubjectIndx] = useState(0)
 
@@ -42,7 +43,7 @@ const Assessment: React.FC<IAssessment> = ({ db }) => {
         <div className='assessment-calculator'>
             <div className="sem-selection">
                 {db.sems && db.sems.map((sem, indx) => 
-                    <div className={`sem-select ${indx === semIndx && 'active-select'}`} onClick={() => setSemIndx(indx)}>{sem}</div>
+                    <div key={indx} className={`sem-select ${indx === semIndx && 'active-select'}`} onClick={() => setSemIndx(indx)}>{sem}</div>
                 )}
             </div>
             <div className="subject-dropdown">
@@ -64,12 +65,12 @@ const Assessment: React.FC<IAssessment> = ({ db }) => {
             <div className="subject-details">
                 <div className="term-selection">
                     {db.terms && db.terms.map((term, indx) =>
-                        <div className={`term-select ${indx === termIndx && 'active-select'}`} onClick={() => setTermIndx(indx)}>{term}</div>
+                        <div key={indx} className={`term-select ${indx === termIndx && 'active-select'}`} onClick={() => setTermIndx(indx)}>{term}</div>
                     )}
                 </div>
                 <div className="assessment-tables">
-                    {subjects && mapAssessmentsByType(subjects[subjectIndx]?.assessments, db.terms[termIndx], assDoc => 
-                        <div className="table-data">
+                    {subjects && mapAssessmentsByType(subjects[subjectIndx]?.assessments, db.terms[termIndx], (assDoc, indx) => 
+                        <div key={indx} className="table-data">
                             <h3 className="table-title">{assDoc.name}</h3>
                             <Table docs={assDoc.items} updateDb={updateDb} />
                         </div>

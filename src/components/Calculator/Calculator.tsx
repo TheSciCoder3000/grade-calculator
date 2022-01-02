@@ -1,35 +1,24 @@
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
-import Assessment from './Tabs/Assessment'
-import GPA from './Tabs/GPA'
-import Semesteral from './Tabs/Semesteral'
 import './css/Calculator.css'
-import { fakeDbData } from './fakeData'
+import { useCalculatorDb } from './CalculatorLogic'
+import GPA from './Tabs/GPA'
+import SubjectDetail from './Tabs/SubjectDetail'
+import ProtectedRoute from './ProtectedRoute'
 
 function Calculator() {
     const { path } = useRouteMatch()
 
-    const db = fakeDbData
+    const [db, dbFunctions] = useCalculatorDb() //{} as IAssessmentDoc// fakeDbData
 
     return (
         <div className="calculator-app">
-            <div className="calculator-tabs">
-                <div className="tab-item">Assessments</div>
-                <div className="tab-item">Semesteral</div>
-                <div className="tab-item">GPA</div>
-            </div>
             <Switch>
-                <Route exact path="/">
-                    <Redirect to="/assessments"/>
-                </Route>
-                <Route path={`${path}/assessments`}>
-                    <Assessment db={db} />
-                </Route>
-                <Route path="/semesteral">
-                    <Semesteral />
-                </Route>
-                <Route path="/gpa">
+                <Route exact path={`${path}`}>
                     <GPA />
                 </Route>
+                <ProtectedRoute isAuth={true} path={`${path}/:subjectName`}>
+                    <SubjectDetail />
+                </ProtectedRoute>
             </Switch>
         </div>
     )

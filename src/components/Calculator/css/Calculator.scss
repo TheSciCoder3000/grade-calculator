@@ -1,152 +1,176 @@
 .calculator-app {
-    .calculator-tabs {
-        display: flex;
+    // .calculator-tabs {
+    //     display: flex;
 
-        .tab-item {
-            padding: 10px 20px;
-        }
-    }
-    .assessment-calculator {
-        padding: 10px 20px;
+    //     .tab-item {
+    //         padding: 10px 20px;
+    //     }
+    // }
+    // .assessment-calculator {
+    //     padding: 10px 20px;
 
-        .sem-selection {
-            display: inline-flex;
-            border: 1px solid black;
-            border-radius: 20px;
+    //     .sem-selection {
+    //         display: inline-flex;
+    //         border: 1px solid black;
+    //         border-radius: 20px;
             
-            .sem-select {
-                padding: 7px 15px;
-                border-radius: 20px;
-                cursor: pointer;
+    //         .sem-select {
+    //             padding: 7px 15px;
+    //             border-radius: 20px;
+    //             cursor: pointer;
 
-                &.active-select {
-                    cursor: default;
-                    border-radius: 20px;
-                    background-color: green;
-                    color: white;
-                }
+    //             &.active-select {
+    //                 cursor: default;
+    //                 border-radius: 20px;
+    //                 background-color: green;
+    //                 color: white;
+    //             }
+    //         }
+    //     }
+    //     .subject-dropdown {
+    //         margin: 20px 0;
+    //         .dropdown-selected {
+    //             display: inline-flex;
+    //             align-items: center;
+    //             height: 32px;
+    //             border: 1px solid gray;
+
+    //             .selected-cont {
+    //                 display: flex;
+    //                 align-items: center;
+    //                 height: 100%;
+    //                 .selected-title {
+    //                     padding: 5px 10px;
+    //                 }
+    //                 .dropdown-toggle-btn {
+    //                     width: 25px;
+    //                     height: 100%;
+    //                     border: none;
+    //                     background-color: white;
+    
+    //                     &:hover {
+    //                         background-color: #f5f5f5;
+    //                         cursor: pointer;
+    //                     }
+    //                 }
+    //             }
+    //             .add-selection-btn {
+    //                 border: none;
+    //                 background-color: white;
+    //                 height: 100%;
+    //                 width: 25px;
+
+    //                 &:hover {
+    //                     background-color: #f5f5f5;
+    //                     cursor: pointer;
+    //                 }
+    //             }
+    //         }
+    //         .dropdown-menu {
+    //             position: absolute;
+    //             background-color: white;
+    //             border: 1px solid #dddddd;
+
+    //             .dropdown-menu-item {
+    //                 padding: 5px 10px;
+
+    //                 &:hover {
+    //                     background-color: #f9f9f9;
+    //                     cursor: pointer;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     .subject-details {
+    //         margin-left: 20px;
+
+    //         .term-selection {
+    //             border-radius: 20px;
+    //             border: 1px solid black;
+    //             display: inline-flex;
+    //             font-size: 0.85em;
+
+    //             .term-select {
+    //                 padding: 4px 10px;
+    //                 cursor: pointer;
+
+    //                 &.active-select {
+    //                     cursor: default;
+    //                     border-radius: 20px;
+    //                     background-color: green;
+    //                     color: white;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     .assessment-tables {
+    //         .table-data {
+    //             .table-title {
+    //                 margin: 10px 0;
+    //                 font-weight: normal;
+    //                 font-size: 1.5em;
+    //             }
+    //         }
+    //     }
+    // }
+    table {
+        border-collapse: collapse;
+        width: 65%;
+        max-width: 1080px;
+        margin-bottom: 30px;
+
+        thead {
+            background-color: green;
+            color: white;
+
+            th {
+                text-align: left;
+                padding: 7px 0;
             }
         }
-        .subject-dropdown {
-            margin: 20px 0;
-            .dropdown-selected {
-                display: inline-flex;
-                align-items: center;
-                height: 32px;
-                border: 1px solid gray;
+        tbody {
+            border: 1px solid #cccccc;
 
-                .selected-cont {
+            td {
+                padding: 7px 0;
+            }
+            tr {
+                position: relative;
+
+                .save-row {
                     display: flex;
                     align-items: center;
-                    height: 100%;
-                    .selected-title {
-                        padding: 5px 10px;
-                    }
-                    .dropdown-toggle-btn {
-                        width: 25px;
-                        height: 100%;
-                        border: none;
-                        background-color: white;
+                    position: absolute;
+                    padding: 2px 10px;
+                    top: 0;
+                    bottom: 0;
+                    margin-left: 10px;
+                }
+            }
+        }
+
+    }
     
-                        &:hover {
-                            background-color: #f5f5f5;
-                            cursor: pointer;
-                        }
-                    }
-                }
-                .add-selection-btn {
-                    border: none;
-                    background-color: white;
-                    height: 100%;
-                    width: 25px;
-
-                    &:hover {
-                        background-color: #f5f5f5;
-                        cursor: pointer;
-                    }
-                }
-            }
-            .dropdown-menu {
-                position: absolute;
-                background-color: white;
-                border: 1px solid #dddddd;
-
-                .dropdown-menu-item {
-                    padding: 5px 10px;
-
-                    &:hover {
-                        background-color: #f9f9f9;
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-        .subject-details {
-            margin-left: 20px;
-
-            .term-selection {
-                border-radius: 20px;
-                border: 1px solid black;
-                display: inline-flex;
-                font-size: 0.85em;
-
-                .term-select {
-                    padding: 4px 10px;
+    .subject-detail {
+        .crumbs {
+            .crumb {
+                text-decoration: none;
+                color: black;
+                margin-right: 7px;
+                
+                &:hover {
                     cursor: pointer;
-
-                    &.active-select {
-                        cursor: default;
-                        border-radius: 20px;
-                        background-color: green;
-                        color: white;
-                    }
+                    color: #02b419;
+                }
+                &::before {
+                    content: '>';
+                    margin-right: 7px;
+                    color: black;
                 }
             }
-        }
-        .assessment-tables {
-            .table-data {
-                .table-title {
-                    margin: 10px 0;
-                    font-weight: normal;
-                    font-size: 1.5em;
-                }
-                table {
-                    border-collapse: collapse;
-                    width: 65%;
-                    max-width: 1080px;
-                    margin-bottom: 30px;
-
-                    thead {
-                        background-color: green;
-                        color: white;
-
-                        th {
-                            text-align: left;
-                            padding: 7px 0;
-                        }
-                    }
-                    tbody {
-                        border: 1px solid #cccccc;
-
-                        td {
-                            padding: 7px 0;
-                        }
-                        tr {
-                            position: relative;
-
-                            .save-row {
-                                display: flex;
-                                align-items: center;
-                                position: absolute;
-                                padding: 2px 10px;
-                                top: 0;
-                                bottom: 0;
-                                margin-left: 10px;
-                            }
-                        }
-                    }
-
-                }
+            .active {
+                pointer-events: none;
+                color: green;
             }
         }
     }

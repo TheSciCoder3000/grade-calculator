@@ -1,167 +1,33 @@
-.calculator-app .calculator-tabs {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.calculator-app .calculator-tabs .tab-item {
-  padding: 10px 20px;
-}
-
-.calculator-app .assessment-calculator {
-  padding: 10px 20px;
-}
-
-.calculator-app .assessment-calculator .sem-selection {
-  display: -webkit-inline-box;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  border: 1px solid black;
-  border-radius: 20px;
-}
-
-.calculator-app .assessment-calculator .sem-selection .sem-select {
-  padding: 7px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.calculator-app .assessment-calculator .sem-selection .sem-select.active-select {
-  cursor: default;
-  border-radius: 20px;
-  background-color: green;
-  color: white;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown {
-  margin: 20px 0;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected {
-  display: -webkit-inline-box;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  height: 32px;
-  border: 1px solid gray;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .selected-cont {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  height: 100%;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .selected-cont .selected-title {
-  padding: 5px 10px;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .selected-cont .dropdown-toggle-btn {
-  width: 25px;
-  height: 100%;
-  border: none;
-  background-color: white;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .selected-cont .dropdown-toggle-btn:hover {
-  background-color: #f5f5f5;
-  cursor: pointer;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .add-selection-btn {
-  border: none;
-  background-color: white;
-  height: 100%;
-  width: 25px;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-selected .add-selection-btn:hover {
-  background-color: #f5f5f5;
-  cursor: pointer;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-menu {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #dddddd;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-menu .dropdown-menu-item {
-  padding: 5px 10px;
-}
-
-.calculator-app .assessment-calculator .subject-dropdown .dropdown-menu .dropdown-menu-item:hover {
-  background-color: #f9f9f9;
-  cursor: pointer;
-}
-
-.calculator-app .assessment-calculator .subject-details {
-  margin-left: 20px;
-}
-
-.calculator-app .assessment-calculator .subject-details .term-selection {
-  border-radius: 20px;
-  border: 1px solid black;
-  display: -webkit-inline-box;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  font-size: 0.85em;
-}
-
-.calculator-app .assessment-calculator .subject-details .term-selection .term-select {
-  padding: 4px 10px;
-  cursor: pointer;
-}
-
-.calculator-app .assessment-calculator .subject-details .term-selection .term-select.active-select {
-  cursor: default;
-  border-radius: 20px;
-  background-color: green;
-  color: white;
-}
-
-.calculator-app .assessment-calculator .assessment-tables .table-data .table-title {
-  margin: 10px 0;
-  font-weight: normal;
-  font-size: 1.5em;
-}
-
-.calculator-app .assessment-calculator .assessment-tables .table-data table {
+.calculator-app table {
   border-collapse: collapse;
   width: 65%;
   max-width: 1080px;
   margin-bottom: 30px;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table thead {
+.calculator-app table thead {
   background-color: green;
   color: white;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table thead th {
+.calculator-app table thead th {
   text-align: left;
   padding: 7px 0;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table tbody {
+.calculator-app table tbody {
   border: 1px solid #cccccc;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table tbody td {
+.calculator-app table tbody td {
   padding: 7px 0;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table tbody tr {
+.calculator-app table tbody tr {
   position: relative;
 }
 
-.calculator-app .assessment-calculator .assessment-tables .table-data table tbody tr .save-row {
+.calculator-app table tbody tr .save-row {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -173,5 +39,27 @@
   top: 0;
   bottom: 0;
   margin-left: 10px;
+}
+
+.calculator-app .subject-detail .crumbs .crumb {
+  text-decoration: none;
+  color: black;
+  margin-right: 7px;
+}
+
+.calculator-app .subject-detail .crumbs .crumb:hover {
+  cursor: pointer;
+  color: #02b419;
+}
+
+.calculator-app .subject-detail .crumbs .crumb::before {
+  content: '>';
+  margin-right: 7px;
+  color: black;
+}
+
+.calculator-app .subject-detail .crumbs .active {
+  pointer-events: none;
+  color: green;
 }
 /*# sourceMappingURL=Calculator.css.map */
