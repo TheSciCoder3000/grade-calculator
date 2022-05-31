@@ -1,10 +1,11 @@
 import React, { useRef } from 'react'
-import { IFirebaseContext } from '@useFirebase'
+import { User } from 'firebase/auth'
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface LoginProps {
-    onLogIn: IFirebaseContext['Auth']['AuthFunctions']['AuthLogIn']
+    onLogIn: (email: string, password: string) => Promise<User | null>
 }
+
 const Login: React.FC<LoginProps> = ({ onLogIn }) => {
     const history = useHistory()
     // HTML References

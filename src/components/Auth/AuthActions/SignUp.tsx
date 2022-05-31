@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { IFirebaseContext } from '@useFirebase';
+import { User } from 'firebase/auth';
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
 interface SignUpProps {
-    onSignUp: IFirebaseContext['Auth']['AuthFunctions']['AuthSignUp']
+    onSignUp: (email: string, password: string) => Promise<User | null>
 }
 
 
