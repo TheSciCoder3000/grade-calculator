@@ -1,9 +1,9 @@
 import React from 'react'
 import { Route, useRouteMatch } from 'react-router-dom'
 import { IFirebaseContext } from 'Firebase'
-import Login from './AuthActions/Login'
-import LogOut from './AuthActions/LogOut'
-import SignUp from './AuthActions/SignUp'
+import Login from '@Components/Auth/Login'
+import LogOut from '@Components/Auth/LogOut'
+import SignUp from '@Components/Auth/SignUp'
 
 import './css/Auth.css'
 
