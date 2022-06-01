@@ -2,7 +2,8 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "paths": {
-          "@useFirebase": ["./Firebase/index"]
+          "@useFirebase": ["./Firebase/index"],
+          "@Components/*": ["./components/*"]
         },
         "target": "es5",
         "lib": [
