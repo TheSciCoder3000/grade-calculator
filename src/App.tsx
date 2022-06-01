@@ -1,10 +1,15 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
-import './App.css';
-import Auth from './components/Auth/Auth';
-import Calculator from './components/Calculator/Calculator';
-import Header from './components/Header/Header';
 import { useFirebaseAuth } from '@useFirebase';
+import './App.css';
 
+import Auth from './pages/AuthPages';
+import Calculator from './pages/CalculatorPages/CalculatorRoute';
+import Header from './components/Header/Header';
+
+/**
+ * Main App Component
+ * @returns JSX Element
+ */
 function App() {
   const { AuthStatus, AuthFunctions } = useFirebaseAuth()
 
