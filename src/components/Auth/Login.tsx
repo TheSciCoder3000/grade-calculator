@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { User } from 'firebase/auth'
 import { NavLink as Link, useHistory } from 'react-router-dom'
 
@@ -11,17 +11,21 @@ const Login: React.FC<LoginProps> = ({ onLogIn }) => {
     // HTML References
     const email = useRef<HTMLInputElement>(null)
     const password = useRef<HTMLInputElement>(null)
+    const [logging, setLogging] = useState(false)
 
     // on Log In Event
     const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setLogging(true)
         console.log('re-authenticating user')
         if (email.current && password.current && email.current.value !== '' && password.current.value !== '') {
             console.log('authenticating user')
-            onLogIn(email.current.value, password.current.value).then(user => {
-                console.log('adding subscriber', user)
-                history.push('/')
-            })
+            onLogIn(email.current.value, password.current.value)
+                .then(user => {
+                    console.log('adding subscriber', user)
+                    history.push('/')
+                })
+                .catch(() => setLogging(false))
         }
     }
     return (
@@ -32,7 +36,7 @@ const Login: React.FC<LoginProps> = ({ onLogIn }) => {
                 <form onSubmit={onSubmitHandler}>
                     <input ref={email} type="text" id="email-input" className='form-input' placeholder="Email" />
                     <input ref={password} type="password" id="password-input" className="form-input" placeholder='Password' />
-                    <button className="form-submit-btn">Log In</button>
+                    <button disabled={logging} className="form-submit-btn">Log In</button>
                 </form>
             </div>
         </div>
