@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import { initializeApp } from "firebase/app";
 import { User } from 'firebase/auth'
@@ -57,77 +57,31 @@ const useAuthContext = () => {
   }
 }
 
-/**
- * creates a dictionary of the data from the database and database-related functions such as:
- * - Adding documents
- * - removing documents
- * - updating documents
- * - listening to changes
- */
-const useFirestoreContext = () => {
-  // Firestore module state
-  const [FirestoreDb, setFirestoreDb] = useState<IUserDoc | undefined>({} as IUserDoc)
-  console.log('testing usefirestore', FirestoreDb)
-  
-
-  const updateFirestoreDb = useCallback((userUid: string) => {
-    return FirebaseDb.onDbChanges(userUid, setFirestoreDb)
-  }, [])
-
-  return [
-    {
-      Firestore: FirestoreDb,
-      FirestoreFunctions: {
-        AddDocs: null,
-        RemoveDocs: null,
-        UpdateDocs: null,
-        onDocsChange: null
-      }
-    },
-    updateFirestoreDb
-  ] 
-  
-}
 
 // ===================================== Firebase Context Creation =====================================
-type FireContextReturnType = ReturnType<typeof useFirestoreContext>
-type FireContextItemArrayType = FireContextReturnType[1]
-type FireFunc = Extract<FireContextItemArrayType, Function>
-type FireObj = Exclude<FireContextItemArrayType, Function>
-type FirestoreContextType = [FireObj, FireFunc]
-
 export interface IFirebaseContext {
   Auth: ReturnType<typeof useAuthContext>
-  Firestore: FirestoreContextType[0]
+}
+interface IFirebaseContextProvider {
+  children: JSX.Element
 }
 
 /**
  * firebase context for providing states across nested components
  */
 const FirebaseContext = createContext<IFirebaseContext>({
-  Auth: {} as ReturnType<typeof useAuthContext>,
-  Firestore: {} as FirestoreContextType[0]
+  Auth: {} as ReturnType<typeof useAuthContext>
 })
-
-
-interface IFirebaseContextProvider {
-  children: JSX.Element
-}
 
 /**
  * Firebase Context provideer component
  */
 export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ children }) => {
   const FirebaseAuth = useAuthContext()
-  const [Firestore, updateFirestore] = useFirestoreContext() as FirestoreContextType
 
-  useEffect(() => {
-    if (FirebaseAuth.AuthStatus) return updateFirestore(FirebaseAuth.AuthStatus.uid)
-  }, [FirebaseAuth.AuthStatus, updateFirestore])
   return (
     <FirebaseContext.Provider value={{
       Auth: FirebaseAuth,
-      Firestore: Firestore
     }}>
       {children}
     </FirebaseContext.Provider>
@@ -135,7 +89,7 @@ export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ ch
 }
 
 
-// ============================ Firebase Hooks ============================
+// ===================================== Firebase Hooks =====================================
 
 const useFirebase = () => useContext(FirebaseContext)
 
@@ -144,76 +98,3 @@ const useFirebase = () => useContext(FirebaseContext)
  * @returns Auth object containing the user credentials and auth-related functions
  */
 export const useFirebaseAuth = () => useFirebase().Auth
-
-/**
- * Firebase firestore hook for accessing the data stored in the FirebaseContext Provider
- * @returns Firestore object containing the database data and database-related functions
- */
-export const useFirestore = () => useFirebase().Firestore
-
-/**
- * interface of the object returned from the useAssessmentDb hook
- */
-export interface IAssessmentDoc {
-  sems: string[]
-  terms: string[]
-  subjects: {
-    name: string
-    sem: string         // key that's going to be filtered 
-    assessments: IAssessmetItem[]
-  }[]
-}
-/**
- * an assessment item type interface of the type/category of the assessment and the items under it
- * - `name:` term name, must be found inside the term array
- * - `items:` array of objects containing all the assessments that are under the term category/filter
- * - - `name:` name of the assessment
- * - - `grade:` score or grade received for the assessment
- */
-export interface IAssessmetItem {
-  name: string
-  items: {
-    name: string
-    grade: number | null
-    type: string
-    term: string          // key that's going to be filtered
-    [x: string]: number | string | null
-  }[]
-}
-
-/**
- * Assessment db hook used to access and restructure the data from the firestore into a component usable object
- * @returns object that is compatible to be used by the assessment component
- */
-export const useAssessmentDb = (): IAssessmentDoc => {
-  const unStructuredDoc = useFirebase().Firestore.Firestore
-  
-  // return an empty array if the firestore context is null or undefined
-  if (!unStructuredDoc) return {} as IAssessmentDoc
-
-  // initialize an array of sems
-  let sems = unStructuredDoc.sems
-
-  // initialize an array of terms
-  let terms = unStructuredDoc.terms
-
-  return {
-    sems,
-    terms,
-    subjects: unStructuredDoc.subjects?.map(subject => {
-      return {
-        name: subject.name,
-        sem: subject.sem,
-        assessments: terms.map(termName => {
-          return {
-            name: termName,
-            items: subject.assessments.filter(assessment => assessment.term === termName).map(assessment => {
-              // let { type, ...copy } = assessment
-              return assessment
-            })
-          }
-        })
-      }
-    })
-  }
-}

@@ -13,33 +13,51 @@ import { FirebaseApp } from 'firebase/app'
  * interface schema of the data received from the firestore
  */
 export interface IUserDoc {
-    userUid: string
-    subjects: ISubject[]                                                   // collection of user's subjects
-    sems: string[]                                                         // array containing the semesters of the user
-    terms: string[]                                                        // array containing the terms a semester has
+    userUid: string                                                         // User's id
+    // name: string                                                         // user's name
+    years: IUserField[]                                                     // collection of object containing the college year name and id
+    subjects: ISubjects[]                                                   // collection of object contianing the subject name and id
+    sems: IUserField[]                                                      // collection of object containing the sem name and id
+    terms: IUserField[]                                                     // collection of object containing the term name and id
 }
 
 /**
- * interface of the subject array property of the IUserDoc.
- * - `name:` Course Name
- * - `sem:` semester name
- * - `assessments:` array containing all the assessments of the subject
- * - - `name:` assessment name
- * - - `term:` the term of the sem in which the assessment is assigned
- * - - `grade:` the score/grade receivied after completing the assessment
- * - - `type:` the type/category in whcich the assessment falls in
- * - - `[x: string]:` other user-defined props that would be visible in the table
+ * Global user field interface used to define the object's name and id
+ * - `name`: string that will be displayed on the ui
+ * - `id`: used for querying in the database
  */
-export interface ISubject {
-    name: string                                                           // coourse name
-    sem: string                                                            // semester name (should be included inside the sems array)
-    assessments: {
-        name: string                                                       // Assessment name (ex. Enabling Assessment)
-        term: string                                                       // term name (should be included inside the terms array)
-        grade: number | null
-        type: string                                                       // used to infer the type of assessment for a unified grading system
-        [x: string]: string | number | null                                // other user-defined props for querying and organization
-    }[]
+interface IUserField {
+    name: string
+    id: string
+}
+
+/**
+ * Subject interface that extends from the IUserField Interface.
+ * Adds the following properties:
+ * - `mid`: avg midterm grade
+ * - `final`: avg finals grade
+ */
+interface ISubjects extends IUserField {
+    year: string
+    sem: string
+    mid: number
+    final: number
+}
+
+/**
+ * interface 
+ * - `name:` Course Name
+ * - `subj`: subject id key
+ * - `term`: term id key
+ * - `type`: type name
+ * - `value`: assessment score
+ */
+export interface IAssessment {
+    name: string                                                           // assessment name 
+    subj: string                                                           // subject id key (should be included inside the subject)
+    term: string                                                           // term id key (should be included inside the terms )
+    type: string                                                           // assessment type (ex. Enabling, Summative, Formative, Class Participation, etc.)
+    value: number
 }
 
 
@@ -62,42 +80,14 @@ export function initializeFirestore(app: FirebaseApp) {
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
+            years: [],
             subjects: [],
-            sems: [] as string[],
-            terms: [] as string[]
+            sems: [],
+            terms: []
         }
 
         return setDoc(dbDocRef(userUid), docData)
     }
 
-    /**
-     * fetches data from the database
-     * @param userUid 
-     * @returns 
-     */
-    const getInitialDb = async (userUid: string) => {
-        return getDoc(dbDocRef(userUid)).then(res => {
-            console.log('user db', res)
-            return res
-        })
-    }
-
-    // update document
-
-    /**
-     * listens for changes that occurs in the database and runs the function passed in the argument
-     * @param userUid 
-     * @param setDbData - function that is run when there are changes in the database
-     * @returns UnSubscribe function
-     */
-    const onDbChanges = (userUid: string, setDbData: any) => {
-        return onSnapshot(dbDocRef(userUid), (snapshot) => {
-            const docData = snapshot.data() as IUserDoc
-            setDbData(docData)
-            console.log('db change detected')
-            console.log('new data: ', snapshot.data())
-        })
-    }
-
-    return { createUserDb, getInitialDb, onDbChanges }
+    return { createUserDb }
 }
