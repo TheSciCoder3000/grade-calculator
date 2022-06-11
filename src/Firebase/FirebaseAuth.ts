@@ -14,7 +14,7 @@ import React from 'react'
  * @param createUserDb 
  * @returns an object containing all the Authetication-related functions
  */
-export function InitializeAuthentication(app: FirebaseApp, createUserDb: (userUid: string) => Promise<void>) {
+export function InitializeAuthentication(app: FirebaseApp) {
     const auth = getAuth(app)
 
     /**
@@ -33,8 +33,6 @@ export function InitializeAuthentication(app: FirebaseApp, createUserDb: (userUi
     const AuthSignUp = async (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                console.log(userCredential)
-                createUserDb(userCredential.user.uid)
                 return userCredential.user
             })
             .catch((error) => {

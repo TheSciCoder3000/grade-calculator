@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { User } from 'firebase/auth';
 import { NavLink as Link, useHistory } from 'react-router-dom'
+import { useFirestore } from '@useFirebase';
 
 interface SignUpProps {
     onSignUp: (email: string, password: string) => Promise<User | null>
@@ -13,6 +14,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp }) => {
     const email = useRef<HTMLInputElement>(null)
     const password = useRef<HTMLInputElement>(null)
     const [signing, setSigning] = useState(false)
+    const { dbFunctions } = useFirestore()
 
 
     // On Sign Up Event
@@ -24,6 +26,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp }) => {
             console.log('authenticating user')
             onSignUp(email.current.value, password.current.value)
                 .then(user => {
+                    if (user) dbFunctions.fetchUserData(user.uid)
                     history.push('/')
                 })
                 .catch(() => setSigning(false))
