@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { IFirebaseContext } from '@useFirebase'
+import { AuthStatusType, SignOutType } from '@useFirebase'
 
 import AccountIcon from './account_circle.svg'
 import './css/Header.css'
 
 interface HeaderProps {
-    IsSignedIn: IFirebaseContext['Auth']['AuthStatus']
-    onSignOut: IFirebaseContext['Auth']['AuthFunctions']['AuthSignOut']
+    IsSignedIn: AuthStatusType
+    onSignOut: SignOutType
 }
 
 const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {

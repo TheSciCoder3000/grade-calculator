@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, useRouteMatch } from 'react-router-dom'
-import { IFirebaseContext } from 'Firebase'
+import { AuthFunctionType } from 'Firebase'
 import Login from '@Components/Auth/Login'
 import LogOut from '@Components/Auth/LogOut'
 import SignUp from '@Components/Auth/SignUp'
@@ -8,7 +8,7 @@ import SignUp from '@Components/Auth/SignUp'
 import './css/Auth.css'
 
 interface AuthProps {
-    AuthFunctions: IFirebaseContext['Auth']['AuthFunctions']
+    AuthFunctions: AuthFunctionType
 }
 
 const Auth: React.FC<AuthProps> = ({ AuthFunctions }) => {
