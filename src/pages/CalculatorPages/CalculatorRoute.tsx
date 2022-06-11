@@ -1,3 +1,5 @@
+import { useFirestore } from '@useFirebase'
+import { useEffect, useState } from 'react'
 import { Route } from 'react-router-dom'
 import CalculatorDetails from '../../components/Calculator/Detail'
 import CalculatorOverview from '../../components/Calculator/Overview'
@@ -8,10 +10,12 @@ import CalculatorOverview from '../../components/Calculator/Overview'
  * @returns JSX Element
  */
 function CalculatorRoute() {
+    const { userData } = useFirestore()
+
     return (
         <div className="calculator-app">
             <Route exact path='/calculator'>
-                <CalculatorOverview />
+                <CalculatorOverview userData={userData} />
             </Route>
             <Route path='/calculator/:subjectId'>
                 <CalculatorDetails />
