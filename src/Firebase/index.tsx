@@ -26,10 +26,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 const FirebaseDb = initializeFirestore(app)
-const FirebaseAuth = InitializeAuthentication(app, FirebaseDb.createUserDb)
+const FirebaseAuth = InitializeAuthentication(app)
 
 
 // ===================================== Firebase Context Values =====================================
+export type AuthStatusType = User | null
+export type AuthFunctionType = ReturnType<typeof useAuthContext>['AuthFunctions']
+export type SignOutType = typeof FirebaseAuth.AuthSignOut
 /**
  * creates a dictionary of the user's authentication with auth-related functions
  * Functions include:
@@ -40,7 +43,7 @@ const FirebaseAuth = InitializeAuthentication(app, FirebaseDb.createUserDb)
  */
 const useAuthContext = () => {
   // auth module states
-  const [AuthStatus, setAuthStatus] = useState<User | null>(null)
+  const [AuthStatus, setAuthStatus] = useState<AuthStatusType>(null)
 
   // Add auth status listener after rendering component
   useEffect(() => FirebaseAuth.AuthStatusListener(setAuthStatus), [])
@@ -58,9 +61,25 @@ const useAuthContext = () => {
 }
 
 
+const useFirestoreGrade = (userId: string | null | undefined) => {
+  const [userData, setUserData] = useState<IUserDoc | null>(null)
+  const { dbListener, ...FirestoreFunctions } = FirebaseDb
+
+  useEffect(() => {
+    if (userId) return FirebaseDb.dbListener(userId, (doc) => setUserData(doc.data() as IUserDoc))
+  }, [userId])
+
+  return {
+    userData,
+    dbFunctions: { ...FirestoreFunctions }
+  }
+}
+
+
 // ===================================== Firebase Context Creation =====================================
-export interface IFirebaseContext {
+interface IFirebaseContext {
   Auth: ReturnType<typeof useAuthContext>
+  Firestore: ReturnType<typeof useFirestoreGrade>
 }
 interface IFirebaseContextProvider {
   children: JSX.Element
@@ -70,19 +89,19 @@ interface IFirebaseContextProvider {
  * firebase context for providing states across nested components
  */
 const FirebaseContext = createContext<IFirebaseContext>({
-  Auth: {} as ReturnType<typeof useAuthContext>
+  Auth: {} as ReturnType<typeof useAuthContext>,
+  Firestore: {} as ReturnType<typeof useFirestoreGrade>
 })
 
 /**
  * Firebase Context provideer component
  */
 export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ children }) => {
-  const FirebaseAuth = useAuthContext()
+  const Auth = useAuthContext()
+  const Firestore = useFirestoreGrade(Auth.AuthStatus?.uid)
 
   return (
-    <FirebaseContext.Provider value={{
-      Auth: FirebaseAuth,
-    }}>
+    <FirebaseContext.Provider value={{ Auth, Firestore }}>
       {children}
     </FirebaseContext.Provider>
   )
@@ -98,3 +117,9 @@ const useFirebase = () => useContext(FirebaseContext)
  * @returns Auth object containing the user credentials and auth-related functions
  */
 export const useFirebaseAuth = () => useFirebase().Auth
+
+/**
+ * Firbase firestore/db hook for accessing the functions to manipulate the database
+ * @returns Firestore object containing the db functions for manipulating the firestore database
+ */
+export const useFirestore = () => useFirebase().Firestore

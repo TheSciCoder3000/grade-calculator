@@ -1,4 +1,4 @@
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, DocumentSnapshot, DocumentData } from 'firebase/firestore'
 import { FirebaseApp } from 'firebase/app'
 
 
@@ -77,17 +77,51 @@ export function initializeFirestore(app: FirebaseApp) {
      * @returns 
      */
     const createUserDb = async (userUid: string) => {
+        const random = (length = 8) => Math.random().toString(16).substr(2, length);
+
+        const yearId = random(12)
+        const semId = random(12)
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
-            years: [],
+            years: [{
+                name: '1st Year',
+                id: yearId
+            }],
             subjects: [],
-            sems: [],
+            sems: [{
+                name: '1st Semester',
+                id: semId
+            }],
             terms: []
         }
 
         return setDoc(dbDocRef(userUid), docData)
     }
 
-    return { createUserDb }
+    /**
+     * used to fetch the user's data
+     * @param userId user's id
+     * @returns a documnet snapshot
+     */
+    const fetchUserData = async (userId: string) => {
+        return getDoc(doc(db, 'users', userId))
+    }
+
+    /**
+     * Creates an firestore event listener that listens to any changes within the document
+     * @param userId string containing the user's id
+     * @param dbHandler a function that is triggered when changes occur in the document
+     * @returns Unsubscribe method to remove the listener
+     */
+    const dbListener = (userId: string, dbHandler: (doc: DocumentSnapshot<DocumentData>) => unknown) => {
+        let unsub = onSnapshot(doc(db, 'users', userId), dbHandler)
+        return unsub
+    }
+
+    const setUserData = async (userId: string, newUserData: IUserDoc) => {
+        return setDoc(doc(db, 'users', userId), newUserData)
+    }
+
+    return { createUserDb, fetchUserData, dbListener, setUserData }
 }
