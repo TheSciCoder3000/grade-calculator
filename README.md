@@ -1,46 +1,24 @@
-# Getting Started with Create React App
+# Grade Calculator App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The following technologies were used for this project:
+- HTML
+- CSS/SCSS
+- Javascript
+- [Typescript](https://www.typescriptlang.org/)
+- [React Js](https://reactjs.org/)
+- [Redux](https://redux.js.org/)
+- [Firebase](https://firebase.google.com/)
 
-## Available Scripts
+## About the Project
+The project is a simple grade calculator but with additional subject management features. The Web App is made for college students in mind to track their grades and progress as they continue their studies. Besides calculating grades, it is also capable of managing the user's studies by warning and inforimg the user if there are any fields that require their attention if they wish to attain a specific grade (which can be set within the web app's settings). More information of each secific features will be explained bellow.
 
-In the project directory, you can run:
+### 1. Grade Calculation and Prediction
+The basic function of this project is to compute the user's grades flexibly. The program is able to compute the user's grade in each term, course, semester or even school year. Besides this, the user can also predict their future grades by allowing them to input dummy grades to view the potential grades. 
+`This feature is not enabled by default but can easily be accessed by toggling the prediciton mode within the grade settings in each table.`
 
-### `yarn start`
+### 2. Target Grades
+Besides computing and storing grades, the users can also set their target grades for each subject, semester or school year. This featue is optional if they wish to have the web app inform them if they have courses that need their attention. When this feature is enabled, it'll automatically compute if the user's current grade meets their target grade and if not, the program will inform them on areas that needs their effort if they wish to reach their target grade.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
