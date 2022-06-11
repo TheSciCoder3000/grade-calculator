@@ -3,7 +3,7 @@ import React from 'react'
 interface ITogglerProps {
     className?: string
     items: string[]
-    addItemHandler: () => any
+    addItemHandler: (fieldName: string) => any
 }
 const Toggler: React.FC<ITogglerProps> = ({ className, items, addItemHandler }) => {
   return (
@@ -13,7 +13,7 @@ const Toggler: React.FC<ITogglerProps> = ({ className, items, addItemHandler }) 
                 {item}
             </div>
         ))}
-        <button className="add-item-cont" onClick={addItemHandler}>+</button>
+        <button className="add-item-cont">+</button>
     </div>
   )
 }
