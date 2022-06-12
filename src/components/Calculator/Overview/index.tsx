@@ -30,12 +30,15 @@ interface ICalculatorOverviewProps {
 }
 
 const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) => {
+  console.log('rendering')
   const { dbFunctions } = useFirestore()
   const [yearId, setYearId] = useState('')
   const [semId, setSemId] = useState('')
 
   useEffect(() => {
-
+    if (!userData) return
+    setYearId(userData.years[0].id)
+    setSemId(userData.sems[0].id)
   }, [userData])
 
 
@@ -61,8 +64,8 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
         <>
           <h1>Course Overview</h1>
           <div className="section-selection">
-            <Toggler className='year-cont' items={userData.years.map(year => year.name)} addItemHandler={addItemHandler('years')} />
-            <Toggler className='sem-cont' items={userData.sems.map(sem => sem.name)} addItemHandler={addItemHandler('sems')} />
+            <Toggler className='year-cont' activeItem={yearId} items={userData.years} addItemHandler={addItemHandler('years')} />
+            <Toggler className='sem-cont' activeItem={semId} items={userData.sems} addItemHandler={addItemHandler('sems')} />
           </div>
           <GradeTable DATA={DATA} />
         </>
