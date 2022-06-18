@@ -29,7 +29,6 @@ interface ICalculatorOverviewProps {
   userData: IUserDoc | null
 }
 
-type HandlerType = 'sems' | 'years'
 
 const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) => {
   console.log('rendering')
@@ -43,6 +42,8 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
     setSemId(userData.sems[0].id)
   }, [userData])
 
+
+  type HandlerType = 'sems' | 'years'
 
   const addItemHandler = (field: HandlerType) => (fieldName: string) => {
     if (!userData) return 
@@ -68,7 +69,8 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
     if (itemIndx !== -1) newUserData[field].splice(itemIndx, 1)
     dbFunctions.setUserData(userData.userUid, newUserData)
       .catch(e => {
-        
+        console.log('error at remove item handler: ', e.message)
+        console.error(e)
       })
   }
 
@@ -78,8 +80,20 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
         <>
           <h1>Course Overview</h1>
           <div className="section-selection">
-            <Toggler className='year-cont' activeItem={yearId} items={userData.years} addItemHandler={addItemHandler('years')} />
-            <Toggler className='sem-cont' activeItem={semId} items={userData.sems} addItemHandler={addItemHandler('sems')} />
+            <Toggler 
+              className='year-cont' 
+              activeItem={yearId} 
+              items={userData.years} 
+              addItemHandler={addItemHandler('years')} 
+              removeItemHandler={removeItemHandler('years')} />
+
+            <Toggler 
+              className='sem-cont' 
+              activeItem={semId} 
+              items={userData.sems} 
+              addItemHandler={addItemHandler('sems')} 
+              removeItemHandler={removeItemHandler('sems')} />
+              
           </div>
           <GradeTable DATA={DATA} />
         </>

@@ -5,6 +5,7 @@ interface ITogglerProps {
     items: { name: string, id: string }[]
     activeItem: string
     addItemHandler: (fieldName: string) => any
+    removeItemHandler: (fieldName: string) => any
 }
 const Toggler: React.FC<ITogglerProps> = ({ className, activeItem, items, addItemHandler }) => {
   return (
