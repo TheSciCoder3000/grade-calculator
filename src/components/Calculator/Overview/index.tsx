@@ -29,6 +29,8 @@ interface ICalculatorOverviewProps {
   userData: IUserDoc | null
 }
 
+type HandlerType = 'sems' | 'years'
+
 const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) => {
   console.log('rendering')
   const { dbFunctions } = useFirestore()
@@ -42,7 +44,7 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
   }, [userData])
 
 
-  const addItemHandler = (field: 'years' | 'sems') => (fieldName: string) => {
+  const addItemHandler = (field: HandlerType) => (fieldName: string) => {
     if (!userData) return 
 
     let newUserData = { ...userData }
@@ -55,6 +57,18 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
       .catch(e => {
         console.log('something went wrong with addItemHandler')
         console.error(e)
+      })
+  }
+
+  const removeItemHandler = (field: HandlerType) => (itemId: string) => {
+    if (!userData) return
+
+    let newUserData = {...userData}
+    const itemIndx = newUserData[field].findIndex(item => item.id === itemId)
+    if (itemIndx !== -1) newUserData[field].splice(itemIndx, 1)
+    dbFunctions.setUserData(userData.userUid, newUserData)
+      .catch(e => {
+        
       })
   }
 
