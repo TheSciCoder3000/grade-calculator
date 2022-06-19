@@ -25,21 +25,32 @@ const DATA = [
   },
 ]
 
+// Component Props Interface
 interface ICalculatorOverviewProps {
+  /**
+   * object containing the user's firestore data.
+   * **This updates every time changes within the firestore occurs.**
+   */
   userData: IUserDoc | null
 }
 
 
 const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) => {
-  console.log('rendering')
   const { dbFunctions } = useFirestore()
   const [yearId, setYearId] = useState('')
   const [semId, setSemId] = useState('')
 
+  // run useEffect everytime userData updates
+  const [initialTableRender, setInitialTableRender] = useState(false)     // used to track if the use effect has already been used
   useEffect(() => {
-    if (!userData) return
+    console.log(!userData, 'and', !initialTableRender)
+    // if userData is null or table has already been rendered
+    if (!userData || initialTableRender) return                     // do not update year and sem states
+
+    // set year and sem state to first index everytime userData updates
     setYearId(userData.years[0].id)
     setSemId(userData.sems[0].id)
+    setInitialTableRender(true)
   }, [userData])
 
 
@@ -73,6 +84,19 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
         console.error(e)
       })
   }
+  
+  const updateItemHandler = (field: HandlerType) => (itemId: string, value: string) => {
+    if (!userData) return
+
+    let newUserData = {...userData}
+    let item = newUserData[field].find(itemInstance => itemInstance.id === itemId)
+    if (item) item.name = value
+    dbFunctions.setUserData(userData.userUid, newUserData)
+      .catch(e => {
+        console.log('error at update item handler: ', e.message)
+        console.error(e)
+      })
+  }
 
   return (
     <div className='calculator__overview-container'>
@@ -85,14 +109,18 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
               activeItem={yearId} 
               items={userData.years} 
               addItemHandler={addItemHandler('years')} 
-              removeItemHandler={removeItemHandler('years')} />
+              removeItemHandler={removeItemHandler('years')}
+              updateItemHandler={updateItemHandler('years')}
+              onItemClick={setYearId} />
 
             <Toggler 
               className='sem-cont' 
               activeItem={semId} 
               items={userData.sems} 
               addItemHandler={addItemHandler('sems')} 
-              removeItemHandler={removeItemHandler('sems')} />
+              removeItemHandler={removeItemHandler('sems')}
+              updateItemHandler={updateItemHandler('sems')}
+              onItemClick={setSemId} />
               
           </div>
           <GradeTable DATA={DATA} />
