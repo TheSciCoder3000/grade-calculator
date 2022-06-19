@@ -60,16 +60,32 @@ const useAuthContext = () => {
   }
 }
 
-
+/**
+ * creates a dictionary of the user's database with database-related functions
+ * Functions include:
+ * - creating user's intial database (on sign up)
+ * - fetching user's initial data
+ * - setting user's data
+ * @param userId 
+ * @returns 
+ */
 const useFirestoreGrade = (userId: string | null | undefined) => {
+  // initialize userData state
   const [userData, setUserData] = useState<IUserDoc | null>(null)
+
+  // destructure firebaseDb functions
   const { dbListener, ...FirestoreFunctions } = FirebaseDb
 
+  // subscribe to firestore event listener and updates userData state on update
   useEffect(() => {
     if (userId) return FirebaseDb.dbListener(userId, (doc) => setUserData(doc.data() as IUserDoc))
-  }, [userId])
+  }, [userId])    // enable, disable or change the listener when userId value changes
 
   return {
+    /**
+     * object containing the user's firestore data.
+     * **This updates every time changes within the firestore occurs.**
+     */
     userData,
     dbFunctions: { ...FirestoreFunctions }
   }
