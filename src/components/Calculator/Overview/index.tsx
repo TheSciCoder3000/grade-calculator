@@ -1,25 +1,32 @@
 import { useFirestore } from '@useFirebase'
-import { IUserDoc } from 'Firebase/FirebaseDb'
-import React, { useEffect, useState } from 'react'
+import { ISubjects, IUserDoc } from 'Firebase/FirebaseDb'
+import React, { useEffect, useState, useMemo } from 'react'
 import GradeTable from "../Table"
 import Toggler from '../Toggler'
+import './Overview.css'
 
-const DATA = [
+const DATA: ISubjects[] = [
   {
-    courseId: 'cpe',
+    id: 'cpe',
     name: 'CPET121',
+    year: '7cb0cb84962b',
+    sem: '1c073661e7a9',
     mid: 97,
     final: 100
   },
   {
-    courseId: 'engm',
+    id: 'engm',
     name: 'ENGM121',
+    year: '7cb0cb84962b',
+    sem: '1c073661e7a9',
     mid: 91,
     final: 92
   },
   {
-    courseId: 'math',
+    id: 'math',
     name: 'MATH121',
+    year: '7cb0cb84962b',
+    sem: '1c073661e7a9',
     mid: 93,
     final: 95
   },
@@ -40,7 +47,10 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
   const [yearId, setYearId] = useState('')
   const [semId, setSemId] = useState('')
 
-  // run useEffect everytime userData updates
+
+
+  // ================================== State Updates ==================================
+  // Initial Table render
   const [initialTableRender, setInitialTableRender] = useState(false)     // used to track if the use effect has already been used
   useEffect(() => {
     console.log(!userData, 'and', !initialTableRender)
@@ -54,6 +64,16 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
   }, [userData])
 
 
+  // Subject data filtering update - used to filter the subject data by year and sem ids
+  const subjectData = DATA
+  const data = useMemo(
+    () => subjectData.filter(subj => (subj.year === yearId && subj.sem === semId)), 
+    [yearId, semId]
+  )
+
+
+
+  // ================================== Toggler CRUD Functions ==================================
   type HandlerType = 'sems' | 'years'
 
   const addItemHandler = (field: HandlerType) => (fieldName: string) => {
@@ -123,7 +143,7 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
               onItemClick={setSemId} />
               
           </div>
-          <GradeTable DATA={DATA} />
+          <GradeTable DATA={data} />
         </>
         :
         <div className="loading-data">
