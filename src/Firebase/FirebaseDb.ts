@@ -37,7 +37,7 @@ interface IUserField {
  * - `mid`: avg midterm grade
  * - `final`: avg finals grade
  */
-interface ISubjects extends IUserField {
+export interface ISubjects extends IUserField {
     year: string
     sem: string
     mid: number
