@@ -1,13 +1,15 @@
+import { ISubjects } from 'Firebase/FirebaseDb'
 import { useMemo, FC } from 'react'
 import { useTable, useSortBy, useRowSelect, CellProps, Column } from 'react-table'
 import Checkbox from './Checkbox'
 import CourseCellLink from './CourseLink'
 import SortIcon from './SortIcon'
+import './Table.css'
 
 // type $FixMe = any
 interface IRow {
-  original: IData
-  values: IData
+  original: ISubjects
+  values: ISubjects
 }
 
 
@@ -17,15 +19,9 @@ interface IColumn {
   Cell?: string | ((cell: { row: IRow }) => JSX.Element | string)
   Footer: string | ((row: { rows: IRow[] }) => JSX.Element | string)
 }
-interface IData {
-  courseId: string;
-  name: string
-  mid: number
-  final: number
-}
 
 interface ITableProps {
-    DATA: IData[]
+    DATA: ISubjects[]
 }
 
 const COLUMNS: IColumn[] = [
@@ -35,7 +31,7 @@ const COLUMNS: IColumn[] = [
       Cell: (cell) => {
         const value = cell.row.original
         return (
-          <CourseCellLink courseName={value.name} courseId={value.courseId} />
+          <CourseCellLink courseName={value.name} courseId={value.id} />
         )
       },
       Footer: 'Total'
@@ -68,7 +64,7 @@ const COLUMNS: IColumn[] = [
 
 const GradeTable: FC<ITableProps> = (props) => {
   // Initialize columns
-  const columns = useMemo(() => COLUMNS as Column<IData>[], [])
+  const columns = useMemo(() => COLUMNS as Column<ISubjects>[], [])
 
   // Intialize Data
   const data = useMemo(() => props.DATA, [props.DATA])
@@ -92,14 +88,13 @@ const GradeTable: FC<ITableProps> = (props) => {
           {
             id: 'selection',
             Header: ({ getToggleAllRowsSelectedProps }) => {
-              // ! Fix typescript
-              // @ts-ignore
-              return <Checkbox {...getToggleAllRowsSelectedProps()} />
+              return <Checkbox 
+                        {...getToggleAllRowsSelectedProps()} 
+                        rowId={'header'} 
+                        header={true} className='header-checkbox' />
             },
-            Cell: ({ row }: React.PropsWithChildren<CellProps<object, any>>) => {
-              // ! Fix typescript
-              // @ts-ignore
-              return <Checkbox {...row.getToggleRowSelectedProps()} />
+            Cell: ({ row }: React.PropsWithChildren<CellProps<ISubjects, any>>) => {
+              return <Checkbox {...row.getToggleRowSelectedProps()} rowId={row.original.id} />
             }
           },
           ...columns
