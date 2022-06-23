@@ -5,17 +5,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { FirebaseConetxtProvider } from '@useFirebase';
-import { store } from './Store'
-import { Provider } from 'react-redux'
 
 ReactDOM.render(
   <React.StrictMode>
     <FirebaseConetxtProvider>
-      <Provider store={store}>
         <Router>
           <App />
         </Router>
-      </Provider>
     </FirebaseConetxtProvider>
   </React.StrictMode>,
   document.getElementById('root')
