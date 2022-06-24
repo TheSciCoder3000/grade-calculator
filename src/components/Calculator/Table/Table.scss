@@ -4,7 +4,6 @@ $primary-color: rgb(0, 160, 0);
     margin-top: 4rem;
     width: 100%;
     border-collapse: collapse;
-    border-radius: 10px;
     overflow: hidden;
 
     .check-cont {
@@ -24,7 +23,6 @@ $primary-color: rgb(0, 160, 0);
             width: 20px;
             aspect-ratio: 1;
             border: 1px solid rgb(55, 55, 55);
-            border-radius: 2px;
             color: white;
             display: flex;
             align-items: center;
@@ -53,7 +51,6 @@ $primary-color: rgb(0, 160, 0);
     thead {
         border: 1px solid $primary-color;
         background-color: $primary-color;
-        border-radius: 10px;
         color: white;
         fill: white;
         
