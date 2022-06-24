@@ -52,8 +52,14 @@ interface ICommonField {
 export interface ISubjects extends ICommonField {
     year: string;
     sem: string;
-    mid: number;
-    final: number;
+    extra?: {
+        name: string;
+        value: string;
+    }[]
+    grades: {
+        name: string
+        value: number
+    }[]
 }
 
 /**
