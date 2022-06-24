@@ -6,30 +6,55 @@ import Toggler from "../Toggler";
 import { useInitializeTogglers, useTogglerCRUD } from "./utils";
 import "./Overview.css";
 
+// TODO: remove this once connected to firestore
 const DATA: ISubjects[] = [
     {
         id: "cpe",
         name: "CPET121",
         year: "7cb0cb84962b",
         sem: "1c073661e7a9",
-        mid: 97,
-        final: 100,
+        grades: [
+            {
+                name: 'Midterm',
+                value: 97,
+            },
+            {
+                name: 'Finals',
+                value: 100,
+            }
+        ],
     },
     {
         id: "engm",
         name: "ENGM121",
         year: "7cb0cb84962b",
         sem: "1c073661e7a9",
-        mid: 91,
-        final: 92,
+        grades: [
+            {
+                name: 'Midterm',
+                value: 91,
+            },
+            {
+                name: 'Finals',
+                value: 92,
+            }
+        ],
     },
     {
         id: "math",
         name: "MATH121",
         year: "7cb0cb84962b",
         sem: "1c073661e7a9",
-        mid: 93,
-        final: 95,
+        grades: [
+            {
+                name: 'Midterm',
+                value: 93,
+            },
+            {
+                name: 'Finals',
+                value: 95,
+            }
+        ],
     },
 ];
 
