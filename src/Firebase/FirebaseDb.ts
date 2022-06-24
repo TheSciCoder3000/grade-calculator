@@ -1,6 +1,13 @@
-import { getFirestore, doc, setDoc, getDoc, onSnapshot, DocumentSnapshot, DocumentData } from 'firebase/firestore'
-import { FirebaseApp } from 'firebase/app'
-
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    onSnapshot,
+    DocumentSnapshot,
+    DocumentData,
+} from "firebase/firestore";
+import { FirebaseApp } from "firebase/app";
 
 /**
  * Firestore (Firebase Database) module
@@ -8,17 +15,16 @@ import { FirebaseApp } from 'firebase/app'
  * - CRUD functions to add, update and delete data from the database
  */
 
-
 /**
  * interface schema of the data received from the firestore
  */
 export interface IUserDoc {
-    userUid: string                                                         // User's id
+    userUid: string; // User's id
     // name: string                                                         // user's name
-    years: IUserField[]                                                     // collection of object containing the college year name and id
-    subjects: ISubjects[]                                                   // collection of object contianing the subject name and id
-    sems: IUserField[]                                                      // collection of object containing the sem name and id
-    terms: IUserField[]                                                     // collection of object containing the term name and id
+    years: ICommonField[]; // collection of object containing the college year name and id
+    subjects: ISubjects[]; // collection of object contianing the subject name and id
+    sems: ICommonField[]; // collection of object containing the sem name and id
+    terms: ICommonField[]; // collection of object containing the term name and id
 }
 
 /**
@@ -26,9 +32,15 @@ export interface IUserDoc {
  * - `name`: string that will be displayed on the ui
  * - `id`: used for querying in the database
  */
-interface IUserField {
-    name: string
-    id: string
+interface ICommonField {
+    /**
+     * display name of item
+     */
+    name: string;
+    /**
+     * database item id
+     */
+    id: string;
 }
 
 /**
@@ -37,29 +49,39 @@ interface IUserField {
  * - `mid`: avg midterm grade
  * - `final`: avg finals grade
  */
-export interface ISubjects extends IUserField {
-    year: string
-    sem: string
-    mid: number
-    final: number
+export interface ISubjects extends ICommonField {
+    year: string;
+    sem: string;
+    mid: number;
+    final: number;
 }
 
 /**
- * interface 
+ * interface
  * - `name:` Course Name
  * - `subj`: subject id key
  * - `term`: term id key
  * - `type`: type name
  * - `value`: assessment score
  */
-export interface IAssessment {
-    name: string                                                           // assessment name 
-    subj: string                                                           // subject id key (should be included inside the subject)
-    term: string                                                           // term id key (should be included inside the terms )
-    type: string                                                           // assessment type (ex. Enabling, Summative, Formative, Class Participation, etc.)
-    value: number
+export interface IAssessment extends ICommonField {
+    /**
+     * subject id key (should be included inside the subject).
+     * * **Item query identifier**
+     */
+    subj: string;
+    /**
+     * term id key (should be included inside the terms )
+     * * **Used to filter which items will be displayed first**
+     */
+    term: string;
+    /**
+     * assessment category (ex. Enabling, Summative, Formative, Class Participation, etc.)
+     * * **Used to determine which table the item will be placed**
+     */
+    catgory: string;
+    value: number;
 }
-
 
 /**
  * initialize the firestore and get access to the firestore-related functions
@@ -68,36 +90,40 @@ export interface IAssessment {
  */
 export function initializeFirestore(app: FirebaseApp) {
     // Get the Firestore Instance
-    const db = getFirestore(app)
-    const dbDocRef = (userUid: string) => doc(db, 'users', userUid)
+    const db = getFirestore(app);
+    const dbDocRef = (userUid: string) => doc(db, "users", userUid);
 
     /**
      * function that is called after the user signs up and creates an account
-     * @param userUid 
-     * @returns 
+     * @param userUid
+     * @returns
      */
     const createUserDb = async (userUid: string) => {
         const random = (length = 8) => Math.random().toString(16).substr(2, length);
 
-        const yearId = random(12)
-        const semId = random(12)
+        const yearId = random(12);
+        const semId = random(12);
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
-            years: [{
-                name: '1st Year',
-                id: yearId
-            }],
+            years: [
+                {
+                    name: "1st Year",
+                    id: yearId,
+                },
+            ],
             subjects: [],
-            sems: [{
-                name: '1st Semester',
-                id: semId
-            }],
-            terms: []
-        }
+            sems: [
+                {
+                    name: "1st Semester",
+                    id: semId,
+                },
+            ],
+            terms: [],
+        };
 
-        return setDoc(dbDocRef(userUid), docData)
-    }
+        return setDoc(dbDocRef(userUid), docData);
+    };
 
     /**
      * used to fetch the user's data
@@ -105,8 +131,8 @@ export function initializeFirestore(app: FirebaseApp) {
      * @returns a documnet snapshot
      */
     const fetchUserData = async (userId: string) => {
-        return getDoc(doc(db, 'users', userId))
-    }
+        return getDoc(doc(db, "users", userId));
+    };
 
     /**
      * Creates an firestore event listener that listens to any changes within the document
@@ -115,13 +141,13 @@ export function initializeFirestore(app: FirebaseApp) {
      * @returns Unsubscribe method to remove the listener
      */
     const dbListener = (userId: string, dbHandler: (doc: DocumentSnapshot<DocumentData>) => unknown) => {
-        let unsub = onSnapshot(doc(db, 'users', userId), dbHandler)
-        return unsub
-    }
+        let unsub = onSnapshot(doc(db, "users", userId), dbHandler);
+        return unsub;
+    };
 
     const setUserData = async (userId: string, newUserData: IUserDoc) => {
-        return setDoc(doc(db, 'users', userId), newUserData)
-    }
+        return setDoc(doc(db, "users", userId), newUserData);
+    };
 
-    return { createUserDb, fetchUserData, dbListener, setUserData }
+    return { createUserDb, fetchUserData, dbListener, setUserData };
 }
