@@ -32,7 +32,7 @@ export interface IUserDoc {
  * - `name`: string that will be displayed on the ui
  * - `id`: used for querying in the database
  */
-interface ICommonField {
+export interface ICommonField {
     /**
      * display name of item
      */
@@ -109,6 +109,7 @@ export function initializeFirestore(app: FirebaseApp) {
 
         const yearId = random(12);
         const semId = random(12);
+        const termId = random(12);
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
@@ -125,7 +126,12 @@ export function initializeFirestore(app: FirebaseApp) {
                     id: semId,
                 },
             ],
-            terms: [],
+            terms: [
+                {
+                    name: "Grade",
+                    id: termId,
+                },
+            ],
         };
 
         return setDoc(dbDocRef(userUid), docData);

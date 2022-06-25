@@ -21,10 +21,10 @@ export const createColumns: CreateColumnType = (subjects) => {
     const blueprint = subjects[0] || {
         grades: [
             {
-                name: 'Midterm',
-                value: 0
-            }
-        ]
+                name: "Midterm",
+                value: 0,
+            },
+        ],
     };
     return [
         {
@@ -38,26 +38,26 @@ export const createColumns: CreateColumnType = (subjects) => {
         },
         ...(blueprint.extra
             ? blueprint.extra.map((extra, indx) => {
-                return {
-                    Header: extra.name,
-                    accessor: (doc) => doc.extra?.find(item => item.name === extra.name)?.value,
-                    Cell: ({ row }) => row.values[extra.name]
-                } as IColumn
+                  return {
+                      Header: extra.name,
+                      accessor: (doc) => doc.extra?.find((item) => item.name === extra.name)?.value,
+                      Cell: ({ row }) => row.values[extra.name],
+                  } as IColumn;
               })
             : []),
-        ...blueprint.grades.map(grade => {
+        ...blueprint.grades.map((grade) => {
             return {
                 Header: grade.name,
-                accessor: (doc) => doc.grades.find(item => item.name === grade.name)?.value,
+                accessor: (doc) => doc.grades.find((item) => item.name === grade.name)?.value,
                 Cell: ({ row }) => row.values[grade.name],
                 Footer: ({ rows }) => {
                     const sum = rows.reduce((partialSum, row) => {
-                        const rowVal = row.values[grade.name] as number
-                        return partialSum + rowVal
-                    }, 0)
-                    return <>{Math.round(sum/rows.length)}</>
-                }
-            } as IColumn
-        })
+                        const rowVal = row.values[grade.name] as number;
+                        return partialSum + rowVal;
+                    }, 0);
+                    return <>{Math.round(sum / rows.length) || 0}</>;
+                },
+            } as IColumn;
+        }),
     ];
 };
