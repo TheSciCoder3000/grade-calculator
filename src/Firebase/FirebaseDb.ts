@@ -55,11 +55,11 @@ export interface ISubjects extends ICommonField {
     extra?: {
         name: string;
         value: string;
-    }[]
+    }[];
     grades: {
-        name: string
-        value: number
-    }[]
+        name: string;
+        value: number;
+    }[];
 }
 
 /**
@@ -151,6 +151,12 @@ export function initializeFirestore(app: FirebaseApp) {
         return unsub;
     };
 
+    /**
+     * updates user data
+     * @param userId user's database id
+     * @param newUserData new value for user data
+     * @returns a Promise that resolves once data is successfully sent to the backend
+     */
     const setUserData = async (userId: string, newUserData: IUserDoc) => {
         return setDoc(doc(db, "users", userId), newUserData);
     };
