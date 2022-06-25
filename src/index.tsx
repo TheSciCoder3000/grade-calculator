@@ -5,13 +5,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { FirebaseConetxtProvider } from '@useFirebase';
+import { ModalController } from '@Components/Modal';
 
 ReactDOM.render(
   <React.StrictMode>
     <FirebaseConetxtProvider>
+      <ModalController>
         <Router>
           <App />
         </Router>
+      </ModalController>
     </FirebaseConetxtProvider>
   </React.StrictMode>,
   document.getElementById('root')
