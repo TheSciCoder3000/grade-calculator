@@ -1,0 +1,74 @@
+.modal-cont {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.534);
+    padding: 0 1.5rem;
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        margin: 0;
+    }
+
+    .modal-view {
+        background-color: white;
+        max-width: 600px;
+        margin: 5rem auto;
+        border-radius: 7px;
+        padding: 2rem;
+        padding-bottom: 4rem;
+        box-sizing: border-box;
+
+        input {
+            padding: 0.35rem 0.5rem;
+        }
+
+        .add-subject-cont {
+            h1 {
+                font-size: 3em;
+                font-weight: 500;
+            }
+
+            .subject-input-cont {
+                margin-top: 2rem;
+                margin-bottom: 2rem;
+
+                .name-field {
+                    width: 100%;
+                    max-width: 275px;
+                    box-sizing: border-box;
+                    margin-bottom: 0.75rem;
+                }
+                .subject-fields {
+                    .grades-cont {
+                        .grades-header {
+                            font-weight: 400;
+                            margin-bottom: 0.35rem;
+                            font-size: 1.5em;
+                        }
+                        .grades-field {
+                            margin-left: 1.75rem;
+                        }
+                    }
+                }
+            }
+            .modal-actions {
+                display: flex;
+                gap: 1rem;
+
+                button {
+                    border: none;
+                    padding: 0.5rem 1rem;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,76 @@
+.modal-cont {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.534);
+  padding: 0 1.5rem;
+}
+
+.modal-cont h1,
+.modal-cont h2,
+.modal-cont h3,
+.modal-cont h4 {
+  margin: 0;
+}
+
+.modal-cont .modal-view {
+  background-color: white;
+  max-width: 600px;
+  margin: 5rem auto;
+  border-radius: 7px;
+  padding: 2rem;
+  padding-bottom: 4rem;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.modal-cont .modal-view input {
+  padding: 0.35rem 0.5rem;
+}
+
+.modal-cont .modal-view .add-subject-cont h1 {
+  font-size: 3em;
+  font-weight: 500;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .name-field {
+  width: 100%;
+  max-width: 275px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin-bottom: 0.75rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .grades-cont .grades-header {
+  font-weight: 400;
+  margin-bottom: 0.35rem;
+  font-size: 1.5em;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .grades-cont .grades-field {
+  margin-left: 1.75rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .modal-actions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .modal-actions button {
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .modal-actions button:hover {
+  cursor: pointer;
+}
+/*# sourceMappingURL=Modal.css.map */
