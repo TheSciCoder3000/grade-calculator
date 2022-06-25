@@ -81,7 +81,7 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
     );
 
     // Subject data filtering update - used to filter the subject data by year and sem ids
-    const subjectData = DATA;
+    const subjectData =  userData?.subjects || [] as ISubjects[];
     const data = useMemo(
         () => subjectData.filter((subj) => subj.year === yearId && subj.sem === semId),
         [yearId, semId]
