@@ -31,6 +31,8 @@
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .calculator__table .check-cont label path {
@@ -42,7 +44,8 @@
 }
 
 .calculator__table .check-cont label.header-check {
-  background-color: white;
+  background-color: #00a000;
+  border: 2px solid white;
 }
 
 .calculator__table th,
@@ -69,5 +72,16 @@
   border-left: 1px solid #a2a2a2;
   border-right: 1px solid #a2a2a2;
   border-bottom: 1px solid #a2a2a2;
+}
+
+.calculator__table tbody .no-subjects-row {
+  text-align: center;
+  padding: 1rem 0;
+  color: grey;
+}
+
+.calculator__table tbody .no-subjects-row:hover {
+  color: #565656;
+  cursor: pointer;
 }
 /*# sourceMappingURL=Table.css.map */

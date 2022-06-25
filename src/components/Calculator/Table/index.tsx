@@ -1,3 +1,4 @@
+import { useController } from "@Components/Modal";
 import { ISubjects } from "Firebase/FirebaseDb";
 import { useMemo, FC } from "react";
 import { useTable, useSortBy, useRowSelect, CellProps, Column } from "react-table";
@@ -50,6 +51,11 @@ const GradeTable: FC<ITableProps> = ({ DATA }) => {
         });
     });
 
+    const setController = useController();
+    const addSubjectHandler = () => {
+        setController("add-subject");
+    };
+
     return (
         <table {...getTableProps({ className: "calculator__table" })}>
             <thead>
@@ -81,16 +87,24 @@ const GradeTable: FC<ITableProps> = ({ DATA }) => {
             </thead>
 
             <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
-                    prepareRow(row);
-                    return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
-                                <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                            ))}
-                        </tr>
-                    );
-                })}
+                {rows.length > 0 ? (
+                    rows.map((row) => {
+                        prepareRow(row);
+                        return (
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                                ))}
+                            </tr>
+                        );
+                    })
+                ) : (
+                    <tr>
+                        <td className="no-subjects-row" colSpan={3} onClick={addSubjectHandler}>
+                            + Add Subject
+                        </td>
+                    </tr>
+                )}
             </tbody>
 
             <tfoot>
