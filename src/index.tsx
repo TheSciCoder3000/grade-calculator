@@ -1,23 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { FirebaseConetxtProvider } from '@useFirebase';
-import { ModalController } from '@Components/Modal';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter as Router } from "react-router-dom";
+import { FirebaseConetxtProvider } from "@useFirebase";
+import { ModalController } from "@Components/Modal";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <FirebaseConetxtProvider>
-      <ModalController>
-        <Router>
-          <App />
-        </Router>
-      </ModalController>
-    </FirebaseConetxtProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <FirebaseConetxtProvider>
+            <ModalController>
+                <Router>
+                    <App />
+                </Router>
+            </ModalController>
+        </FirebaseConetxtProvider>
+    </React.StrictMode>,
+    document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

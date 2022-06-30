@@ -1,6 +1,6 @@
 import { useFirestore } from "@useFirebase";
 import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import GradeTable from "../Table";
 import Toggler from "../Toggler";
 import { useInitializeTogglers, useTogglerCRUD } from "./utils";
