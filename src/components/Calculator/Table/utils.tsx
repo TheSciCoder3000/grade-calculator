@@ -55,7 +55,7 @@ export const createColumns: CreateColumnType = (subjects) => {
                         const rowVal = row.values[grade.name] as number;
                         return partialSum + rowVal;
                     }, 0);
-                    return <>{Math.round(sum / rows.length) || 0}</>;
+                    return <>{(sum / rows.length).toFixed(2) || 0}</>;
                 },
             } as IColumn;
         }),
