@@ -30,7 +30,7 @@ const AddSubjects = () => {
 
         // initialize new updates
         let userSubjects = [...userData.subjects];
-        userSubjects.push({
+        const newSubject = {
             sem: modalPayload.semId,
             year: modalPayload.yearId,
             grades: [
@@ -41,7 +41,9 @@ const AddSubjects = () => {
             ],
             name: subjectName.current.value,
             id: subjectName.current.value,
-        });
+        };
+        if (modalPayload.indx) userSubjects.splice(modalPayload.indx, 0, newSubject);
+        else userSubjects.push(newSubject);
 
         // send updates to the database
         dbFunctions.setUserData(userData.userUid, {
