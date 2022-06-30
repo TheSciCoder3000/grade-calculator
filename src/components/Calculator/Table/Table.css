@@ -5,49 +5,6 @@
   overflow: hidden;
 }
 
-.calculator__table .check-cont input {
-  display: none;
-}
-
-.calculator__table .check-cont input:checked + label {
-  background-color: #00a000;
-  border: 1px solid #00a000;
-  content: '\002714';
-}
-
-.calculator__table .check-cont label {
-  content: '';
-  display: inline-block;
-  width: 20px;
-  aspect-ratio: 1;
-  border: 1px solid #373737;
-  color: white;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-}
-
-.calculator__table .check-cont label path {
-  stroke-width: 10px;
-}
-
-.calculator__table .check-cont label:hover {
-  cursor: pointer;
-}
-
-.calculator__table .check-cont label.header-check {
-  background-color: #00a000;
-  border: 2px solid white;
-}
-
 .calculator__table th,
 .calculator__table td {
   padding: 0.85rem 1rem;
