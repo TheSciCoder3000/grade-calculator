@@ -8,15 +8,13 @@ import { FirebaseConetxtProvider } from "@useFirebase";
 import { ModalController } from "@Components/Modal";
 
 ReactDOM.render(
-    <React.StrictMode>
-        <FirebaseConetxtProvider>
-            <ModalController>
-                <Router>
-                    <App />
-                </Router>
-            </ModalController>
-        </FirebaseConetxtProvider>
-    </React.StrictMode>,
+    <FirebaseConetxtProvider>
+        <ModalController>
+            <Router>
+                <App />
+            </Router>
+        </ModalController>
+    </FirebaseConetxtProvider>,
     document.getElementById("root")
 );
 
