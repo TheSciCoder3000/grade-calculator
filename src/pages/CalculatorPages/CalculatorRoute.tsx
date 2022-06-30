@@ -4,6 +4,7 @@ import { Route } from "react-router-dom";
 import CalculatorDetails from "@Components/Calculator/Detail";
 import CalculatorOverview from "@Components/Calculator/Overview";
 import AddSubjects from "@Components/Modal/Froms/AddSubjects";
+import RemoveSubjects from "@Components/Modal/Froms/RemoveSubjects";
 
 /**
  * Calculator Route Component,
@@ -24,6 +25,9 @@ function CalculatorRoute() {
             <Modal>
                 <MSwitch type="add-subject">
                     <AddSubjects />
+                </MSwitch>
+                <MSwitch type="delete-subject">
+                    <RemoveSubjects />
                 </MSwitch>
             </Modal>
         </div>

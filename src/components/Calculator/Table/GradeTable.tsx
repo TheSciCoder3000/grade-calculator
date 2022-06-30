@@ -30,7 +30,7 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
         footerGroups,
         selectedFlatRows,
     } = useTable({ columns, data }, useSortBy, useRowSelect, (hooks) => {
-        hooks.visibleColumns.push((columns) => {
+        hooks.visibleColumns.push((ColumnsInstance) => {
             return [
                 {
                     id: "selection",
@@ -48,77 +48,104 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
                         return <Checkbox {...row.getToggleRowSelectedProps()} rowId={row.original.id} />;
                     },
                 },
-                ...columns,
+                ...ColumnsInstance,
             ];
         });
     });
 
     const setController = useController();
-    const addSubjectHandler = () => {
-        setController({ target: "add-subject", data: { yearId, semId } });
+    const addSubjectHandler = (indx?: number) => {
+        setController({ target: "add-subject", data: { yearId, semId, indx } });
+    };
+
+    const deleteSubjectsHandler = () => {
+        if (selectedFlatRows.length)
+            setController({
+                target: "delete-subject",
+                data: { subject: selectedFlatRows.map((row) => row.original) },
+            });
     };
 
     return (
-        <table {...getTableProps({ className: "calculator__table" })}>
-            <thead>
-                {headerGroups.map((headerGroup) => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column, indx) => (
-                            <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                <div className="table-data-cont">
-                                    {column.render("Header")}
-                                    <span>
-                                        {column.id !== "selection" && (
-                                            <SortIcon
-                                                key={indx}
-                                                sort={
-                                                    column.isSorted
-                                                        ? column.isSortedDesc
-                                                            ? "desc"
-                                                            : "asc"
-                                                        : ""
-                                                }
-                                            />
-                                        )}
-                                    </span>
-                                </div>
-                            </th>
-                        ))}
-                    </tr>
-                ))}
-            </thead>
+        <div className="table-cont">
+            <div className="table-controls">
+                <button className="trash" onClick={deleteSubjectsHandler}>
+                    Trash
+                </button>
+                <button className="settings">Settings</button>
+            </div>
+            <table {...getTableProps({ className: "calculator__table" })}>
+                <thead>
+                    {headerGroups.map((headerGroup) => (
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroup.headers.map((column, indx) => (
+                                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                    <div className="table-data-cont">
+                                        {column.render("Header")}
+                                        <span>
+                                            {column.id !== "selection" && (
+                                                <SortIcon
+                                                    key={indx}
+                                                    sort={
+                                                        column.isSorted
+                                                            ? column.isSortedDesc
+                                                                ? "desc"
+                                                                : "asc"
+                                                            : ""
+                                                    }
+                                                />
+                                            )}
+                                        </span>
+                                    </div>
+                                </th>
+                            ))}
 
-            <tbody {...getTableBodyProps()}>
-                {rows.length > 0 ? (
-                    rows.map((row) => {
-                        prepareRow(row);
-                        return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map((cell) => (
-                                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                                ))}
-                            </tr>
-                        );
-                    })
-                ) : (
-                    <tr>
-                        <td className="no-subjects-row" colSpan={3} onClick={addSubjectHandler}>
-                            + Add Subject
-                        </td>
-                    </tr>
-                )}
-            </tbody>
+                            {/* used to remove the whitespace */}
+                            <th></th>
+                        </tr>
+                    ))}
+                </thead>
 
-            <tfoot>
-                {footerGroups.map((footerGroup) => (
-                    <tr {...footerGroup.getFooterGroupProps()}>
-                        {footerGroup.headers.map((column) => (
-                            <td {...column.getFooterProps()}>{column.render("Footer")}</td>
-                        ))}
-                    </tr>
-                ))}
-            </tfoot>
-        </table>
+                <tbody {...getTableBodyProps()}>
+                    {rows.length > 0 ? (
+                        rows.map((row, indx) => {
+                            prepareRow(row);
+                            return (
+                                <tr {...row.getRowProps()}>
+                                    {row.cells.map((cell) => (
+                                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                                    ))}
+                                    <div className="row-controls">
+                                        <button
+                                            onClick={() => addSubjectHandler(indx + 1)}
+                                            className="row-add-subject"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </tr>
+                            );
+                        })
+                    ) : (
+                        <tr>
+                            <td className="no-subjects-row" colSpan={3} onClick={() => addSubjectHandler()}>
+                                + Add Subject
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+
+                <tfoot>
+                    {footerGroups.map((footerGroup) => (
+                        <tr {...footerGroup.getFooterGroupProps()}>
+                            {footerGroup.headers.map((column) => (
+                                <td {...column.getFooterProps()}>{column.render("Footer")}</td>
+                            ))}
+                        </tr>
+                    ))}
+                </tfoot>
+            </table>
+        </div>
     );
 };
 

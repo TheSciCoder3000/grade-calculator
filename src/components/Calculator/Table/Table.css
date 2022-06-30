@@ -1,44 +1,88 @@
-.calculator__table {
+.table-cont {
   margin-top: 4rem;
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
 }
 
-.calculator__table th,
-.calculator__table td {
+.table-cont .table-controls {
+  margin-bottom: 0.35rem;
+}
+
+.table-cont .table-controls button {
+  margin-right: 0.5rem;
+}
+
+.table-cont .calculator__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-cont .calculator__table th,
+.table-cont .calculator__table td {
   padding: 0.85rem 1rem;
   text-align: left;
 }
 
-.calculator__table thead {
+.table-cont .calculator__table thead {
   border: 1px solid #00a000;
   background-color: #00a000;
   color: white;
   fill: white;
 }
 
-.calculator__table thead .table-data-cont {
+.table-cont .calculator__table thead .table-data-cont {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   gap: 1.5rem;
 }
 
-.calculator__table tbody {
+.table-cont .calculator__table tbody {
   border-left: 1px solid #a2a2a2;
   border-right: 1px solid #a2a2a2;
   border-bottom: 1px solid #a2a2a2;
 }
 
-.calculator__table tbody .no-subjects-row {
+.table-cont .calculator__table tbody .no-subjects-row {
   text-align: center;
   padding: 1rem 0;
   color: grey;
 }
 
-.calculator__table tbody .no-subjects-row:hover {
+.table-cont .calculator__table tbody .no-subjects-row:hover {
   color: #565656;
   cursor: pointer;
+}
+
+.table-cont .calculator__table tbody tr {
+  position: relative;
+}
+
+.table-cont .calculator__table tbody tr .row-controls {
+  position: absolute;
+  height: 100%;
+  right: 100%;
+  padding-right: 1rem;
+  display: none;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.table-cont .calculator__table tbody tr .row-controls .row-add-subject {
+  font-size: 1.2em;
+  border: none;
+  background-color: transparent;
+  height: 30px;
+  aspect-ratio: 1;
+}
+
+.table-cont .calculator__table tbody tr .row-controls .row-add-subject:hover {
+  background-color: #f7f7f7;
+  cursor: pointer;
+}
+
+.table-cont .calculator__table tbody tr:hover .row-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 /*# sourceMappingURL=Table.css.map */
