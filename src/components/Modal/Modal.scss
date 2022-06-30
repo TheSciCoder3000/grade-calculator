@@ -44,12 +44,12 @@
                     margin-bottom: 0.75rem;
                 }
                 .subject-fields {
+                    h2 {
+                        font-weight: 400;
+                        margin-bottom: 0.35rem;
+                        font-size: 1.5em;
+                    }
                     .grades-cont {
-                        .grades-header {
-                            font-weight: 400;
-                            margin-bottom: 0.35rem;
-                            font-size: 1.5em;
-                        }
                         .grades-field {
                             margin-left: 1.75rem;
                         }

@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import "./Modal.css";
 
-type TModalContext = string | null;
-const ModalContext = createContext<TModalContext>("");
+type TModalContext = TModalObject | null;
+interface TModalObject {
+    target: string;
+    data?: any;
+}
+const ModalContext = createContext<TModalContext>(null);
 
 const ModalControllerContext = createContext<IControllerContext>({} as IControllerContext);
 export const ModalController: React.FC = ({ children }) => {
@@ -15,6 +19,7 @@ export const ModalController: React.FC = ({ children }) => {
 };
 
 export const useController = () => useContext(ModalControllerContext).setController;
+export const useControllerData = () => useContext(ModalControllerContext).controller?.data;
 
 interface IModalProps {
     className?: string;
@@ -49,7 +54,7 @@ interface IMSwitchProps {
 export const MSwitch: React.FC<IMSwitchProps> = ({ type, children }) => {
     const ModalType = useContext(ModalContext);
 
-    return type === ModalType ? <>{children}</> : <></>;
+    return type === ModalType?.target ? <>{children}</> : <></>;
 };
 
 interface IControllerContext {

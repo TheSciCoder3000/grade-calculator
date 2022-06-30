@@ -9,9 +9,11 @@ import { createColumns } from "./utils";
 
 interface ITableProps {
     DATA: ISubjects[];
+    yearId: string;
+    semId: string;
 }
 
-const GradeTable: FC<ITableProps> = ({ DATA }) => {
+const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
     // Initialize columns
     const columns = useMemo(() => createColumns(DATA) as Column<ISubjects>[], [DATA]);
 
@@ -53,7 +55,7 @@ const GradeTable: FC<ITableProps> = ({ DATA }) => {
 
     const setController = useController();
     const addSubjectHandler = () => {
-        setController("add-subject");
+        setController({ target: "add-subject", data: { yearId, semId } });
     };
 
     return (
