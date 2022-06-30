@@ -6,58 +6,6 @@ import Toggler from "../Toggler";
 import { useInitializeTogglers, useTogglerCRUD } from "./utils";
 import "./Overview.css";
 
-// TODO: remove this once connected to firestore
-const DATA: ISubjects[] = [
-    {
-        id: "cpe",
-        name: "CPET121",
-        year: "7cb0cb84962b",
-        sem: "1c073661e7a9",
-        grades: [
-            {
-                name: 'Midterm',
-                value: 97,
-            },
-            {
-                name: 'Finals',
-                value: 100,
-            }
-        ],
-    },
-    {
-        id: "engm",
-        name: "ENGM121",
-        year: "7cb0cb84962b",
-        sem: "1c073661e7a9",
-        grades: [
-            {
-                name: 'Midterm',
-                value: 91,
-            },
-            {
-                name: 'Finals',
-                value: 92,
-            }
-        ],
-    },
-    {
-        id: "math",
-        name: "MATH121",
-        year: "7cb0cb84962b",
-        sem: "1c073661e7a9",
-        grades: [
-            {
-                name: 'Midterm',
-                value: 93,
-            },
-            {
-                name: 'Finals',
-                value: 95,
-            }
-        ],
-    },
-];
-
 // Component Props Interface
 interface ICalculatorOverviewProps {
     /**
@@ -81,11 +29,10 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
     );
 
     // Subject data filtering update - used to filter the subject data by year and sem ids
-    const subjectData =  userData?.subjects || [] as ISubjects[];
-    const data = useMemo(
-        () => subjectData.filter((subj) => subj.year === yearId && subj.sem === semId),
-        [yearId, semId]
-    );
+    const data = useMemo(() => {
+        const subjectData = userData?.subjects || ([] as ISubjects[]);
+        return subjectData.filter((subj) => subj.year === yearId && subj.sem === semId);
+    }, [yearId, semId, userData]);
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
@@ -119,7 +66,7 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
                             onItemClick={setSemId}
                         />
                     </div>
-                    <GradeTable DATA={data} />
+                    <GradeTable DATA={data} {...{ yearId, semId }} />
                 </>
             ) : (
                 <div className="loading-data">Loading User data</div>
