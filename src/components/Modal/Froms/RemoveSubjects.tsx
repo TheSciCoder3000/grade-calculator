@@ -1,6 +1,5 @@
 import { useFirestore } from "@useFirebase";
 import { ISubjects } from "Firebase/FirebaseDb";
-import React from "react";
 import { useController, useControllerData } from "../CustomModal";
 
 const RemoveSubjects = () => {
@@ -11,11 +10,10 @@ const RemoveSubjects = () => {
     const deleteSubjectsHandler = () => {
         if (!userData) return;
         setController(null);
-        console.log("removing", data.subject.name);
         dbFunctions.setUserData(userData.userUid, {
             ...userData,
-            subjects: userData.subjects.filter((subj) =>
-                data.subject.some((removeSubj: ISubjects) => removeSubj.name !== subj.name)
+            subjects: userData.subjects.filter(
+                (subj) => !data.subject.some((removeSubj: ISubjects) => removeSubj.name === subj.name)
             ),
         });
     };
