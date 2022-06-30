@@ -3,7 +3,7 @@
     left: 0;
     right: 0;
     top: 0;
-    bottom: 0;
+    min-height: 100vh;
     background-color: rgba(0, 0, 0, 0.534);
     padding: 0 1.5rem;
 
@@ -27,6 +27,20 @@
             padding: 0.35rem 0.5rem;
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+
+            button {
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
         .add-subject-cont {
             h1 {
                 font-size: 3em;
@@ -56,17 +70,24 @@
                     }
                 }
             }
-            .modal-actions {
-                display: flex;
-                gap: 1rem;
+        }
 
-                button {
-                    border: none;
-                    padding: 0.5rem 1rem;
+        .remove-subject-cont {
+            h1 {
+                font-size: 2.5em;
+                font-weight: 500;
+            }
+            p {
+                margin-bottom: 2 rem;
+            }
 
-                    &:hover {
-                        cursor: pointer;
-                    }
+            .confirm-delete {
+                background-color: red;
+                color: white;
+                font-weight: 600;
+
+                &:hover {
+                    background-color: rgb(255, 69, 69);
                 }
             }
         }
