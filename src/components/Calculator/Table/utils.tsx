@@ -18,14 +18,17 @@ interface IColumn {
 
 type CreateColumnType = (subjects: ISubjects[]) => IColumn[];
 export const createColumns: CreateColumnType = (subjects) => {
-    const blueprint = subjects[0] || {
-        grades: [
-            {
-                name: "Midterm",
-                value: 0,
-            },
-        ],
-    };
+    let ExtraBlueprint = new Set<string>();
+    let GradesBlueprint = new Set<string>();
+    subjects.forEach((subject) => {
+        subject.grades.forEach((grade) => {
+            GradesBlueprint.add(grade.name);
+        });
+        subject.extra?.forEach((extra) => {
+            ExtraBlueprint.add(extra.name);
+        });
+    });
+
     return [
         {
             Header: "Course Name",
@@ -36,23 +39,21 @@ export const createColumns: CreateColumnType = (subjects) => {
             },
             Footer: "Average",
         },
-        ...(blueprint.extra
-            ? blueprint.extra.map((extra, indx) => {
-                  return {
-                      Header: extra.name,
-                      accessor: (doc) => doc.extra?.find((item) => item.name === extra.name)?.value,
-                      Cell: ({ row }) => row.values[extra.name],
-                  } as IColumn;
-              })
-            : []),
-        ...blueprint.grades.map((grade) => {
+        ...[...ExtraBlueprint].map((extra, indx) => {
             return {
-                Header: grade.name,
-                accessor: (doc) => doc.grades.find((item) => item.name === grade.name)?.value,
-                Cell: ({ row }) => row.values[grade.name],
+                Header: extra,
+                accessor: (doc) => doc.extra?.find((item) => item.name === extra)?.value,
+                Cell: ({ row }) => row.values[extra] || "",
+            } as IColumn;
+        }),
+        ...[...GradesBlueprint].map((grade) => {
+            return {
+                Header: grade,
+                accessor: (doc) => doc.grades.find((item) => item.name === grade)?.value,
+                Cell: ({ row }) => row.values[grade],
                 Footer: ({ rows }) => {
                     const sum = rows.reduce((partialSum, row) => {
-                        const rowVal = row.values[grade.name] as number;
+                        const rowVal = row.values[grade] as number;
                         return partialSum + rowVal;
                     }, 0);
                     return <>{(sum / rows.length).toFixed(2) || 0}</>;
