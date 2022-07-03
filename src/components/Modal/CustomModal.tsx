@@ -1,14 +1,34 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import "./Modal.css";
 
+// ============================== Types ==============================
 type TModalContext = TModalObject | null;
 interface TModalObject {
     target: string;
     data?: any;
 }
-const ModalContext = createContext<TModalContext>(null);
+interface IControllerContext {
+    controller: TModalContext;
+    setController: React.Dispatch<React.SetStateAction<TModalContext>>;
+}
+interface IMSwitchProps {
+    type: string;
+}
+interface IModalProps {
+    className?: string;
+}
 
+// ============================== Module Logic ==============================
+
+/**
+ * Used to provide the react app the ability to retrieve and set the modal state and the attached payload
+ */
 const ModalControllerContext = createContext<IControllerContext>({} as IControllerContext);
+
+/**
+ * Modal Controller container that wraps around your react app to give the application access to the modal state and update it
+ * @returns jsx component
+ */
 export const ModalController: React.FC = ({ children }) => {
     const [controller, setController] = useState<TModalContext>(null);
     return (
@@ -18,16 +38,34 @@ export const ModalController: React.FC = ({ children }) => {
     );
 };
 
+/**
+ * context function to get the update controller method
+ * @returns a function to update the modal state
+ */
 export const useController = () => useContext(ModalControllerContext).setController;
+/**
+ * context function to get the attached payload of the current modal state
+ * @returns data/payload attached to the modal state
+ */
 export const useControllerData = () => useContext(ModalControllerContext).controller?.data;
 
-interface IModalProps {
-    className?: string;
-}
+/**
+ * Used to provide the modal children the modal state and the optional payload/data
+ */
+const ModalContext = createContext<TModalContext>(null);
+
+/**
+ * a modal container to provide the modal children context values
+ * @param {IModalProps} ModalProps
+ * @returns a jsx component
+ */
 export const Modal: React.FC<IModalProps> = ({ className, children }) => {
+    // get the app's current modal state and update state method
     const { controller, setController } = useContext(ModalControllerContext);
+    // get the model view container node ref to close the modal when user clicks outside the modal
     const modalViewRef = useRef<HTMLDivElement>(null);
 
+    // initialize an event listener to check if a click is within or outside the modal
     useEffect(() => {
         const handleOutsideClick = (e: MouseEvent) => {
             if (modalViewRef.current && controller && !modalViewRef.current.contains(e.target as Node | null))
@@ -37,6 +75,7 @@ export const Modal: React.FC<IModalProps> = ({ className, children }) => {
         document.addEventListener("mousedown", handleOutsideClick);
         return () => document.removeEventListener("mousedown", handleOutsideClick);
     }, [modalViewRef, controller]);
+
     return (
         <ModalContext.Provider value={controller}>
             <div style={{ display: !controller ? "none" : "block" }} className={`modal-cont ${className}`}>
@@ -48,16 +87,12 @@ export const Modal: React.FC<IModalProps> = ({ className, children }) => {
     );
 };
 
-interface IMSwitchProps {
-    type: string;
-}
+/**
+ * It contains the modal that is going to be displayed when its type matches with the modal state
+ * @param {IMSwitchProps} MSwitchProps object containing the container's `type` property
+ */
 export const MSwitch: React.FC<IMSwitchProps> = ({ type, children }) => {
     const ModalType = useContext(ModalContext);
 
     return type === ModalType?.target ? <>{children}</> : <></>;
 };
-
-interface IControllerContext {
-    controller: TModalContext;
-    setController: React.Dispatch<React.SetStateAction<TModalContext>>;
-}
