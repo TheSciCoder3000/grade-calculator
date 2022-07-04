@@ -56,18 +56,28 @@
   position: relative;
 }
 
+.table-cont .calculator__table tbody tr td {
+  position: relative;
+  z-index: 10;
+}
+
 .table-cont .calculator__table tbody tr .row-controls {
   position: absolute;
   height: 100%;
-  right: 100%;
+  left: -5rem;
+  right: -5rem;
+}
+
+.table-cont .calculator__table tbody tr .row-controls .main-controls {
   padding-right: 1rem;
   display: none;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  height: 100%;
 }
 
-.table-cont .calculator__table tbody tr .row-controls .row-add-subject {
+.table-cont .calculator__table tbody tr .row-controls button {
   font-size: 1.2em;
   border: none;
   background-color: transparent;
@@ -75,12 +85,24 @@
   aspect-ratio: 1;
 }
 
-.table-cont .calculator__table tbody tr .row-controls .row-add-subject:hover {
+.table-cont .calculator__table tbody tr .row-controls button:hover {
   background-color: #f7f7f7;
   cursor: pointer;
 }
 
-.table-cont .calculator__table tbody tr:hover .row-controls {
+.table-cont .calculator__table tbody tr .row-controls .cancel-edit {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.9rem;
+}
+
+.table-cont .calculator__table tbody tr .row-controls .row-save-subject {
+  position: absolute;
+  left: 1.2rem;
+  top: 0.9rem;
+}
+
+.table-cont .calculator__table tbody tr:hover .main-controls {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

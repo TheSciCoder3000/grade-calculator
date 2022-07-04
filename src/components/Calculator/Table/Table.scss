@@ -90,15 +90,25 @@ $primary-color: rgb(0, 160, 0);
             tr {
                 position: relative;
 
+                td {
+                    position: relative;
+                    z-index: 10;
+                }
+
                 .row-controls {
                     position: absolute;
                     height: 100%;
-                    right: 100%;
-                    padding-right: 1rem;
-                    display: none;
-                    align-items: center;
+                    left: -5rem;
+                    right: -5rem;
+                    // z-index: -1;
 
-                    .row-add-subject {
+                    .main-controls {
+                        padding-right: 1rem;
+                        display: none;
+                        align-items: center;
+                        height: 100%;
+                    }
+                    button {
                         font-size: 1.2em;
                         border: none;
                         background-color: transparent;
@@ -110,10 +120,21 @@ $primary-color: rgb(0, 160, 0);
                             cursor: pointer;
                         }
                     }
+
+                    .cancel-edit {
+                        position: absolute;
+                        right: 0.8rem;
+                        top: 0.9rem;
+                    }
+                    .row-save-subject {
+                        position: absolute;
+                        left: 1.2rem;
+                        top: 0.9rem;
+                    }
                 }
 
                 &:hover {
-                    .row-controls {
+                    .main-controls {
                         display: flex;
                     }
                 }

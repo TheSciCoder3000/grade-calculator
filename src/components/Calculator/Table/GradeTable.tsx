@@ -5,6 +5,7 @@ import { useTable, useSortBy, useRowSelect, CellProps, Column } from "react-tabl
 import Checkbox from "./Checkbox";
 import SortIcon from "./SortIcon";
 import "./Table.css";
+import TableRow from "./TableRow";
 import { createColumns } from "./utils";
 
 interface ITableProps {
@@ -68,13 +69,17 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
 
     return (
         <div className="table-cont">
+            {/* ============================== Table Controls ============================== */}
             <div className="table-controls">
                 <button className="trash" onClick={deleteSubjectsHandler}>
                     Trash
                 </button>
                 <button className="settings">Settings</button>
             </div>
+
+            {/* ============================== Main table ============================== */}
             <table {...getTableProps({ className: "calculator__table" })}>
+                {/* +++++++++++++++++++++ Table Header +++++++++++++++++++++ */}
                 <thead>
                     {headerGroups.map((headerGroup) => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
@@ -106,26 +111,17 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
                     ))}
                 </thead>
 
+                {/* +++++++++++++++++++++ Table Body +++++++++++++++++++++ */}
                 <tbody {...getTableBodyProps()}>
                     {rows.length > 0 ? (
-                        rows.map((row, indx) => {
-                            prepareRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells.map((cell) => (
-                                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                                    ))}
-                                    <div className="row-controls">
-                                        <button
-                                            onClick={() => addSubjectHandler(indx + 1)}
-                                            className="row-add-subject"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </tr>
-                            );
-                        })
+                        rows.map((row, indx) => (
+                            <TableRow
+                                row={row}
+                                indx={indx}
+                                prepareRow={prepareRow}
+                                addSubjectHandler={addSubjectHandler}
+                            />
+                        ))
                     ) : (
                         <tr>
                             <td className="no-subjects-row" colSpan={3} onClick={() => addSubjectHandler()}>
@@ -135,6 +131,7 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
                     )}
                 </tbody>
 
+                {/* +++++++++++++++++++++ Table Footer +++++++++++++++++++++ */}
                 <tfoot>
                     {footerGroups.map((footerGroup) => (
                         <tr {...footerGroup.getFooterGroupProps()}>
