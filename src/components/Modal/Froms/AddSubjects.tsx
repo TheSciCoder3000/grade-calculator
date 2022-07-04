@@ -1,5 +1,5 @@
 import { useFirestore } from "@useFirebase";
-import { ICommonField } from "Firebase/FirebaseDb";
+import { ICommonField, ISubjects } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
@@ -30,9 +30,10 @@ const AddSubjects = () => {
 
         // initialize new updates
         let userSubjects = [...userData.subjects];
-        const newSubject = {
+        const newSubject: ISubjects = {
             sem: modalPayload.semId,
             year: modalPayload.yearId,
+            extra: [],
             grades: [
                 {
                     name: "Midterm",

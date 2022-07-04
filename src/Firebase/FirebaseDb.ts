@@ -52,7 +52,7 @@ export interface ICommonField {
 export interface ISubjects extends ICommonField {
     year: string;
     sem: string;
-    extra?: {
+    extra: {
         name: string;
         value: string;
     }[];

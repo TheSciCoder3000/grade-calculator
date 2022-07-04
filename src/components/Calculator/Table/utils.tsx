@@ -24,7 +24,7 @@ export const createColumns: CreateColumnType = (subjects) => {
         subject.grades.forEach((grade) => {
             GradesBlueprint.add(grade.name);
         });
-        subject.extra?.forEach((extra) => {
+        subject.extra.forEach((extra) => {
             ExtraBlueprint.add(extra.name);
         });
     });
@@ -42,7 +42,7 @@ export const createColumns: CreateColumnType = (subjects) => {
         ...[...ExtraBlueprint].map((extra, indx) => {
             return {
                 Header: extra,
-                accessor: (doc) => doc.extra?.find((item) => item.name === extra)?.value,
+                accessor: (doc) => doc.extra.find((item) => item.name === extra)?.value,
                 Cell: ({ row }) => row.values[extra] || "",
             } as IColumn;
         }),
