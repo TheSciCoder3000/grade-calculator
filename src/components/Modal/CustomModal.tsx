@@ -19,6 +19,7 @@ interface IModalProps {
 }
 
 // ============================== Module Logic ==============================
+// TODO: USE REACT PORTALS
 
 /**
  * Used to provide the react app the ability to retrieve and set the modal state and the attached payload
