@@ -21,10 +21,10 @@ import { FirebaseApp } from "firebase/app";
 export interface IUserDoc {
     userUid: string; // User's id
     // name: string                                                         // user's name
-    years: ICommonField[]; // collection of object containing the college year name and id
+    years: ITableCommonProps[]; // collection of object containing the college year name and id
     subjects: ISubjects[]; // collection of object contianing the subject name and id
-    sems: ICommonField[]; // collection of object containing the sem name and id
-    terms: ICommonField[]; // collection of object containing the term name and id
+    sems: ITableCommonProps[]; // collection of object containing the sem name and id
+    terms: ITableCommonProps[]; // collection of object containing the term name and id
 }
 
 /**
@@ -32,7 +32,7 @@ export interface IUserDoc {
  * - `name`: string that will be displayed on the ui
  * - `id`: used for querying in the database
  */
-export interface ICommonField {
+export interface ITableCommonProps {
     /**
      * display name of item
      */
@@ -43,7 +43,7 @@ export interface ICommonField {
     id: string;
 }
 
-interface IExtraProp {
+interface IFieldProps {
     name: string;
     value: string | number;
 }
@@ -54,22 +54,24 @@ interface IExtraProp {
  * - `mid`: avg midterm grade
  * - `final`: avg finals grade
  */
-export interface ISubjects extends ICommonField {
+export interface ISubjects extends ITableCommonProps {
     year: string;
     sem: string;
-    extra: IExtraProp[];
-    grades: IExtraProp[];
+    grades: IFieldProps[];
+    extra: IFieldProps[];
 }
 
 /**
  * interface
+ * - `id:` item identifier
  * - `name:` Course Name
+ * - `extra:` list of extra custom fields that is displayed in the table
  * - `subj`: subject id key
  * - `term`: term id key
  * - `type`: type name
  * - `grade`: assessment score
  */
-export interface IAssessment extends ICommonField {
+export interface IAssessment extends ITableCommonProps {
     /**
      * subject id key (should be included inside the subject).
      * * **Item query identifier**
@@ -86,7 +88,7 @@ export interface IAssessment extends ICommonField {
      */
     catgory: string;
     grade: number;
-    extra: IExtraProp[];
+    extra: IFieldProps[];
 }
 
 /**
