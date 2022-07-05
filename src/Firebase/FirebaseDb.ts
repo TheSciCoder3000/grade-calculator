@@ -43,6 +43,11 @@ export interface ICommonField {
     id: string;
 }
 
+interface IExtraProp {
+    name: string;
+    value: string | number;
+}
+
 /**
  * Subject interface that extends from the IUserField Interface.
  * Adds the following properties:
@@ -52,14 +57,8 @@ export interface ICommonField {
 export interface ISubjects extends ICommonField {
     year: string;
     sem: string;
-    extra: {
-        name: string;
-        value: string;
-    }[];
-    grades: {
-        name: string;
-        value: number;
-    }[];
+    extra: IExtraProp[];
+    grades: IExtraProp[];
 }
 
 /**
@@ -87,6 +86,7 @@ export interface IAssessment extends ICommonField {
      */
     catgory: string;
     grade: number;
+    extra: IExtraProp[];
 }
 
 /**
