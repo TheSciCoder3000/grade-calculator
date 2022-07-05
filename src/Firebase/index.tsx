@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
+import "dotenv/config";
 import { initializeApp } from "firebase/app";
 import { User } from "firebase/auth";
 // import { getAnalytics } from "firebase/analytics";
@@ -7,17 +7,17 @@ import { User } from "firebase/auth";
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { initializeFirestore, IUserDoc } from "./FirebaseDb";
 
-// TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+console.log("api key", process.env);
 const firebaseConfig = {
-    apiKey: "AIzaSyDR7cy9pg18k1hEhbKkFgG9wNM5T6CcFvY",
-    authDomain: "grade-calculator-3000.firebaseapp.com",
-    projectId: "grade-calculator-3000",
-    storageBucket: "grade-calculator-3000.appspot.com",
-    messagingSenderId: "565775310347",
-    appId: "1:565775310347:web:7d2abca2387076bf45b10e",
-    measurementId: "G-8DV6VP5YXG",
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_APP_ID,
+    measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
