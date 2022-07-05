@@ -68,7 +68,7 @@ export interface ISubjects extends ICommonField {
  * - `subj`: subject id key
  * - `term`: term id key
  * - `type`: type name
- * - `value`: assessment score
+ * - `grade`: assessment score
  */
 export interface IAssessment extends ICommonField {
     /**
@@ -86,7 +86,7 @@ export interface IAssessment extends ICommonField {
      * * **Used to determine which table the item will be placed**
      */
     catgory: string;
-    value: number;
+    grade: number;
 }
 
 /**
