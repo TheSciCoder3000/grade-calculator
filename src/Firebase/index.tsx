@@ -6,10 +6,10 @@ import { User } from "firebase/auth";
 
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { initializeFirestore, IUserDoc } from "./FirebaseDb";
+import "dotenv/config";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-console.log("api key", process.env);
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
     authDomain: process.env.REACT_APP_AUTH_DOMAIN,
@@ -109,7 +109,9 @@ const FirebaseContext = createContext<IFirebaseContext>({
  */
 export const FirebaseConetxtProvider: React.FC<IFirebaseContextProvider> = ({ children }) => {
     const Auth = useAuthContext();
-    const Firestore = useFirestoreGrade(Auth.AuthStatus?.uid);
+    const Firestore = useFirestoreGrade(
+        process.env.REACT_APP_DEMO_MODE === "PROD" ? Auth.AuthStatus?.uid : process.env.REACT_APP_DEMO_ID
+    );
 
     return <FirebaseContext.Provider value={{ Auth, Firestore }}>{children}</FirebaseContext.Provider>;
 };

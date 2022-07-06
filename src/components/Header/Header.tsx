@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthStatusType, SignOutType } from "@useFirebase";
-
 import AccountIcon from "./account_circle.svg";
 import "./css/Header.css";
+import "dotenv/config";
 
 interface HeaderProps {
     IsSignedIn: AuthStatusType;
@@ -16,7 +16,7 @@ interface HeaderProps {
  * @returns JSX Header Component
  */
 const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
-    // Header states initialization
+    // Header states
     const history = useHistory();
     const [toggleProfileMenu, setToggleProfileMenu] = useState(false);
 
@@ -40,10 +40,12 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
         return () => document.removeEventListener("mousedown", handleOutsideClick);
     }, [menuRef]);
 
+    const demoMode = process.env.REACT_APP_DEMO_MODE === "DEMO";
+
     return (
         <div className="header">
             <div className="header-cont">
-                <div className="header-logo">Grade Calculator</div>
+                <div className="header-logo">Grade Calculator{demoMode ? ": DEMO MODE" : ""}</div>
                 <div className="header-menu">
                     {IsSignedIn ? (
                         <>
@@ -57,7 +59,10 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
                                 />
                                 {toggleProfileMenu && (
                                     <div ref={menuRef} className="profile-menu">
-                                        <div className="sign-out-menu menu-item" onClick={onSignOut}>
+                                        <div
+                                            className="sign-out-menu menu-item"
+                                            onClick={demoMode ? () => {} : onSignOut}
+                                        >
                                             Sign Out
                                         </div>
                                     </div>

@@ -1,15 +1,17 @@
 import React, { useState, useMemo } from "react";
-import { useFirestore } from "@useFirebase";
+import { useFirebaseAuth, useFirestore } from "@useFirebase";
 import { ISubjects } from "Firebase/FirebaseDb";
 import { createSubjectsColumns, useTogglerCRUD } from "./utils";
 import { useController } from "@Components/Modal";
 import GradeTable from "@Components/Calculator/Table";
 import Toggler from "../Toggler";
 import "./Overview.css";
+import "dotenv/config";
 
 const CaluclatorOverview: React.FC = () => {
     // use firestore data and functions
     const { userData, dbFunctions } = useFirestore();
+    const { AuthStatus } = useFirebaseAuth();
 
     // initialize component states
     const [yearId, setYearId] = useState("");
@@ -67,7 +69,7 @@ const CaluclatorOverview: React.FC = () => {
 
     return (
         <div className="calculator__overview-container">
-            {userData ? (
+            {userData && (AuthStatus || process.env.REACT_APP_DEMO_MODE === "DEMO") ? (
                 <>
                     <h1>Course Overview</h1>
                     <div className="section-selection">
@@ -99,6 +101,8 @@ const CaluclatorOverview: React.FC = () => {
                         SaveChangesHandler={SaveChangesHanlder}
                     />
                 </>
+            ) : !AuthStatus ? (
+                <div className="no-connection">No Connection</div>
             ) : (
                 <div className="loading-data">Loading User data</div>
             )}
