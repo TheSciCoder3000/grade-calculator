@@ -5,8 +5,21 @@ $primary-color: rgb(0, 160, 0);
 
     .table-controls {
         margin-bottom: 0.35rem;
+        display: flex;
+        justify-content: flex-end;
+
         button {
             margin-right: 0.5rem;
+            display: block;
+            border: none;
+            background-color: transparent;
+            font-size: 1.25em;
+            fill: rgb(150, 150, 150);
+
+            &:hover {
+                cursor: pointer;
+                fill: rgb(110, 110, 110);
+            }
         }
     }
 
@@ -98,8 +111,7 @@ $primary-color: rgb(0, 160, 0);
                 .row-controls {
                     position: absolute;
                     height: 100%;
-                    left: -5rem;
-                    right: -5rem;
+                    left: -4.5rem;
                     // z-index: -1;
 
                     .main-controls {
@@ -123,12 +135,12 @@ $primary-color: rgb(0, 160, 0);
 
                     .cancel-edit {
                         position: absolute;
-                        right: 0.8rem;
+                        right: 2.5rem;
                         top: 0.9rem;
                     }
                     .row-save-subject {
                         position: absolute;
-                        left: 1.2rem;
+                        left: 2rem;
                         top: 0.9rem;
                     }
                 }

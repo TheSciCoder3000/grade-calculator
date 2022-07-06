@@ -4,10 +4,26 @@
 
 .table-cont .table-controls {
   margin-bottom: 0.35rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
 }
 
 .table-cont .table-controls button {
   margin-right: 0.5rem;
+  display: block;
+  border: none;
+  background-color: transparent;
+  font-size: 1.25em;
+  fill: #969696;
+}
+
+.table-cont .table-controls button:hover {
+  cursor: pointer;
+  fill: #6e6e6e;
 }
 
 .table-cont .calculator__table {
@@ -64,8 +80,7 @@
 .table-cont .calculator__table tbody tr .row-controls {
   position: absolute;
   height: 100%;
-  left: -5rem;
-  right: -5rem;
+  left: -4.5rem;
 }
 
 .table-cont .calculator__table tbody tr .row-controls .main-controls {
@@ -92,13 +107,13 @@
 
 .table-cont .calculator__table tbody tr .row-controls .cancel-edit {
   position: absolute;
-  right: 0.8rem;
+  right: 2.5rem;
   top: 0.9rem;
 }
 
 .table-cont .calculator__table tbody tr .row-controls .row-save-subject {
   position: absolute;
-  left: 1.2rem;
+  left: 2rem;
   top: 0.9rem;
 }
 

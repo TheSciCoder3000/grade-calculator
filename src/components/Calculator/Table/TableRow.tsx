@@ -1,5 +1,6 @@
 import React, { useState, useRef, createRef, useEffect } from "react";
 import { Row } from "react-table";
+import { Edit, Save, Cancel } from "./svg";
 
 interface ITableProps<T extends object = {}> {
     row: Row<T>;
@@ -70,16 +71,16 @@ const TableRow = <T extends {}>({
                             +
                         </button>
                         <button onClick={() => setEditMode(true)} className="row-edit-subject">
-                            Edit
+                            <Edit />
                         </button>
                     </div>
                 ) : (
                     <>
                         <button onClick={() => SaveChangesHandler()} className="row-save-subject">
-                            Save
+                            <Save />
                         </button>
                         <button onClick={() => setEditMode(false)} className="cancel-edit">
-                            Cancel
+                            <Cancel />
                         </button>
                     </>
                 )}

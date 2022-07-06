@@ -1,9 +1,10 @@
 import { useMemo } from "react";
-import { useTable, useSortBy, useRowSelect, CellProps, Hooks, Column } from "react-table";
+import { useTable, useSortBy, useRowSelect, Column } from "react-table";
 import SortIcon from "./SortIcon";
-import "./Table.css";
 import TableRow from "./TableRow";
 import { selectionHook } from "./utils";
+import { Trash, Settings } from "./svg";
+import "./Table.css";
 
 interface ITableProps<T extends {}> {
     DATA: T[];
@@ -54,9 +55,11 @@ const GradeTable = <T extends { id: string }>({
             {/* ============================== Table Controls ============================== */}
             <div className="table-controls">
                 <button className="trash" onClick={onSubjectsDelete}>
-                    Trash
+                    <Trash />
                 </button>
-                <button className="settings">Settings</button>
+                <button className="settings">
+                    <Settings />
+                </button>
             </div>
 
             {/* ============================== Main table ============================== */}
