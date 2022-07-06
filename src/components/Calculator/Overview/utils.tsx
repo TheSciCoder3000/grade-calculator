@@ -1,11 +1,29 @@
-import { IUserDoc } from "Firebase/FirebaseDb";
+import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
 import { useState, useEffect } from "react";
+import { Cell, Column, Row } from "react-table";
+import CourseCellLink from "../Table/CourseLink";
 
-// Intializing the Togglers component
+// toggler crud functions
+type HandlerType = "sems" | "years";
 type SetStateType = (userData: IUserDoc) => void;
-type TInitializeTogglers = (userData: IUserDoc | null, ...setTogglers: SetStateType[]) => void;
+type TogglerCRUDType = (
+    userData: IUserDoc | null,
+    setUserData: (userId: string, newValue: IUserDoc) => Promise<void>,
+    ...setTogglers: SetStateType[]
+) => {
+    addItemHandler: (field: HandlerType) => (fieldName: string) => void;
+    removeItemHandler: (field: HandlerType) => (itemId: string) => void;
+    updateItemHandler: (field: HandlerType) => (itemId: string, value: string) => void;
+};
 
-export const useInitializeTogglers: TInitializeTogglers = (userData, ...setTogglers) => {
+/**
+ * Initialize the togglers and generate toggler CRUD functions
+ * @param userData - user's firestore data
+ * @param setUserData - firebase function for updating the user's data
+ * @param setTogglers - functions that are run when initializing the togglers
+ * @returns toggler CRUD functions
+ */
+export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTogglers) => {
     const [initializeTable, setInitializeTable] = useState(false);
     useEffect(() => {
         // if userData is null or table has already been rendered
@@ -15,20 +33,7 @@ export const useInitializeTogglers: TInitializeTogglers = (userData, ...setToggl
         setTogglers.forEach((setToggler) => setToggler(userData));
         setInitializeTable(true);
     }, [userData]);
-};
 
-// toggler crud functions
-type HandlerType = "sems" | "years";
-type TogglerCRUDType = (
-    userData: IUserDoc | null,
-    setUserData: (userId: string, newValue: IUserDoc) => Promise<void>
-) => {
-    addItemHandler: (field: HandlerType) => (fieldName: string) => void;
-    removeItemHandler: (field: HandlerType) => (itemId: string) => void;
-    updateItemHandler: (field: HandlerType) => (itemId: string, value: string) => void;
-};
-
-export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData) => {
     const addItemHandler = (field: HandlerType) => (fieldName: string) => {
         if (!userData) return;
 
@@ -69,4 +74,63 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData) => {
     };
 
     return { addItemHandler, removeItemHandler, updateItemHandler };
+};
+
+interface IColumn<T extends {}> {
+    Header: string;
+    accessor: string | ((doc: T) => number | string);
+    Cell?: string | ((cell: Cell<T>) => JSX.Element | string);
+    Footer?: string | ((row: { rows: Row<T>[] }) => JSX.Element | string);
+}
+
+/**
+ * generate table columns data using subject array
+ * @param subjects
+ * @returns a column data type supported by the table component
+ */
+export const createSubjectsColumns = (subjects: ISubjects[]) => {
+    let ExtraBlueprint = new Set<string>();
+    let GradesBlueprint = new Set<string>();
+    subjects.forEach((subject) => {
+        subject.grades.forEach((grade) => {
+            GradesBlueprint.add(grade.name);
+        });
+        subject.extra.forEach((extra) => {
+            ExtraBlueprint.add(extra.name);
+        });
+    });
+
+    return [
+        {
+            Header: "Course Name",
+            accessor: "name",
+            Cell: (cell) => {
+                const value = cell.row.original;
+                return <CourseCellLink courseName={value.name} courseId={value.id} />;
+            },
+            Footer: "Average",
+        } as IColumn<ISubjects>,
+        ...[...ExtraBlueprint].map((extra) => {
+            return {
+                Header: extra,
+                accessor: (doc) => doc.extra.find((item) => item.name === extra)?.value,
+                Cell: ({ row }) => row.values[extra] || "",
+            } as IColumn<ISubjects>;
+        }),
+        ...[...GradesBlueprint].map((grade) => {
+            return {
+                Header: grade,
+                accessor: (doc) => doc.grades.find((item) => item.name === grade)?.value,
+                Cell: ({ row }) => row.values[grade],
+                Footer: (prop) => {
+                    const { rows } = prop;
+                    const sum = rows.reduce((partialSum, row) => {
+                        const rowVal = row.values[grade] as number;
+                        return partialSum + rowVal;
+                    }, 0);
+                    return <>{(sum / rows.length).toFixed(2) || 0}</>;
+                },
+            } as IColumn<ISubjects>;
+        }),
+    ] as Column<ISubjects>[];
 };
