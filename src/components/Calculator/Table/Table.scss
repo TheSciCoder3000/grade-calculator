@@ -110,6 +110,10 @@ $primary-color: rgb(0, 160, 0);
                 td {
                     position: relative;
                     z-index: 10;
+
+                    &:first-child {
+                        width: 1rem;
+                    }
                 }
 
                 .row-controls {
