@@ -1,19 +1,22 @@
-import { useFirestore } from "@useFirebase";
-import { ISubjects } from "Firebase/FirebaseDb";
 import React, { useState, useRef, createRef, useEffect } from "react";
-import { Cell, Row } from "react-table";
+import { Row } from "react-table";
 
-interface ITableProps {
-    row: Row<ISubjects>;
+interface ITableProps<T extends object = {}> {
+    row: Row<T>;
     indx: number;
-    prepareRow: (row: Row<ISubjects>) => void;
+    prepareRow: (row: Row<T>) => void;
     addSubjectHandler: (indx?: number) => void;
+    updateSubjectHandler: (newSubjData: { name: string; value: string | undefined }[]) => void;
 }
 
-const TableRow: React.FC<ITableProps> = ({ row, indx, prepareRow, addSubjectHandler }) => {
+const TableRow = <T extends {}>({
+    row,
+    indx,
+    prepareRow,
+    addSubjectHandler,
+    updateSubjectHandler,
+}: ITableProps<T>) => {
     prepareRow(row);
-
-    const { userData, dbFunctions } = useFirestore();
     const [editMode, setEditMode] = useState(false);
 
     // initialize refs for each column field
@@ -29,57 +32,21 @@ const TableRow: React.FC<ITableProps> = ({ row, indx, prepareRow, addSubjectHand
     }, [editMode]);
 
     /**
-     * updates the database on the changes in each item
+     * Calls the update function and passes the list of fields
      */
     const SaveChangesHandler = () => {
-        // cancel update if userData is null
-        if (!userData) return;
-
         // disable edit mode
         setEditMode(false);
 
-        // TODO: create a new object with the updated data
-        let newUserSubject = [...userData.subjects].map((subj) => {
-            if (subj.id === row.original.id) {
-                return RowRefs.current.reduce(
-                    (subjObj, currItem) => {
-                        const inputEl = currItem.cellRef.current;
-                        const itemField = currItem.value;
-
-                        // if input element is null
-                        if (!inputEl) return subjObj; // return the unchanged object
-
-                        // initialize variables
-                        let SubjCopy = { ...subjObj }; // create an editable copy of subject object
-
-                        // either one of these var are defined or all of them are undefined
-                        const gradeItem = SubjCopy.grades.find((gradeItem) => gradeItem.name === itemField); // create a ref to the grade item
-                        const extraItem = SubjCopy.extra.find((extraItem) => extraItem.name === itemField); // create a ref to the extra item
-
-                        // if the item value is "name"
-                        if (currItem.value === "name")
-                            SubjCopy[currItem.value] = inputEl.value; // update the name field
-                        // else if subject.grades contains field
-                        else if (gradeItem) gradeItem.value = parseInt(inputEl.value); // update new int value
-                        // else if subject.extra contains field
-                        else if (extraItem) extraItem.value = inputEl.value; // update new value
-                        // else add to array of extra fields
-                        else
-                            SubjCopy.extra.push({
-                                name: itemField,
-                                value: inputEl.value,
-                            });
-                        return SubjCopy;
-                    },
-                    { ...row.original } as ISubjects
-                );
-            } else return subj;
+        let newUserSubject = RowRefs.current.map((item) => {
+            return {
+                name: item.value,
+                value: item.cellRef.current?.value,
+            };
         });
 
-        dbFunctions.setUserData(userData.userUid, {
-            ...userData,
-            subjects: newUserSubject,
-        });
+        // update subject
+        updateSubjectHandler(newUserSubject);
     };
 
     return (
@@ -97,7 +64,7 @@ const TableRow: React.FC<ITableProps> = ({ row, indx, prepareRow, addSubjectHand
                 </td>
             ))}
             <div className="row-controls">
-                {!editMode && (
+                {!editMode ? (
                     <div className="main-controls">
                         <button onClick={() => addSubjectHandler(indx + 1)} className="row-add-subject">
                             +
@@ -106,8 +73,7 @@ const TableRow: React.FC<ITableProps> = ({ row, indx, prepareRow, addSubjectHand
                             Edit
                         </button>
                     </div>
-                )}
-                {editMode && (
+                ) : (
                     <>
                         <button onClick={() => SaveChangesHandler()} className="row-save-subject">
                             Save

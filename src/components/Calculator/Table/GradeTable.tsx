@@ -1,22 +1,32 @@
-import { useController } from "@Components/Modal";
-import { ISubjects } from "Firebase/FirebaseDb";
-import { useMemo, FC } from "react";
-import { useTable, useSortBy, useRowSelect, CellProps, Column } from "react-table";
-import Checkbox from "./Checkbox";
+import { useMemo } from "react";
+import { useTable, useSortBy, useRowSelect, CellProps, Hooks, Column } from "react-table";
 import SortIcon from "./SortIcon";
 import "./Table.css";
 import TableRow from "./TableRow";
-import { createColumns } from "./utils";
+import { selectionHook } from "./utils";
 
-interface ITableProps {
-    DATA: ISubjects[];
-    yearId: string;
-    semId: string;
+interface ITableProps<T extends {}> {
+    DATA: T[];
+    COLUMNS: Column<T>[];
+    addSubjectHandler: (indx?: number) => void;
+    deleteSubjectHandler: (selectedRows: T[]) => void;
+    SaveChangesHandler: (newRowData: { name: string; value: string | undefined }[]) => void;
 }
 
-const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
+/**
+ * Reusable table component
+ * - data - data that will be displayed in the table
+ * - CRUD - crud functions to manipulate the database
+ */
+const GradeTable = <T extends { id: string }>({
+    DATA,
+    COLUMNS,
+    addSubjectHandler,
+    deleteSubjectHandler,
+    SaveChangesHandler,
+}: ITableProps<T>) => {
     // Initialize columns
-    const columns = useMemo(() => createColumns(DATA) as Column<ISubjects>[], [DATA]);
+    const columns = useMemo(() => COLUMNS, [COLUMNS]);
 
     // Intialize Data
     const data = useMemo(() => DATA, [DATA]);
@@ -30,48 +40,18 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
         prepareRow,
         footerGroups,
         selectedFlatRows,
-    } = useTable({ columns, data }, useSortBy, useRowSelect, (hooks) => {
-        hooks.visibleColumns.push((ColumnsInstance) => {
-            return [
-                {
-                    id: "selection",
-                    Header: ({ getToggleAllRowsSelectedProps }) => {
-                        return (
-                            <Checkbox
-                                {...getToggleAllRowsSelectedProps()}
-                                rowId={"header"}
-                                header={true}
-                                className="header-checkbox"
-                            />
-                        );
-                    },
-                    Cell: ({ row }: React.PropsWithChildren<CellProps<ISubjects, any>>) => {
-                        return <Checkbox {...row.getToggleRowSelectedProps()} rowId={row.original.id} />;
-                    },
-                },
-                ...ColumnsInstance,
-            ];
-        });
-    });
+    } = useTable({ columns, data }, useSortBy, useRowSelect, selectionHook);
 
-    const setController = useController();
-    const addSubjectHandler = (indx?: number) => {
-        setController({ target: "add-subject", data: { yearId, semId, indx } });
-    };
-
-    const deleteSubjectsHandler = () => {
-        if (selectedFlatRows.length)
-            setController({
-                target: "delete-subject",
-                data: { subject: selectedFlatRows.map((row) => row.original) },
-            });
-    };
+    /**
+     * map selected rows to the delete function handler
+     */
+    const onSubjectsDelete = () => deleteSubjectHandler(selectedFlatRows.map((row) => row.original));
 
     return (
         <div className="table-cont">
             {/* ============================== Table Controls ============================== */}
             <div className="table-controls">
-                <button className="trash" onClick={deleteSubjectsHandler}>
+                <button className="trash" onClick={onSubjectsDelete}>
                     Trash
                 </button>
                 <button className="settings">Settings</button>
@@ -120,12 +100,14 @@ const GradeTable: FC<ITableProps> = ({ DATA, yearId, semId }) => {
                                 indx={indx}
                                 prepareRow={prepareRow}
                                 addSubjectHandler={addSubjectHandler}
+                                updateSubjectHandler={SaveChangesHandler}
                             />
                         ))
                     ) : (
                         <tr>
                             <td className="no-subjects-row" colSpan={3} onClick={() => addSubjectHandler()}>
-                                + Add Subject
+                                {/* TODO: modify to dynamically display the table item besides subjects */}+
+                                Add Subject
                             </td>
                         </tr>
                     )}

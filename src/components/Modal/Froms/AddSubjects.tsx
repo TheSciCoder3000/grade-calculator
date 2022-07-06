@@ -1,12 +1,12 @@
 import { useFirestore } from "@useFirebase";
-import { ICommonField, ISubjects } from "Firebase/FirebaseDb";
+import { ITableCommonProps, ISubjects } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
 const AddSubjects = () => {
     // const [newSubjects, NewSubjects] = useState([]);
     const { userData, dbFunctions } = useFirestore();
-    const [terms, setTerms] = useState([] as ICommonField[]);
+    const [terms, setTerms] = useState([] as ITableCommonProps[]);
     const setController = useController();
     const modalPayload = useControllerData();
 
