@@ -21,9 +21,13 @@
   fill: #969696;
 }
 
-.table-cont .table-controls button:hover {
+.table-cont .table-controls button:hover:not(:disabled) {
   cursor: pointer;
   fill: #6e6e6e;
+}
+
+.table-cont .table-controls button:disabled {
+  fill: #c8c8c8;
 }
 
 .table-cont .calculator__table {
@@ -81,6 +85,7 @@
   position: absolute;
   height: 100%;
   left: -4.5rem;
+  right: 0;
 }
 
 .table-cont .calculator__table tbody tr .row-controls .main-controls {

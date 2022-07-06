@@ -16,9 +16,13 @@ $primary-color: rgb(0, 160, 0);
             font-size: 1.25em;
             fill: rgb(150, 150, 150);
 
-            &:hover {
+            &:hover:not(:disabled) {
                 cursor: pointer;
                 fill: rgb(110, 110, 110);
+            }
+
+            &:disabled {
+                fill: rgb(200, 200, 200);
             }
         }
     }
@@ -112,6 +116,7 @@ $primary-color: rgb(0, 160, 0);
                     position: absolute;
                     height: 100%;
                     left: -4.5rem;
+                    right: 0;
                     // z-index: -1;
 
                     .main-controls {

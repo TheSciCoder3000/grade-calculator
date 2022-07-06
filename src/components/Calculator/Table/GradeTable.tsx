@@ -54,7 +54,7 @@ const GradeTable = <T extends { id: string }>({
         <div className="table-cont">
             {/* ============================== Table Controls ============================== */}
             <div className="table-controls">
-                <button className="trash" onClick={onSubjectsDelete}>
+                <button className="trash" disabled={selectedFlatRows.length === 0} onClick={onSubjectsDelete}>
                     <Trash />
                 </button>
                 <button className="settings">
