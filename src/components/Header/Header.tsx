@@ -10,10 +10,17 @@ interface HeaderProps {
     onSignOut: SignOutType;
 }
 
+/**
+ * App header component
+ * @param {HeaderProps} HeaderProps - { IsSignedIn, onSignOut }
+ * @returns JSX Header Component
+ */
 const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
+    // Header states initialization
     const history = useHistory();
     const [toggleProfileMenu, setToggleProfileMenu] = useState(false);
 
+    // handle clicks outside the profile menu container
     const menuRef = useRef<HTMLDivElement>(null);
     const imgRef = useRef<HTMLImageElement>(null);
     useEffect(() => {
@@ -32,6 +39,7 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
         document.addEventListener("mousedown", handleOutsideClick);
         return () => document.removeEventListener("mousedown", handleOutsideClick);
     }, [menuRef]);
+
     return (
         <div className="header">
             <div className="header-cont">

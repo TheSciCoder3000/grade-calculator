@@ -17,6 +17,8 @@ interface ITableProps<T extends {}> {
  * Reusable table component
  * - data - data that will be displayed in the table
  * - CRUD - crud functions to manipulate the database
+ * @param {ITableProps} TableProps
+ * @returns Reusable Table JSX Component
  */
 const GradeTable = <T extends { id: string }>({
     DATA,

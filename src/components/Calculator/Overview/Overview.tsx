@@ -1,23 +1,17 @@
 import React, { useState, useMemo } from "react";
 import { useFirestore } from "@useFirebase";
-import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
+import { ISubjects } from "Firebase/FirebaseDb";
 import { createSubjectsColumns, useTogglerCRUD } from "./utils";
 import { useController } from "@Components/Modal";
 import GradeTable from "@Components/Calculator/Table";
 import Toggler from "../Toggler";
 import "./Overview.css";
 
-// Component Props Interface
-interface ICalculatorOverviewProps {
-    /**
-     * object containing the user's firestore data.
-     * **This updates every time changes within the firestore occurs.**
-     */
-    userData: IUserDoc | null;
-}
+const CaluclatorOverview: React.FC = () => {
+    // use firestore data and functions
+    const { userData, dbFunctions } = useFirestore();
 
-const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) => {
-    const { dbFunctions } = useFirestore();
+    // initialize component states
     const [yearId, setYearId] = useState("");
     const [semId, setSemId] = useState("");
 
@@ -44,16 +38,31 @@ const CaluclatorOverview: React.FC<ICalculatorOverviewProps> = ({ userData }) =>
     );
 
     // ================================== Table CRUD Functions ==================================
+    /**
+     * Used for toggling the modal
+     */
     const setController = useController();
 
+    /**
+     * Adds a new subject item
+     * @param indx - optional, indicates the position of the new subject in the list of subject
+     */
     const addSubjectHandler = (indx?: number) => {
         setController({ target: "add-subject", data: { yearId, semId, indx } });
     };
 
+    /**
+     * Deletes the subject items
+     * @param subject - a list of subjects that are to be deleted
+     */
     const deleteSubjectHandler = (subject: ISubjects[]) => {
         setController({ target: "delete-subject", data: { subject } });
     };
 
+    /**
+     * Update changes made within a subject item
+     * @param newRowData - an object containing the field name and value of the updated item in a subject
+     */
     const SaveChangesHanlder = (newRowData: { name: string; value: string | undefined }[]) => {};
 
     return (

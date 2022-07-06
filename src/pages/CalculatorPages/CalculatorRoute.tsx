@@ -12,12 +12,10 @@ import RemoveSubjects from "@Components/Modal/Froms/RemoveSubjects";
  * @returns JSX Element
  */
 function CalculatorRoute() {
-    const { userData } = useFirestore();
-
     return (
         <div className="calculator-app">
             <Route exact path="/calculator">
-                <CalculatorOverview userData={userData} />
+                <CalculatorOverview />
             </Route>
             <Route path="/calculator/:subjectId">
                 <CalculatorDetails />

@@ -34,6 +34,10 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
         setInitializeTable(true);
     }, [userData]);
 
+    /**
+     * Creates an add item handler for adding filter items
+     * @param field - "years" or "sems"
+     */
     const addItemHandler = (field: HandlerType) => (fieldName: string) => {
         if (!userData) return;
 
@@ -49,6 +53,10 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
         });
     };
 
+    /**
+     * Creates a remove item handler for removing filter items
+     * @param field - "years" or "sems"
+     */
     const removeItemHandler = (field: HandlerType) => (itemId: string) => {
         if (!userData) return;
 
@@ -61,6 +69,10 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
         });
     };
 
+    /**
+     * Creates an update item handler to update a filter item using its itemId and new value as its paramter
+     * @param field - "years" or "sems"
+     */
     const updateItemHandler = (field: HandlerType) => (itemId: string, value: string) => {
         if (!userData) return;
 
