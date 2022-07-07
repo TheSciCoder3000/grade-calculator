@@ -7,10 +7,10 @@ interface ITableProps<T extends object = {}> {
     indx: number;
     prepareRow: (row: Row<T>) => void;
     addSubjectHandler: (indx?: number) => void;
-    updateSubjectHandler: (newSubjData: { name: string; value: string | undefined }[]) => void;
+    updateSubjectHandler: (rowId: string, newRowData: { name: string; value: string | undefined }[]) => void;
 }
 
-const TableRow = <T extends {}>({
+const TableRow = <T extends { id: string }>({
     row,
     indx,
     prepareRow,
@@ -47,7 +47,7 @@ const TableRow = <T extends {}>({
         });
 
         // update subject
-        updateSubjectHandler(newUserSubject);
+        updateSubjectHandler(row.original.id, newUserSubject);
     };
 
     return (

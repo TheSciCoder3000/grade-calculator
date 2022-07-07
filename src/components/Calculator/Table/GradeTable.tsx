@@ -11,7 +11,7 @@ interface ITableProps<T extends {}> {
     COLUMNS: Column<T>[];
     addSubjectHandler: (indx?: number) => void;
     deleteSubjectHandler: (selectedRows: T[]) => void;
-    SaveChangesHandler: (newRowData: { name: string; value: string | undefined }[]) => void;
+    SaveChangesHandler: (rowId: string, newRowData: { name: string; value: string | undefined }[]) => void;
 }
 
 /**

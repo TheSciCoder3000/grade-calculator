@@ -65,7 +65,46 @@ const CaluclatorOverview: React.FC = () => {
      * Update changes made within a subject item
      * @param newRowData - an object containing the field name and value of the updated item in a subject
      */
-    const SaveChangesHanlder = (newRowData: { name: string; value: string | undefined }[]) => {};
+    const SaveChangesHandler = (rowId: string, newRowData: { name: string; value: string | undefined }[]) => {
+        if (!userData) return;
+
+        // throw error if id does not exist in the list of subjects
+        if (!userData.subjects.some((subject) => subject.id === rowId))
+            throw new Error("Updating a subject Item that does not exist");
+
+        dbFunctions.setUserData(userData.userUid, {
+            ...userData,
+            subjects: userData.subjects.map((subj) => {
+                if (subj.id === rowId)
+                    return newRowData.reduce(
+                        (partial, curr) => {
+                            if (curr.name === "name") return { ...partial, name: curr.value || "" };
+                            else if (partial.grades.some((item) => item.name === curr.name))
+                                return {
+                                    ...partial,
+                                    grades: partial.grades.map((gradeItem) => {
+                                        if (gradeItem.name === curr.name)
+                                            return { ...gradeItem, value: parseInt(curr.value || "0") };
+                                        return gradeItem;
+                                    }),
+                                };
+                            else if (partial.extra.some((item) => item.name === curr.name))
+                                return {
+                                    ...partial,
+                                    extra: partial.extra.map((extraItem) => {
+                                        if (extraItem.name === curr.name)
+                                            return { ...extraItem, value: curr.value || "" };
+                                        return extraItem;
+                                    }),
+                                };
+                            return partial;
+                        },
+                        { ...subj }
+                    );
+                return subj;
+            }),
+        });
+    };
 
     return (
         <div className="calculator__overview-container">
@@ -98,7 +137,7 @@ const CaluclatorOverview: React.FC = () => {
                         COLUMNS={TableColumns}
                         addSubjectHandler={addSubjectHandler}
                         deleteSubjectHandler={deleteSubjectHandler}
-                        SaveChangesHandler={SaveChangesHanlder}
+                        SaveChangesHandler={SaveChangesHandler}
                     />
                 </>
             ) : !AuthStatus ? (
