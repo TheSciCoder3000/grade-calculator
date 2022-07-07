@@ -28,6 +28,12 @@ const AddSubjects = () => {
 
         setController(null); // closes the modal
 
+        // generate unique id
+        const random = (length = 8) => Math.random().toString(16).substr(2, length);
+        let generatedId = random(20);
+        // while the id already exists, generate another unique id
+        while (userData.subjects.some((subj) => subj.id === generatedId)) generatedId = random(20);
+
         // initialize new updates
         let userSubjects = [...userData.subjects];
         const newSubject: ISubjects = {
@@ -41,7 +47,7 @@ const AddSubjects = () => {
                 },
             ],
             name: subjectName.current.value,
-            id: subjectName.current.value,
+            id: generatedId,
         };
         if (modalPayload.indx) userSubjects.splice(modalPayload.indx, 0, newSubject);
         else userSubjects.push(newSubject);
