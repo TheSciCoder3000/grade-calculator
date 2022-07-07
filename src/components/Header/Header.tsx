@@ -69,7 +69,7 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
                                 )}
                             </div>
                         </>
-                    ) : (
+                    ) : !demoMode ? (
                         <ul>
                             <li
                                 className="menu-items"
@@ -88,6 +88,8 @@ const Header: React.FC<HeaderProps> = ({ IsSignedIn, onSignOut }) => {
                                 Sign Up
                             </li>
                         </ul>
+                    ) : (
+                        <></>
                     )}
                 </div>
             </div>
