@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Cancel } from "../Table/svg";
 
 interface ITogglerProps {
     className?: string;
@@ -116,6 +117,9 @@ const Toggler: React.FC<ITogglerProps> = ({
                         style={{ display: editMode === item.id ? "block" : "none" }}
                         onKeyDown={(e) => onEditKeyHandler(e, item.id)}
                     />
+                    <div className="delete-cont" onClick={() => removeItemHandler(item.id)}>
+                        <Cancel />
+                    </div>
                 </div>
             ))}
             {toggleFieldInput && (

@@ -8,7 +8,7 @@ const AddSubjects = () => {
     const { userData, dbFunctions } = useFirestore();
     const [terms, setTerms] = useState([] as ITableCommonProps[]);
     const setController = useController();
-    const modalPayload = useControllerData();
+    const modalPayload: { yearId: string; semId: string; indx: number | undefined } = useControllerData();
 
     useEffect(() => {
         if (!userData) return;
@@ -35,7 +35,7 @@ const AddSubjects = () => {
         while (userData.subjects.some((subj) => subj.id === generatedId)) generatedId = random(20);
 
         // initialize new updates
-        let userSubjects = [...userData.subjects];
+        // let userSubjects = [...userData.subjects];
         const newSubject: ISubjects = {
             sem: modalPayload.semId,
             year: modalPayload.yearId,
@@ -49,14 +49,11 @@ const AddSubjects = () => {
             name: subjectName.current.value,
             id: generatedId,
         };
-        if (modalPayload.indx) userSubjects.splice(modalPayload.indx, 0, newSubject);
-        else userSubjects.push(newSubject);
+        // if (modalPayload.indx) userSubjects.splice(modalPayload.indx, 0, newSubject);
+        // else userSubjects.push(newSubject);
 
         // send updates to the database
-        dbFunctions.setUserData(userData.userUid, {
-            ...userData,
-            subjects: userSubjects,
-        });
+        dbFunctions.useSubjectFunctions(userData).addSubject(newSubject, modalPayload.indx);
     };
     return (
         <div className="add-subject-cont">

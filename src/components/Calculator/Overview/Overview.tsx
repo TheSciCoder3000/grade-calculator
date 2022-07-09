@@ -34,7 +34,6 @@ const CaluclatorOverview: React.FC = () => {
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
         userData,
-        dbFunctions.setUserData,
         (userStateData) => setYearId(userStateData.years[0].id),
         (userStateData) => setSemId(userStateData.sems[0].id)
     );
@@ -72,9 +71,8 @@ const CaluclatorOverview: React.FC = () => {
         if (!userData.subjects.some((subject) => subject.id === rowId))
             throw new Error("Updating a subject Item that does not exist");
 
-        dbFunctions.setUserData(userData.userUid, {
-            ...userData,
-            subjects: userData.subjects.map((subj) => {
+        dbFunctions.useSubjectFunctions(userData).updateSubject(
+            userData.subjects.map((subj) => {
                 if (subj.id === rowId)
                     return newRowData.reduce(
                         (partial, curr) => {
@@ -102,8 +100,8 @@ const CaluclatorOverview: React.FC = () => {
                         { ...subj }
                     );
                 return subj;
-            }),
-        });
+            })
+        );
     };
 
     return (

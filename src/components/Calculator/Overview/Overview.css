@@ -22,21 +22,44 @@
 .calculator__overview-container .section-selection .toggler-cont .item-cont {
   border: 1px solid black;
   border-radius: 2rem;
-  padding: 0.35rem 1.15rem;
+  padding: 0.35rem 0.75rem 0.35rem 1.15rem;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .calculator__overview-container .section-selection .toggler-cont .item-cont:not(.active-item) {
   cursor: pointer;
 }
 
+.calculator__overview-container .section-selection .toggler-cont .item-cont .delete-cont {
+  margin-left: 0.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.calculator__overview-container .section-selection .toggler-cont .item-cont .delete-cont:hover {
+  cursor: pointer;
+  fill: #575757;
+}
+
 .calculator__overview-container .section-selection .toggler-cont .item-cont.active-item {
   color: white;
   background-color: green;
   border: 1px solid green;
+  fill: white;
+}
+
+.calculator__overview-container .section-selection .toggler-cont .item-cont.active-item .delete-cont:hover {
+  fill: #d7d7d7;
 }
 
 .calculator__overview-container .section-selection .toggler-cont .add-item-cont {

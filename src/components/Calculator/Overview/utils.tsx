@@ -1,3 +1,5 @@
+import { useController } from "@Components/Modal";
+import { useFirestore } from "@useFirebase";
 import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
 import { useState, useEffect } from "react";
 import { Cell, Column, Row } from "react-table";
@@ -8,7 +10,6 @@ type HandlerType = "sems" | "years";
 type SetStateType = (userData: IUserDoc) => void;
 type TogglerCRUDType = (
     userData: IUserDoc | null,
-    setUserData: (userId: string, newValue: IUserDoc) => Promise<void>,
     ...setTogglers: SetStateType[]
 ) => {
     addItemHandler: (field: HandlerType) => (fieldName: string) => void;
@@ -19,11 +20,13 @@ type TogglerCRUDType = (
 /**
  * Initialize the togglers and generate toggler CRUD functions
  * @param userData - user's firestore data
- * @param setUserData - firebase function for updating the user's data
  * @param setTogglers - functions that are run when initializing the togglers
  * @returns toggler CRUD functions
  */
-export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTogglers) => {
+export const useTogglerCRUD: TogglerCRUDType = (userData, ...setTogglers) => {
+    const setController = useController();
+    const { dbFunctions } = useFirestore();
+
     const [initializeTable, setInitializeTable] = useState(false);
     useEffect(() => {
         // if userData is null or table has already been rendered
@@ -41,16 +44,16 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
     const addItemHandler = (field: HandlerType) => (fieldName: string) => {
         if (!userData) return;
 
-        let newUserData = { ...userData };
-        newUserData[field].push({
-            name: fieldName,
-            id: Math.random().toString(16).substr(2, 12),
-        });
-
-        setUserData(userData?.userUid, newUserData).catch((e) => {
-            console.log("something went wrong with addItemHandler");
-            console.error(e);
-        });
+        dbFunctions
+            .useFilterFunctions(userData)
+            .addFilter(field, {
+                name: fieldName,
+                id: Math.random().toString(16).substr(2, 12),
+            })
+            .catch((e) => {
+                console.log("something went wrong with addItemHandler");
+                console.error(e);
+            });
     };
 
     /**
@@ -60,13 +63,10 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
     const removeItemHandler = (field: HandlerType) => (itemId: string) => {
         if (!userData) return;
 
-        let newUserData = { ...userData };
-        const itemIndx = newUserData[field].findIndex((item) => item.id === itemId);
-        if (itemIndx !== -1) newUserData[field].splice(itemIndx, 1);
-        setUserData(userData.userUid, newUserData).catch((e) => {
-            console.log("error at remove item handler: ", e.message);
-            console.error(e);
-        });
+        const itemRef = userData[field].find((item) => item.id === itemId);
+        if (!itemRef) return;
+
+        setController({ target: "remove-filter", data: { ...itemRef, type: field } });
     };
 
     /**
@@ -79,10 +79,13 @@ export const useTogglerCRUD: TogglerCRUDType = (userData, setUserData, ...setTog
         let newUserData = { ...userData };
         let item = newUserData[field].find((itemInstance) => itemInstance.id === itemId);
         if (item) item.name = value;
-        setUserData(userData.userUid, newUserData).catch((e) => {
-            console.log("error at update item handler: ", e.message);
-            console.error(e);
-        });
+        dbFunctions
+            .useFilterFunctions(userData)
+            .updateFilters(field, newUserData[field])
+            .catch((e) => {
+                console.log("error at update item handler: ", e.message);
+                console.error(e);
+            });
     };
 
     return { addItemHandler, removeItemHandler, updateItemHandler };

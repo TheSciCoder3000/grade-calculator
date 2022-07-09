@@ -4,7 +4,6 @@
     margin: 0 auto;
 
     h1 {
-
     }
 
     .section-selection {
@@ -19,20 +18,37 @@
             .item-cont {
                 border: 1px solid black;
                 border-radius: 2rem;
-                padding: 0.35rem 1.15rem;
+                padding: 0.35rem 0.75rem 0.35rem 1.15rem;
                 user-select: none;
-                
+                display: flex;
+
                 &:not(.active-item) {
                     cursor: pointer;
+                }
+
+                .delete-cont {
+                    margin-left: 0.5rem;
+                    display: flex;
+                    align-items: center;
+
+                    &:hover {
+                        cursor: pointer;
+                        fill: rgb(87, 87, 87);
+                    }
                 }
 
                 &.active-item {
                     color: white;
                     background-color: green;
                     border: 1px solid green;
+                    fill: white;
+
+                    .delete-cont:hover {
+                        fill: rgb(215, 215, 215);
+                    }
                 }
             }
-            
+
             .add-item-cont {
                 display: block;
                 border: none;

@@ -6,6 +6,12 @@ import {
     onSnapshot,
     DocumentSnapshot,
     DocumentData,
+    deleteDoc,
+    query,
+    where,
+    collection,
+    getDocs,
+    writeBatch,
 } from "firebase/firestore";
 import { FirebaseApp } from "firebase/app";
 
@@ -22,9 +28,9 @@ export interface IUserDoc {
     userUid: string; // User's id
     // name: string                                                         // user's name
     years: ITableCommonProps[]; // collection of object containing the college year name and id
+    terms: ITableCommonProps[]; // collection of object containing the term name and id
     subjects: ISubjects[]; // collection of object contianing the subject name and id
     sems: ITableCommonProps[]; // collection of object containing the sem name and id
-    terms: ITableCommonProps[]; // collection of object containing the term name and id
 }
 
 /**
@@ -161,13 +167,176 @@ export function initializeFirestore(app: FirebaseApp) {
 
     /**
      * updates user data
+     * ! depracated and to be replaced with single purpose functions
+     * TODO: replace the function with multiple single purpose CRUD functions
      * @param userId user's database id
      * @param newUserData new value for user data
      * @returns a Promise that resolves once data is successfully sent to the backend
      */
     const setUserData = async (userId: string, newUserData: IUserDoc) => {
-        return setDoc(doc(db, "users", userId), newUserData);
+        return setDoc(doc(db, "users", userId), newUserData).then();
     };
 
-    return { createUserDb, fetchUserData, dbListener, setUserData };
+    // ========================================== Assessment CRUD functions ==========================================
+    const getAssessmentFunctions = (userId: string) => {
+        /**
+         * adds an assessment to the subfolder of the user document
+         * @param userId
+         * @param assessmentData - data of the assessment item that will be added
+         */
+        const addAssessment = (assessmentData: IAssessment) => {
+            return setDoc(doc(db, "users", userId, "assessments", assessmentData.id), assessmentData);
+        };
+
+        const assessmentListener = (
+            userId: string,
+            assessmentId: string,
+            dbHandler: (doc: DocumentSnapshot<DocumentData>) => unknown
+        ) => {
+            return onSnapshot(doc(db, "users", userId, "assessments", assessmentId), dbHandler);
+        };
+
+        /**
+         * updates the assessment item
+         * @param userId
+         * @param newAssessment
+         */
+        const updateAssessment = (newAssessment: IAssessment) => {
+            return setDoc(doc(db, "users", userId, "assessments", newAssessment.id), newAssessment);
+        };
+
+        /**
+         * delete an assessment item
+         * @param itemIds - ids of all the assessment that will be deleted
+         */
+        const removeAssessment = (itemIds: string[]) => {
+            if (itemIds.length > 498) throw new Error("Assessments to be deleted has exceeded 500");
+
+            const q = query(
+                collection(db, "users", userId, "assessments"),
+                where("subj", "in", [...itemIds])
+            );
+
+            return getDocs(q).then((querySnapshot) => {
+                const batch = writeBatch(db);
+                querySnapshot.docs.forEach((snapshot) => {
+                    console.log("ref", snapshot.ref);
+                    batch.delete(snapshot.ref);
+                });
+
+                return batch.commit();
+            });
+        };
+
+        return { addAssessment, assessmentListener, updateAssessment, removeAssessment };
+    };
+
+    // ========================================== Subjects CRUD functions ==========================================
+    const useSubjectFunctions = (userData: IUserDoc) => {
+        /**
+         * adds a subject to the user data
+         * @param subjectData
+         */
+        const addSubject = (subjectData: ISubjects, pos?: number) => {
+            const subjectsCount = userData.subjects.length;
+
+            let newSubjects = [...userData.subjects];
+            newSubjects.splice(pos || subjectsCount, 0, subjectData);
+
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                subjects: [...newSubjects],
+            });
+        };
+
+        /**
+         * updates the subject item
+         * @param newSubjectData
+         */
+        const updateSubject = (newSubjects: ISubjects[]) => {
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                subjects: newSubjects,
+            });
+        };
+
+        /**
+         * delete subjects and the assessments
+         * @param subjects
+         * @param onFinished
+         * @returns
+         */
+        const deleteSubjects = (subjects: ISubjects[], onFinished: () => void) => {
+            const subjectIds = new Set(subjects.map((subj) => subj.id));
+            const q = query(
+                collection(db, "users", userData.userUid, "assessments"),
+                where("subj", "in", [...subjectIds])
+            );
+
+            return getAssessmentFunctions(userData.userUid)
+                .removeAssessment([...subjectIds])
+                .then(() => {
+                    onFinished();
+                    return setDoc(doc(db, "users", userData.userUid), {
+                        ...userData,
+                        subjects: [...userData.subjects.filter((subj) => ![...subjectIds].includes(subj.id))],
+                    });
+                });
+        };
+
+        return { addSubject, updateSubject, deleteSubjects };
+    };
+
+    // ========================================== Filters CRUD functions ==========================================
+    /**
+     * a set of filter CRUD functions
+     * @param userData
+     * @returns
+     */
+    const useFilterFunctions = (userData: IUserDoc) => {
+        const userId = userData.userUid;
+        /**
+         * add filters
+         * @param userId
+         * @param filterData
+         */
+        const addFilter = (filterType: "sems" | "years", filterData: ITableCommonProps) => {
+            return setDoc(doc(db, "users", userId), {
+                ...userData,
+                [filterType]: [...userData[filterType], filterData],
+            });
+        };
+
+        /**
+         * update a filter item
+         * @param userId
+         * @param userData - copy of user's document
+         * @param filterType - either years or sems
+         * @param newFilterData - new filter value
+         */
+        const updateFilters = (filterType: "sems" | "years", newFilterData: ITableCommonProps[]) => {
+            const newUserData: IUserDoc = {
+                ...userData,
+                [filterType]: newFilterData,
+            };
+            return setDoc(doc(db, "users", userId), newUserData);
+        };
+
+        const deleteFilter = (filterType: "sems" | "years", filterId: string) => {
+            if (filterType === "years") {
+            }
+        };
+
+        return { addFilter, updateFilters, deleteFilter };
+    };
+
+    return {
+        createUserDb,
+        fetchUserData,
+        dbListener,
+        setUserData,
+        useFilterFunctions,
+        useSubjectFunctions,
+        getAssessmentFunctions,
+    };
 }
