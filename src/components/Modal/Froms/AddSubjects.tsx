@@ -18,6 +18,11 @@ const AddSubjects = () => {
     // Submit Handler
     const subjectName = useRef<HTMLInputElement>(null);
     const gradeRef = useRef<HTMLInputElement>(null);
+    /**
+     * create a new subject using user input
+     * TODO: add form validation
+     * @returns
+     */
     const AddSubjectsHandler = () => {
         // check if elements are accessible
         if (!subjectName.current || !gradeRef.current || !userData) return;

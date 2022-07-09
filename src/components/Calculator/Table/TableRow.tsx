@@ -34,6 +34,7 @@ const TableRow = <T extends { id: string }>({
 
     /**
      * Calls the update function and passes the list of fields
+     * TODO: add form validation before submitting changes
      */
     const SaveChangesHandler = () => {
         // disable edit mode

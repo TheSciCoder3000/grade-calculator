@@ -55,6 +55,7 @@ const Toggler: React.FC<ITogglerProps> = ({
 
     /**
      * An add item handler
+     * TODO: add form validation
      * @param e - Keyboard Event
      */
     const fieldInputHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,6 +95,7 @@ const Toggler: React.FC<ITogglerProps> = ({
 
     /**
      * Keyboard event handler for submiting changes in the toggler item
+     * TODO: add form validation
      * @param e - Keyboard Event
      * @param itemId - toggler item's id
      */
