@@ -1,16 +1,38 @@
 import { useFirestore } from "@useFirebase";
-import React from "react";
-import { useController, useControllerData } from "../CustomModal";
+import { useState } from "react";
+import { useAllowOutsideClick, useController, useControllerData } from "../CustomModal";
 
 const RemoveFilter = () => {
-    const { id, name, type }: { id: string; name: string; type: "sems" | "years" } = useControllerData();
+    const {
+        id,
+        name,
+        type,
+        parentFilterId,
+    }: { id: string; name: string; type: "sems" | "years"; parentFilterId: string } = useControllerData();
     const { userData, dbFunctions } = useFirestore();
+    const [deleting, setDeleting] = useState(false);
     const setController = useController();
+    const setAllowOutsideClick = useAllowOutsideClick();
 
     const deleteFilterHandler = () => {
         if (!userData) return;
 
-        dbFunctions.useFilterFunctions(userData).deleteFilter(type, id);
+        setAllowOutsideClick(false);
+        setDeleting(true);
+
+        const reset = () => {
+            setController(null);
+            setAllowOutsideClick(true);
+            setDeleting(false);
+        };
+
+        const { deleteFilter } = dbFunctions.useFilterFunctions(userData);
+
+        if (type === "years") deleteFilter(type, id).then(reset);
+        else {
+            if (!parentFilterId) throw new Error("parent filter id is null or undefined");
+            deleteFilter(type, id, parentFilterId).then(reset);
+        }
     };
 
     return (
@@ -21,8 +43,8 @@ const RemoveFilter = () => {
                 <button className="cancel-delete" onClick={() => setController(null)}>
                     Cancel
                 </button>
-                <button className="confirm-delete" onClick={deleteFilterHandler}>
-                    Delete
+                <button disabled={deleting} className="confirm-delete" onClick={deleteFilterHandler}>
+                    {deleting ? "deleting" : "Delete"}
                 </button>
             </div>
         </div>

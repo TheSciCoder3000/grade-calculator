@@ -10,6 +10,8 @@ interface TModalObject {
 interface IControllerContext {
     controller: TModalContext;
     setController: React.Dispatch<React.SetStateAction<TModalContext>>;
+    allowOutsideClick: boolean;
+    setAllowOutsideClick: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface IMSwitchProps {
     type: string;
@@ -32,8 +34,11 @@ const ModalControllerContext = createContext<IControllerContext>({} as IControll
  */
 export const ModalController: React.FC = ({ children }) => {
     const [controller, setController] = useState<TModalContext>(null);
+    const [allowOutsideClick, setAllowOutsideClick] = useState(false);
     return (
-        <ModalControllerContext.Provider value={{ controller, setController }}>
+        <ModalControllerContext.Provider
+            value={{ controller, setController, allowOutsideClick, setAllowOutsideClick }}
+        >
             {children}
         </ModalControllerContext.Provider>
     );
@@ -49,6 +54,11 @@ export const useController = () => useContext(ModalControllerContext).setControl
  * @returns data/payload attached to the modal state
  */
 export const useControllerData = () => useContext(ModalControllerContext).controller?.data;
+/**
+ * context function to get the update allow outside click method
+ * @returns a function to allow or disable outside click
+ */
+export const useAllowOutsideClick = () => useContext(ModalControllerContext).setAllowOutsideClick;
 
 /**
  * Used to provide the modal children the modal state and the optional payload/data
@@ -62,20 +72,25 @@ const ModalContext = createContext<TModalContext>(null);
  */
 export const Modal: React.FC<IModalProps> = ({ className, children }) => {
     // get the app's current modal state and update state method
-    const { controller, setController } = useContext(ModalControllerContext);
+    const { controller, setController, allowOutsideClick } = useContext(ModalControllerContext);
     // get the model view container node ref to close the modal when user clicks outside the modal
     const modalViewRef = useRef<HTMLDivElement>(null);
 
     // initialize an event listener to check if a click is within or outside the modal
     useEffect(() => {
         const handleOutsideClick = (e: MouseEvent) => {
-            if (modalViewRef.current && controller && !modalViewRef.current.contains(e.target as Node | null))
+            if (
+                modalViewRef.current &&
+                controller &&
+                !modalViewRef.current.contains(e.target as Node | null) &&
+                !allowOutsideClick
+            )
                 setController(null);
         };
 
         document.addEventListener("mousedown", handleOutsideClick);
         return () => document.removeEventListener("mousedown", handleOutsideClick);
-    }, [modalViewRef, controller]);
+    }, [modalViewRef, controller, allowOutsideClick]);
 
     return (
         <ModalContext.Provider value={controller}>

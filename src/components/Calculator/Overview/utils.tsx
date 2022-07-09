@@ -8,14 +8,6 @@ import CourseCellLink from "../Table/CourseLink";
 // toggler crud functions
 type HandlerType = "sems" | "years";
 type SetStateType = (userData: IUserDoc) => void;
-type TogglerCRUDType = (
-    userData: IUserDoc | null,
-    ...setTogglers: SetStateType[]
-) => {
-    addItemHandler: (field: HandlerType) => (fieldName: string) => void;
-    removeItemHandler: (field: HandlerType) => (itemId: string) => void;
-    updateItemHandler: (field: HandlerType) => (itemId: string, value: string) => void;
-};
 
 /**
  * Initialize the togglers and generate toggler CRUD functions
@@ -23,70 +15,128 @@ type TogglerCRUDType = (
  * @param setTogglers - functions that are run when initializing the togglers
  * @returns toggler CRUD functions
  */
-export const useTogglerCRUD: TogglerCRUDType = (userData, ...setTogglers) => {
+export const useTogglerCRUD = (userData: IUserDoc | null, ...setTogglers: SetStateType[]) => {
     const setController = useController();
     const { dbFunctions } = useFirestore();
 
+    // on initial render
     const [initializeTable, setInitializeTable] = useState(false);
     useEffect(() => {
         // if userData is null or table has already been rendered
         if (!userData || initializeTable) return; // do not update togglers
 
         // else, for each toggler run the toggler functions
-        setTogglers.forEach((setToggler) => setToggler(userData));
+        setTogglers.forEach((setToggler) => setToggler(userData)); // set togglers to first item
         setInitializeTable(true);
     }, [userData]);
 
+    // ================================================= Add filter item and overloads =================================================
+    function addItemHandler(field: "years"): (fieldName: string) => void;
+    function addItemHandler(field: "sems", parentFilterId: string): (fieldName: string) => void;
+
     /**
-     * Creates an add item handler for adding filter items
-     * @param field - "years" or "sems"
+     * Adds a filter item
+     * @param field
+     * @param parentFilterId
      */
-    const addItemHandler = (field: HandlerType) => (fieldName: string) => {
-        if (!userData) return;
+    function addItemHandler(field: HandlerType, parentFilterId?: string): (fieldName: string) => void {
+        if (!userData) throw new Error("unable to update when userData is null or undefined");
 
-        dbFunctions
-            .useFilterFunctions(userData)
-            .addFilter(field, {
-                name: fieldName,
-                id: Math.random().toString(16).substr(2, 12),
-            })
-            .catch((e) => {
-                console.log("something went wrong with addItemHandler");
-                console.error(e);
-            });
-    };
+        const { addFilter } = dbFunctions.useFilterFunctions(userData);
+        if (field === "years") {
+            return (fieldName: string) =>
+                addFilter(field, {
+                    id: Math.random().toString(16).substr(2, 12),
+                    name: fieldName,
+                    sems: [
+                        {
+                            id: Math.random().toString(16).substr(2, 12),
+                            name: "1st sem",
+                        },
+                    ],
+                }).catch((e) => {
+                    console.log("something went wrong with addItemHandler");
+                    console.error(e);
+                });
+        } else {
+            if (!parentFilterId) throw new Error("Parent filter id is null or undefined");
 
+            return (fieldName: string) =>
+                addFilter(
+                    field,
+                    {
+                        id: Math.random().toString(16).substr(2, 12),
+                        name: fieldName,
+                    },
+                    parentFilterId
+                );
+        }
+    }
+
+    // ================================================= delete filter items and overloads =================================================
+    function removeItemHandler(field: "years"): (itemId: string) => void;
+    function removeItemHandler(field: "sems", parentFilterId: string): (itemId: string) => void;
     /**
      * Creates a remove item handler for removing filter items
      * @param field - "years" or "sems"
      */
-    const removeItemHandler = (field: HandlerType) => (itemId: string) => {
-        if (!userData) return;
+    function removeItemHandler(field: HandlerType, parentFilterId?: string) {
+        return (itemId: string) => {
+            if (!userData) return;
+            let itemRef: { name: string } | undefined;
 
-        const itemRef = userData[field].find((item) => item.id === itemId);
-        if (!itemRef) return;
+            if (field === "years") {
+                itemRef = userData.years.find((year) => year.id === itemId);
+            } else {
+                if (!parentFilterId) throw new Error("parent filter id is null or undefined");
+                itemRef = userData.years
+                    .find((year) => year.id === parentFilterId)
+                    ?.sems.find((sem) => sem.id === itemId);
+            }
 
-        setController({ target: "remove-filter", data: { ...itemRef, type: field } });
-    };
+            if (!itemRef) throw new Error(`item in ${field} with id ${itemId} does not exist`);
+            setController({
+                target: "remove-filter",
+                data: {
+                    id: itemId,
+                    name: itemRef.name,
+                    type: field,
+                    parentFilterId,
+                },
+            });
+        };
+    }
 
+    // ================================================= update filter items and overloads =================================================
+    function updateItemHandler(field: "years"): (itemId: string, value: string) => void;
+    function updateItemHandler(
+        field: "sems",
+        parentFilterId: string
+    ): (itemId: string, value: string) => void;
     /**
      * Creates an update item handler to update a filter item using its itemId and new value as its paramter
      * @param field - "years" or "sems"
      */
-    const updateItemHandler = (field: HandlerType) => (itemId: string, value: string) => {
-        if (!userData) return;
+    function updateItemHandler(field: HandlerType, parentFilterId?: string) {
+        if (!userData) throw new Error("unable to update when userData is null or undefined");
 
-        let newUserData = { ...userData };
-        let item = newUserData[field].find((itemInstance) => itemInstance.id === itemId);
-        if (item) item.name = value;
-        dbFunctions
-            .useFilterFunctions(userData)
-            .updateFilters(field, newUserData[field])
-            .catch((e) => {
-                console.log("error at update item handler: ", e.message);
-                console.error(e);
-            });
-    };
+        const { updateFilters } = dbFunctions.useFilterFunctions(userData);
+
+        if (field === "years") {
+            return (itemId: string, value: string) =>
+                updateFilters(field, { id: itemId, name: value }).catch((e) => {
+                    console.log("error at update item handler: ", e.message);
+                    console.error(e);
+                });
+        } else {
+            if (!parentFilterId) throw new Error("parent filter id is null or undefined");
+            return (itemId: string, value: string) =>
+                updateFilters(field, { id: itemId, name: value }, parentFilterId).catch((e) => {
+                    console.log("error at update item handler: ", e.message);
+                    console.error(e);
+                });
+        }
+    }
 
     return { addItemHandler, removeItemHandler, updateItemHandler };
 };

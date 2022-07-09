@@ -31,6 +31,15 @@ const Toggler: React.FC<ITogglerProps> = ({
     const [fieldInputText, setFieldInputText] = useState("");
     const fieldInput = useRef<HTMLInputElement>(null);
 
+    // sets the first item active when an item is deleted
+    const itemCount = useRef(items.length);
+    useEffect(() => {
+        if (itemCount.current !== items.length) {
+            if (itemCount.current > items.length && items[0]) onItemClick(items[0].id);
+            itemCount.current = items.length;
+        }
+    }, [items]);
+
     // Focus onto the input field upon rendering the input field for creating toggler items
     useEffect(() => {
         if (toggleFieldInput) fieldInput.current?.focus();
@@ -105,9 +114,10 @@ const Toggler: React.FC<ITogglerProps> = ({
             {items.map((item) => (
                 <div
                     key={`${item.name}-${item.id}`}
-                    onClick={() => onItemClick(item.id)}
+                    onClick={() => activeItem !== item.id && onItemClick(item.id)}
                     onDoubleClick={() => dbClickHandler(item.id, item.name)}
                     className={`item-cont ${activeItem === item.id && "active-item"}`}
+                    style={items.length === 1 ? { paddingRight: "1.25rem" } : {}}
                 >
                     {editMode === item.id ? "" : item.name}
                     <input
@@ -117,9 +127,11 @@ const Toggler: React.FC<ITogglerProps> = ({
                         style={{ display: editMode === item.id ? "block" : "none" }}
                         onKeyDown={(e) => onEditKeyHandler(e, item.id)}
                     />
-                    <div className="delete-cont" onClick={() => removeItemHandler(item.id)}>
-                        <Cancel />
-                    </div>
+                    {items.length > 1 && (
+                        <div className="delete-cont" onClick={() => removeItemHandler(item.id)}>
+                            <Cancel />
+                        </div>
+                    )}
                 </div>
             ))}
             {toggleFieldInput && (

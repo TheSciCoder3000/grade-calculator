@@ -14,7 +14,7 @@ const RemoveSubjects = () => {
     const deleteSubjectsHandler = () => {
         if (!userData) return;
 
-        dbFunctions.useSubjectFunctions(userData).deleteSubjects(subject, () => setController(null));
+        dbFunctions.getSubjectFunctions(userData).deleteSubjects(subject, () => setController(null));
     };
 
     return (

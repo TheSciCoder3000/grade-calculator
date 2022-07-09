@@ -53,7 +53,7 @@ const AddSubjects = () => {
         // else userSubjects.push(newSubject);
 
         // send updates to the database
-        dbFunctions.useSubjectFunctions(userData).addSubject(newSubject, modalPayload.indx);
+        dbFunctions.getSubjectFunctions(userData).addSubject(newSubject, modalPayload.indx);
     };
     return (
         <div className="add-subject-cont">

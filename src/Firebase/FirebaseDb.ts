@@ -27,10 +27,13 @@ import { FirebaseApp } from "firebase/app";
 export interface IUserDoc {
     userUid: string; // User's id
     // name: string                                                         // user's name
-    years: ITableCommonProps[]; // collection of object containing the college year name and id
+    years: IYears[]; // collection of object containing the college year name and id
     terms: ITableCommonProps[]; // collection of object containing the term name and id
     subjects: ISubjects[]; // collection of object contianing the subject name and id
-    sems: ITableCommonProps[]; // collection of object containing the sem name and id
+}
+
+export interface IYears extends ITableCommonProps {
+    sems: ITableCommonProps[];
 }
 
 /**
@@ -97,6 +100,8 @@ export interface IAssessment extends ITableCommonProps {
     extra: IFieldProps[];
 }
 
+const random = (length = 8) => Math.random().toString(16).substr(2, length);
+
 /**
  * initialize the firestore and get access to the firestore-related functions
  * @param app instance of the FirebaseApp
@@ -113,8 +118,6 @@ export function initializeFirestore(app: FirebaseApp) {
      * @returns
      */
     const createUserDb = async (userUid: string) => {
-        const random = (length = 8) => Math.random().toString(16).substr(2, length);
-
         const yearId = random(12);
         const semId = random(12);
         const termId = random(12);
@@ -125,15 +128,15 @@ export function initializeFirestore(app: FirebaseApp) {
                 {
                     name: "1st Year",
                     id: yearId,
+                    sems: [
+                        {
+                            id: semId,
+                            name: "1st sem",
+                        },
+                    ],
                 },
             ],
             subjects: [],
-            sems: [
-                {
-                    name: "1st Semester",
-                    id: semId,
-                },
-            ],
             terms: [
                 {
                     name: "Grade",
@@ -232,7 +235,7 @@ export function initializeFirestore(app: FirebaseApp) {
     };
 
     // ========================================== Subjects CRUD functions ==========================================
-    const useSubjectFunctions = (userData: IUserDoc) => {
+    const getSubjectFunctions = (userData: IUserDoc) => {
         /**
          * adds a subject to the user data
          * @param subjectData
@@ -266,7 +269,11 @@ export function initializeFirestore(app: FirebaseApp) {
          * @param onFinished
          * @returns
          */
-        const deleteSubjects = (subjects: ISubjects[], onFinished: () => void) => {
+        const deleteSubjects = async (subjects: ISubjects[], onFinished?: () => void) => {
+            if (subjects.length < 1) {
+                onFinished && onFinished();
+                return userData;
+            }
             const subjectIds = new Set(subjects.map((subj) => subj.id));
             const q = query(
                 collection(db, "users", userData.userUid, "assessments"),
@@ -276,11 +283,12 @@ export function initializeFirestore(app: FirebaseApp) {
             return getAssessmentFunctions(userData.userUid)
                 .removeAssessment([...subjectIds])
                 .then(() => {
-                    onFinished();
-                    return setDoc(doc(db, "users", userData.userUid), {
+                    if (onFinished) onFinished();
+                    const newUserData = {
                         ...userData,
                         subjects: [...userData.subjects.filter((subj) => ![...subjectIds].includes(subj.id))],
-                    });
+                    };
+                    return setDoc(doc(db, "users", userData.userUid), newUserData).then(() => newUserData);
                 });
         };
 
@@ -295,17 +303,54 @@ export function initializeFirestore(app: FirebaseApp) {
      */
     const useFilterFunctions = (userData: IUserDoc) => {
         const userId = userData.userUid;
+
+        type addFilterReturnType = ReturnType<typeof setDoc>;
+
+        // ================================================= Add filter and overloads =================================================
+        function addFilter(filterType: "years", filterData: IYears): addFilterReturnType;
+        function addFilter(
+            filterType: "sems",
+            filterData: ITableCommonProps,
+            parentFilterId: string
+        ): addFilterReturnType;
+
         /**
          * add filters
-         * @param userId
-         * @param filterData
          */
-        const addFilter = (filterType: "sems" | "years", filterData: ITableCommonProps) => {
+        function addFilter(
+            filterType: "sems" | "years",
+            filterData: IYears | ITableCommonProps,
+            parentFilterId?: string
+        ): addFilterReturnType {
+            if (filterType === "years") {
+                return setDoc(doc(db, "users", userId), {
+                    ...userData,
+                    years: [...userData.years, filterData as IYears],
+                });
+            }
+
+            const yearIndx = userData.years.findIndex((year) => year.id === parentFilterId);
+            if (yearIndx === -1) throw new Error(`parent filter id ${parentFilterId} does not exist`);
+
+            const yearsCopy = [...userData.years];
+            yearsCopy[yearIndx].sems.push(filterData as ITableCommonProps);
             return setDoc(doc(db, "users", userId), {
                 ...userData,
-                [filterType]: [...userData[filterType], filterData],
-            });
-        };
+                years: [...yearsCopy],
+            } as IUserDoc);
+        }
+
+        // ================================================= Update filter and overloads =================================================
+        interface IFilterData {
+            id: string;
+            name: string;
+        }
+        function updateFilters(filterType: "years", newFilterData: IFilterData): Promise<void>;
+        function updateFilters(
+            filterType: "sems",
+            newFilterData: IFilterData,
+            parentFilterId: string
+        ): Promise<void>;
 
         /**
          * update a filter item
@@ -314,18 +359,100 @@ export function initializeFirestore(app: FirebaseApp) {
          * @param filterType - either years or sems
          * @param newFilterData - new filter value
          */
-        const updateFilters = (filterType: "sems" | "years", newFilterData: ITableCommonProps[]) => {
-            const newUserData: IUserDoc = {
-                ...userData,
-                [filterType]: newFilterData,
-            };
-            return setDoc(doc(db, "users", userId), newUserData);
-        };
+        function updateFilters(
+            filterType: "sems" | "years",
+            newFilterData: IFilterData,
+            parentFilterId?: string
+        ): Promise<void> {
+            let newUserData: IUserDoc = { ...userData };
 
-        const deleteFilter = (filterType: "sems" | "years", filterId: string) => {
+            // if filter type is years
             if (filterType === "years") {
+                // set new user data
+                newUserData = {
+                    ...userData,
+                    years: [
+                        ...userData.years.map((year) =>
+                            year.id === newFilterData.id ? { ...year, name: newFilterData.name } : year
+                        ),
+                    ],
+                };
+            } else {
+                // else, it is sems then check if parentFIlterId is null and throw error if it is
+                if (!parentFilterId) throw new Error(`parent filter id is null or undefined`);
+
+                // check if filter id exist then throw error if it doesnt
+                const filterIndx = userData.years.findIndex((year) => year.id === parentFilterId);
+                if (filterIndx === -1) throw new Error(`Filter item id ${newFilterData.id} does not exist`);
+
+                // set new user data
+                newUserData = {
+                    ...userData,
+                    years: [
+                        ...userData.years.map((year) => {
+                            // if year id is equal to parent fitler id
+                            if (year.id === parentFilterId) {
+                                // year with updated sems
+                                return {
+                                    ...year,
+                                    sems: [
+                                        ...year.sems.map((sem) =>
+                                            sem.id === newFilterData.id
+                                                ? { ...sem, name: newFilterData.name }
+                                                : sem
+                                        ),
+                                    ],
+                                };
+                            }
+
+                            // else return the original year object
+                            return year;
+                        }),
+                    ],
+                };
             }
-        };
+
+            return setDoc(doc(db, "users", userId), newUserData);
+        }
+
+        // ================================================= delete filter and overloads =================================================
+        function deleteFilter(filterType: "years", filterId: string): Promise<void>;
+        function deleteFilter(filterType: "sems", filterId: string, parentFilterId: string): Promise<void>;
+
+        function deleteFilter(filterType: "sems" | "years", filterId: string, parentFilterId?: string) {
+            let newYearsData = [...userData.years];
+            let deleteSubjects = [];
+
+            // set the years and deleted subjects array depending on the filter type
+            if (filterType === "years") {
+                deleteSubjects = userData.subjects.filter((subj) => subj.year === filterId);
+                newYearsData = userData.years.filter((year) => year.id !== filterId);
+            } else {
+                if (!parentFilterId) throw new Error("parent filter id is null or undefined");
+                deleteSubjects = userData.subjects.filter(
+                    (subj) => subj.year === parentFilterId && subj.sem === filterId
+                );
+                newYearsData = userData.years.map((year) => {
+                    if (year.id === parentFilterId)
+                        return {
+                            ...year,
+                            sems: year.sems.filter((sem) => sem.id !== filterId),
+                        };
+
+                    return year;
+                });
+            }
+
+            // delete subjects first then delete filter
+            return getSubjectFunctions(userData)
+                .deleteSubjects(deleteSubjects)
+                .then((newUserData) => {
+                    return setDoc(doc(db, "users", userId), {
+                        ...newUserData,
+                        years: newYearsData,
+                    });
+                });
+        }
 
         return { addFilter, updateFilters, deleteFilter };
     };
@@ -336,7 +463,7 @@ export function initializeFirestore(app: FirebaseApp) {
         dbListener,
         setUserData,
         useFilterFunctions,
-        useSubjectFunctions,
+        getSubjectFunctions,
         getAssessmentFunctions,
     };
 }

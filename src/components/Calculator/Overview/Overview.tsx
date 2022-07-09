@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useFirebaseAuth, useFirestore } from "@useFirebase";
 import { ISubjects } from "Firebase/FirebaseDb";
 import { createSubjectsColumns, useTogglerCRUD } from "./utils";
@@ -35,7 +35,7 @@ const CaluclatorOverview: React.FC = () => {
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
         userData,
         (userStateData) => setYearId(userStateData.years[0].id),
-        (userStateData) => setSemId(userStateData.sems[0].id)
+        (userStateData) => setSemId(userStateData.years[0].sems[0].id)
     );
 
     // ================================== Table CRUD Functions ==================================
@@ -71,7 +71,7 @@ const CaluclatorOverview: React.FC = () => {
         if (!userData.subjects.some((subject) => subject.id === rowId))
             throw new Error("Updating a subject Item that does not exist");
 
-        dbFunctions.useSubjectFunctions(userData).updateSubject(
+        dbFunctions.getSubjectFunctions(userData).updateSubject(
             userData.subjects.map((subj) => {
                 if (subj.id === rowId)
                     return newRowData.reduce(
@@ -117,18 +117,25 @@ const CaluclatorOverview: React.FC = () => {
                             addItemHandler={addItemHandler("years")}
                             removeItemHandler={removeItemHandler("years")}
                             updateItemHandler={updateItemHandler("years")}
-                            onItemClick={setYearId}
+                            onItemClick={(itemId) => {
+                                setYearId(itemId);
+                                setSemId(
+                                    userData?.years.find((year) => year.id === itemId)?.sems[0].id || ""
+                                );
+                            }}
                         />
 
-                        <Toggler
-                            className="sem-cont"
-                            activeItem={semId}
-                            items={userData.sems}
-                            addItemHandler={addItemHandler("sems")}
-                            removeItemHandler={removeItemHandler("sems")}
-                            updateItemHandler={updateItemHandler("sems")}
-                            onItemClick={setSemId}
-                        />
+                        {yearId && (
+                            <Toggler
+                                className="sem-cont"
+                                activeItem={semId}
+                                items={userData.years.find((year) => year.id === yearId)?.sems || []}
+                                addItemHandler={addItemHandler("sems", yearId)}
+                                removeItemHandler={removeItemHandler("sems", yearId)}
+                                updateItemHandler={updateItemHandler("sems", yearId)}
+                                onItemClick={setSemId}
+                            />
+                        )}
                     </div>
                     <GradeTable
                         DATA={data}
