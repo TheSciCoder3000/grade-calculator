@@ -4,6 +4,7 @@ import SortIcon from "./SortIcon";
 import TableRow from "./TableRow";
 import { selectionHook } from "./utils";
 import { Trash, Settings } from "./svg";
+import TableSettings from "./TableSettings";
 import "./Table.css";
 
 interface ITableProps<T extends {}> {
@@ -57,9 +58,7 @@ const GradeTable = <T extends { id: string }>({
                 <button className="trash" disabled={selectedFlatRows.length === 0} onClick={onSubjectsDelete}>
                     <Trash />
                 </button>
-                <button className="settings">
-                    <Settings />
-                </button>
+                <TableSettings />
             </div>
 
             {/* ============================== Main table ============================== */}

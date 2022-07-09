@@ -1,10 +1,10 @@
 import { Modal, MSwitch } from "@Components/Modal";
-import { useFirestore } from "@useFirebase";
 import { Route } from "react-router-dom";
 import CalculatorDetails from "@Components/Calculator/Detail";
 import CalculatorOverview from "@Components/Calculator/Overview";
 import AddSubjects from "@Components/Modal/Froms/AddSubjects";
 import RemoveSubjects from "@Components/Modal/Froms/RemoveSubjects";
+import RemoveFilter from "@Components/Modal/Froms/RemoveFilter";
 
 /**
  * Calculator Route Component,
@@ -26,6 +26,9 @@ function CalculatorRoute() {
                 </MSwitch>
                 <MSwitch type="delete-subject">
                     <RemoveSubjects />
+                </MSwitch>
+                <MSwitch type="remove-filter">
+                    <RemoveFilter />
                 </MSwitch>
             </Modal>
         </div>

@@ -10,6 +10,7 @@
   -webkit-box-pack: end;
       -ms-flex-pack: end;
           justify-content: flex-end;
+  position: relative;
 }
 
 .table-cont .table-controls button {
@@ -28,6 +29,29 @@
 
 .table-cont .table-controls button:disabled {
   fill: #c8c8c8;
+}
+
+.table-cont .table-controls .settings-cont {
+  position: relative;
+}
+
+.table-cont .table-controls .settings-cont .settings-menu {
+  position: absolute;
+  top: -650%;
+  right: 100%;
+  min-height: 200px;
+  width: 500px;
+  border: 1px solid #d2d2d2;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background-color: white;
+}
+
+.table-cont .table-controls .settings-cont .settings-menu h3 {
+  font-weight: 400;
+  margin: 0.5rem 0;
 }
 
 .table-cont .calculator__table {
@@ -116,7 +140,7 @@
 
 .table-cont .calculator__table tbody tr .row-controls .cancel-edit {
   position: absolute;
-  right: 2.5rem;
+  right: -2rem;
   top: 0.9rem;
 }
 
