@@ -40,7 +40,7 @@ const RemoveFilter = () => {
             <h1>Remove Subject Confirmation</h1>
             <p>Are you sure you want to remove the filter "{name}"?</p>
             <div className="modal-actions">
-                <button className="cancel-delete" onClick={() => setController(null)}>
+                <button disabled={deleting} className="cancel-delete" onClick={() => setController(null)}>
                     Cancel
                 </button>
                 <button disabled={deleting} className="confirm-delete" onClick={deleteFilterHandler}>

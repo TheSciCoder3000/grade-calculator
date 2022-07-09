@@ -34,7 +34,7 @@ const ModalControllerContext = createContext<IControllerContext>({} as IControll
  */
 export const ModalController: React.FC = ({ children }) => {
     const [controller, setController] = useState<TModalContext>(null);
-    const [allowOutsideClick, setAllowOutsideClick] = useState(false);
+    const [allowOutsideClick, setAllowOutsideClick] = useState(true);
     return (
         <ModalControllerContext.Provider
             value={{ controller, setController, allowOutsideClick, setAllowOutsideClick }}
@@ -83,7 +83,7 @@ export const Modal: React.FC<IModalProps> = ({ className, children }) => {
                 modalViewRef.current &&
                 controller &&
                 !modalViewRef.current.contains(e.target as Node | null) &&
-                !allowOutsideClick
+                allowOutsideClick
             )
                 setController(null);
         };

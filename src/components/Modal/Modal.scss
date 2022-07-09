@@ -90,6 +90,18 @@
                 &:hover {
                     background-color: rgb(255, 69, 69);
                 }
+
+                &:disabled {
+                    background-color: rgb(232, 76, 76);
+                }
+            }
+
+            .cancel-delete:disabled {
+                background-color: rgb(202, 202, 202);
+                color: rgb(99, 99, 99);
+            }
+            button:disabled {
+                cursor: not-allowed;
             }
         }
     }

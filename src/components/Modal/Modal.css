@@ -94,4 +94,17 @@
 .modal-cont .modal-view .remove-subject-cont .confirm-delete:hover {
   background-color: #ff4545;
 }
+
+.modal-cont .modal-view .remove-subject-cont .confirm-delete:disabled {
+  background-color: #e84c4c;
+}
+
+.modal-cont .modal-view .remove-subject-cont .cancel-delete:disabled {
+  background-color: #cacaca;
+  color: #636363;
+}
+
+.modal-cont .modal-view .remove-subject-cont button:disabled {
+  cursor: not-allowed;
+}
 /*# sourceMappingURL=Modal.css.map */
