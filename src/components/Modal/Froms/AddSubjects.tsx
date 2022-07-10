@@ -3,6 +3,11 @@ import { ITableCommonProps, ISubjects } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
+/**
+ * AddSubjects modal component
+ * TODO: dynamically add extra and grade fields
+ * @returns add subjects JSX modal component
+ */
 const AddSubjects = () => {
     // const [newSubjects, NewSubjects] = useState([]);
     const { userData, dbFunctions } = useFirestore();

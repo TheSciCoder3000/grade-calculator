@@ -142,8 +142,9 @@ $primary-color: rgb(0, 160, 0);
                 .row-controls {
                     position: absolute;
                     height: 100%;
-                    left: -4.5rem;
+                    left: -5.5rem;
                     right: 0;
+                    box-sizing: border-box;
                     // z-index: -1;
 
                     .main-controls {

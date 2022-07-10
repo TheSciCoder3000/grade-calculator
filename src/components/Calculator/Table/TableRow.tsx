@@ -1,5 +1,6 @@
 import React, { useState, useRef, createRef, useEffect } from "react";
 import { Row } from "react-table";
+import FormValidation from "@Utilities/FormValidation";
 import { Edit, Save, Cancel } from "./svg";
 
 interface ITableProps<T extends object = {}> {
@@ -34,21 +35,34 @@ const TableRow = <T extends { id: string }>({
 
     /**
      * Calls the update function and passes the list of fields
-     * TODO: add form validation before submitting changes
      */
     const SaveChangesHandler = () => {
+        let updateSubject = true;
         // disable edit mode
         setEditMode(false);
 
-        let newUserSubject = RowRefs.current.map((item) => {
-            return {
-                name: item.value,
-                value: item.cellRef.current?.value,
-            };
-        });
+        let newUserSubject = RowRefs.current
+            // parses it into { name, value }
+            .map((item) => {
+                return {
+                    name: item.value,
+                    value: item.cellRef.current?.value.trimStart().trimEnd(),
+                };
+            })
+            // filters invalid fields
+            .filter((item) => {
+                if (!item.value) {
+                    updateSubject = false;
+                    return false;
+                }
+                const isValid = FormValidation().isStringInputValid(item.value);
+
+                updateSubject = isValid ? updateSubject : false;
+                return isValid;
+            });
 
         // update subject
-        updateSubjectHandler(row.original.id, newUserSubject);
+        if (updateSubject) updateSubjectHandler(row.original.id, newUserSubject);
     };
 
     return (
@@ -65,7 +79,7 @@ const TableRow = <T extends { id: string }>({
                     )}
                 </td>
             ))}
-            <div className="row-controls">
+            <td className="row-controls">
                 {!editMode ? (
                     <div className="main-controls">
                         <button onClick={() => addSubjectHandler(indx + 1)} className="row-add-subject">
@@ -85,7 +99,7 @@ const TableRow = <T extends { id: string }>({
                         </button>
                     </>
                 )}
-            </div>
+            </td>
         </tr>
     );
 };
@@ -95,12 +109,25 @@ interface IEditCell {
 }
 const EditCell = React.forwardRef<HTMLInputElement, IEditCell>(({ value }, ref) => {
     const [inputValue, setInputValue] = useState(value);
+
+    const setCellValue = (inputVal: string) => {
+        setInputValue((state) => {
+            if (typeof value === "number") {
+                const parsedValue = parseInt(inputVal);
+                if (parsedValue >= 0) return parsedValue;
+                return state;
+            }
+
+            return inputVal;
+        });
+    };
+
     return (
         <input
             ref={ref}
             type={typeof value === "number" ? "number" : "text"}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => setCellValue(e.target.value)}
         />
     );
 });

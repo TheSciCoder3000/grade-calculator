@@ -4,7 +4,7 @@
         "paths": {
             "@useFirebase": ["./Firebase/index"],
             "@Components/*": ["./components/*"],
-            "@Utilities/*": ["./util/index"]
+            "@Utilities/*": ["./util/*"]
         },
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],

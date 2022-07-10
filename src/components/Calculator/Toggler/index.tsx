@@ -1,3 +1,4 @@
+import FormValidation from "@Utilities/FormValidation";
 import React, { useState, useEffect, useRef } from "react";
 import { Cancel } from "../Table/svg";
 
@@ -55,13 +56,15 @@ const Toggler: React.FC<ITogglerProps> = ({
 
     /**
      * An add item handler
-     * TODO: add form validation
      * @param e - Keyboard Event
      */
     const fieldInputHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            if (fieldInput.current) addItemHandler(fieldInput.current.value);
-            resetInputField();
+        if (e.key === "Enter" && fieldInput.current) {
+            const newTogglerValue = fieldInput.current.value;
+            if (FormValidation().isStringInputValid(newTogglerValue)) {
+                addItemHandler(fieldInput.current.value);
+                resetInputField();
+            }
         } else if (e.key === "Escape") resetInputField();
     };
 
@@ -95,14 +98,14 @@ const Toggler: React.FC<ITogglerProps> = ({
 
     /**
      * Keyboard event handler for submiting changes in the toggler item
-     * TODO: add form validation
      * @param e - Keyboard Event
      * @param itemId - toggler item's id
      */
     const onEditKeyHandler = (e: React.KeyboardEvent<HTMLInputElement>, itemId: string) => {
-        if (e.key === "Enter") {
+        const newTogglerValue = editFields.current[itemId].value;
+        if (e.key === "Enter" && FormValidation().isStringInputValid(newTogglerValue)) {
             setEditMode(null);
-            updateItemHandler(itemId, editFields.current[itemId].value);
+            updateItemHandler(itemId, newTogglerValue);
         } else if (e.key === "Escape") setEditMode(null);
     };
 

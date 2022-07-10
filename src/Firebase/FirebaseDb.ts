@@ -168,18 +168,6 @@ export function initializeFirestore(app: FirebaseApp) {
         return unsub;
     };
 
-    /**
-     * updates user data
-     * ! depracated and to be replaced with single purpose functions
-     * TODO: replace the function with multiple single purpose CRUD functions
-     * @param userId user's database id
-     * @param newUserData new value for user data
-     * @returns a Promise that resolves once data is successfully sent to the backend
-     */
-    const setUserData = async (userId: string, newUserData: IUserDoc) => {
-        return setDoc(doc(db, "users", userId), newUserData).then();
-    };
-
     // ========================================== Assessment CRUD functions ==========================================
     const getAssessmentFunctions = (userId: string) => {
         /**
@@ -256,7 +244,37 @@ export function initializeFirestore(app: FirebaseApp) {
          * updates the subject item
          * @param newSubjectData
          */
-        const updateSubject = (newSubjects: ISubjects[]) => {
+        const updateSubject = (rowId: string, newRowData: { name: string; value: string | undefined }[]) => {
+            const newSubjects = userData.subjects.map((subj) => {
+                if (subj.id === rowId)
+                    return newRowData.reduce(
+                        (partial, curr) => {
+                            if (curr.name === "name") return { ...partial, name: curr.value || "" };
+                            else if (partial.grades.some((item) => item.name === curr.name))
+                                return {
+                                    ...partial,
+                                    grades: partial.grades.map((gradeItem) => {
+                                        if (gradeItem.name === curr.name)
+                                            return { ...gradeItem, value: parseInt(curr.value || "0") };
+                                        return gradeItem;
+                                    }),
+                                };
+                            else if (partial.extra.some((item) => item.name === curr.name))
+                                return {
+                                    ...partial,
+                                    extra: partial.extra.map((extraItem) => {
+                                        if (extraItem.name === curr.name)
+                                            return { ...extraItem, value: curr.value || "" };
+                                        return extraItem;
+                                    }),
+                                };
+                            return partial;
+                        },
+                        { ...subj }
+                    );
+                return subj;
+            });
+
             return setDoc(doc(db, "users", userData.userUid), {
                 ...userData,
                 subjects: newSubjects,
@@ -461,7 +479,6 @@ export function initializeFirestore(app: FirebaseApp) {
         createUserDb,
         fetchUserData,
         dbListener,
-        setUserData,
         useFilterFunctions,
         getSubjectFunctions,
         getAssessmentFunctions,

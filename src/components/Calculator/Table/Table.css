@@ -112,8 +112,10 @@
 .table-cont .calculator__table tbody tr .row-controls {
   position: absolute;
   height: 100%;
-  left: -4.5rem;
+  left: -5.5rem;
   right: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .table-cont .calculator__table tbody tr .row-controls .main-controls {

@@ -1,3 +1,8 @@
+/**
+ * function that validates user inputs
+ * TODO: add warning prompts there is an invalid input
+ * @returns a list of functions to validate user inputs
+ */
 export default function FormValidation() {
     function isStringInputValid(value: string): boolean;
     function isStringInputValid(inputEl: HTMLInputElement): boolean;
@@ -20,7 +25,7 @@ export default function FormValidation() {
         }
 
         // initialize test cases
-        const stringIsEmpty = stringInput === "" || /\s/g.test(stringInput);
+        const stringIsEmpty = /^\s*$/.test(stringInput);
         const exceedLimit = stringInput.length > 50;
 
         // return if input is valid

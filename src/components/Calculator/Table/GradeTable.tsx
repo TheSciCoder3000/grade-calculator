@@ -65,7 +65,7 @@ const GradeTable = <T extends { id: string }>({
             <table {...getTableProps({ className: "calculator__table" })}>
                 {/* +++++++++++++++++++++ Table Header +++++++++++++++++++++ */}
                 <thead>
-                    {headerGroups.map((headerGroup) => (
+                    {headerGroups.map((headerGroup, indx) => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, indx) => (
                                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
@@ -100,6 +100,7 @@ const GradeTable = <T extends { id: string }>({
                     {rows.length > 0 ? (
                         rows.map((row, indx) => (
                             <TableRow
+                                key={indx}
                                 row={row}
                                 indx={indx}
                                 prepareRow={prepareRow}
