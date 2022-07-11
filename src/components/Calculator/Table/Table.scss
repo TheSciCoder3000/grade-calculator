@@ -130,7 +130,7 @@ $primary-color: rgb(0, 160, 0);
             tr {
                 position: relative;
 
-                td {
+                td:not(.row-controls) {
                     position: relative;
                     z-index: 10;
 

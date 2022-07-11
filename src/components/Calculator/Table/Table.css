@@ -100,12 +100,12 @@
   position: relative;
 }
 
-.table-cont .calculator__table tbody tr td {
+.table-cont .calculator__table tbody tr td:not(.row-controls) {
   position: relative;
   z-index: 10;
 }
 
-.table-cont .calculator__table tbody tr td:first-child {
+.table-cont .calculator__table tbody tr td:not(.row-controls):first-child {
   width: 1rem;
 }
 
