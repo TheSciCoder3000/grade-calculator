@@ -4,7 +4,7 @@ import { ITableCommonProps, ISubjects } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
-type FieldTypes = "grade" | "extra";
+type FieldTypes = "grades" | "extra";
 type IFieldInputs = Record<FieldTypes, { name: string; value: string | number }[]>;
 
 /**
@@ -23,7 +23,7 @@ const AddSubjects = () => {
     } = useControllerData();
 
     // input states
-    const [fieldInputs, setfieldInputs] = useState<IFieldInputs>({ grade: [], extra: [] } as IFieldInputs);
+    const [fieldInputs, setfieldInputs] = useState<IFieldInputs>({ grades: [], extra: [] } as IFieldInputs);
 
     // parsed table fields
     const fields = modalPayload.fields.reduce((partial, curr) => {
@@ -44,13 +44,13 @@ const AddSubjects = () => {
                             [curr.type]: [
                                 ...(partial[curr.type] || []),
                                 ...curr.fields.map((fieldName) => {
-                                    return { name: fieldName, value: curr.type === "grade" ? 0 : "" };
+                                    return { name: fieldName, value: curr.type === "grades" ? 0 : "" };
                                 }),
                             ],
                         };
                         // return partial
                     },
-                    { grade: [], extra: [] } as typeof state
+                    { grades: [], extra: [] } as typeof state
                 );
             });
     }, []);
@@ -61,8 +61,44 @@ const AddSubjects = () => {
      * @returns
      */
     const AddSubjectsHandler = () => {
+        // check if subject name is empty
+        if (!subjectName.current?.value) return console.log("subject name is empty");
+        if (!userData) return console.log("user data is null or undefined");
+
+        // filter out null or undefined field names
+        const fieldTypes: FieldTypes[] = ["grades", "extra"];
+        let filteredSubjectData = fieldTypes.reduce(
+            (partial, fieldName) => {
+                return {
+                    ...partial,
+                    [fieldName]: partial[fieldName].filter((field) => {
+                        // if field name is empty then exclude
+                        if (!field.name) return false;
+
+                        // if field value is empty and field name is not included in the set of fields
+                        if (!field.value && !fields.includes(field.name) && field.value !== 0) return false;
+
+                        // else include
+                        return true;
+                    }),
+                };
+            },
+            { ...fieldInputs }
+        );
+
+        let NewSubjectData: ISubjects = {
+            ...filteredSubjectData,
+            name: subjectName.current.value,
+            sem: modalPayload.semId,
+            year: modalPayload.yearId,
+            id: Math.random().toString(20).substring(2, 12),
+        };
+
         // send updates to the database
-        // dbFunctions.getSubjectFunctions(userData).addSubject(newSubject, modalPayload.indx);
+        dbFunctions
+            .getSubjectFunctions(userData)
+            .addSubject(NewSubjectData, modalPayload.indx)
+            .then(() => setController(null));
     };
 
     /**
@@ -77,7 +113,7 @@ const AddSubjects = () => {
             let newFields = [...state[type]];
             newFields.splice(newFieldInputPos || state[type].length, 0, {
                 name: "",
-                value: "",
+                value: type === "grades" ? 0 : "",
             });
             return {
                 ...state,
@@ -93,7 +129,7 @@ const AddSubjects = () => {
      * @param newValue - new user input value
      */
     const onInputChange = (fieldType: FieldTypes, fieldName: string, newValue: string | number) => {
-        if (fieldType === "grade") {
+        if (fieldType === "grades") {
             newValue = parseInt(newValue as string) || 0;
             if (newValue < 0) newValue = 0;
         }
@@ -121,7 +157,6 @@ const AddSubjects = () => {
     };
 
     const removeField = (fieldType: FieldTypes, fieldIndx: number) => {
-        console.log("removing field at index ", fieldIndx);
         setfieldInputs((state) => {
             return {
                 ...state,
@@ -145,11 +180,11 @@ const AddSubjects = () => {
                     <div className="field-group-cont grades-cont">
                         <h2 className="grades-header">
                             Grades
-                            <button className="add-term" onClick={() => addFieldInput("grade")}>
+                            <button className="add-term" onClick={() => addFieldInput("grades")}>
                                 +
                             </button>
                         </h2>
-                        {fieldInputs.grade.map((term, indx) => (
+                        {fieldInputs.grades.map((term, indx) => (
                             <div key={indx} className="item-field">
                                 {fields.includes(term.name) ? (
                                     term.name
@@ -158,7 +193,7 @@ const AddSubjects = () => {
                                         type="text"
                                         placeholder="Field Name"
                                         onChange={(e) =>
-                                            onFieldNameInputChange("grade", e.target.value, indx)
+                                            onFieldNameInputChange("grades", e.target.value, indx)
                                         }
                                     />
                                 )}{" "}
@@ -168,13 +203,13 @@ const AddSubjects = () => {
                                     value={`${term.value || 0}`}
                                     placeholder={`${term.name} Grade`}
                                     onChange={(e) =>
-                                        onInputChange("grade", term.name, parseInt(e.target.value))
+                                        onInputChange("grades", term.name, parseInt(e.target.value))
                                     }
                                 />{" "}
                                 {!fields.includes(term.name) && (
                                     <button
                                         className="remove-field-btn"
-                                        onClick={() => removeField("grade", indx)}
+                                        onClick={() => removeField("grades", indx)}
                                     >
                                         <Trash />
                                     </button>
@@ -216,7 +251,7 @@ const AddSubjects = () => {
                                         className="remove-field-btn"
                                         onClick={() => removeField("extra", indx)}
                                     >
-                                        -
+                                        <Trash />
                                     </button>
                                 )}
                             </div>

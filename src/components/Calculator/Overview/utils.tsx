@@ -196,7 +196,7 @@ export const createSubjectsColumns = (subjects: ISubjects[]) => {
                     }, 0);
                     return <>{(sum / rows.length).toFixed(2) || 0}</>;
                 },
-                type: "grade",
+                type: "grades",
             } as IColumn<ISubjects>;
         }),
     ] as (Column<ISubjects> & { type: string })[];

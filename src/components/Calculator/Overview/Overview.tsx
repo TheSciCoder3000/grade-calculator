@@ -42,6 +42,7 @@ const CaluclatorOverview: React.FC = () => {
 
         return [...partial, { type: curr.type, fields: [newField] }];
     }, [] as { type: string; fields: string[] }[]);
+    console.log({ fields });
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
