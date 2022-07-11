@@ -21,13 +21,13 @@ function CalculatorRoute() {
                 <CalculatorDetails />
             </Route>
             <Modal>
-                <MSwitch type="add-subject">
+                <MSwitch key="0" type="add-subject">
                     <AddSubjects />
                 </MSwitch>
-                <MSwitch type="delete-subject">
+                <MSwitch key="1" type="delete-subject">
                     <RemoveSubjects />
                 </MSwitch>
-                <MSwitch type="remove-filter">
+                <MSwitch key="2" type="remove-filter">
                     <RemoveFilter />
                 </MSwitch>
             </Modal>

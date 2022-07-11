@@ -7,6 +7,7 @@ import GradeTable from "@Components/Calculator/Table";
 import Toggler from "../Toggler";
 import "./Overview.css";
 import "dotenv/config";
+import { Column } from "react-table";
 
 const CaluclatorOverview: React.FC = () => {
     // use firestore data and functions
@@ -31,6 +32,17 @@ const CaluclatorOverview: React.FC = () => {
      */
     const TableColumns = useMemo(() => createSubjectsColumns(data), [data]);
 
+    const fields = TableColumns.filter((col) => col.accessor !== "name").reduce((partial, curr) => {
+        const newField = curr.Header as string;
+        if (partial.some((field) => field.type === curr.type))
+            return partial.map((field) => {
+                if (field.type === curr.type) return { ...field, fields: [...field.fields, newField] };
+                else return field;
+            });
+
+        return [...partial, { type: curr.type, fields: [newField] }];
+    }, [] as { type: string; fields: string[] }[]);
+
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
         userData,
@@ -49,7 +61,7 @@ const CaluclatorOverview: React.FC = () => {
      * @param indx - optional, indicates the position of the new subject in the list of subject
      */
     const addSubjectHandler = (indx?: number) => {
-        setController({ target: "add-subject", data: { yearId, semId, indx } });
+        setController({ target: "add-subject", data: { yearId, semId, indx, fields } });
     };
 
     /**

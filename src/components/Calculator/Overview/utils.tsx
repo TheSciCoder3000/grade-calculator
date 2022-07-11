@@ -180,6 +180,7 @@ export const createSubjectsColumns = (subjects: ISubjects[]) => {
                 Header: extra,
                 accessor: (doc) => doc.extra.find((item) => item.name === extra)?.value,
                 Cell: ({ row }) => row.values[extra] || "",
+                type: "extra",
             } as IColumn<ISubjects>;
         }),
         ...[...GradesBlueprint].map((grade) => {
@@ -195,7 +196,8 @@ export const createSubjectsColumns = (subjects: ISubjects[]) => {
                     }, 0);
                     return <>{(sum / rows.length).toFixed(2) || 0}</>;
                 },
+                type: "grade",
             } as IColumn<ISubjects>;
         }),
-    ] as Column<ISubjects>[];
+    ] as (Column<ISubjects> & { type: string })[];
 };

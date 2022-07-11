@@ -70,10 +70,71 @@
   font-weight: 400;
   margin-bottom: 0.35rem;
   font-size: 1.5em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
-.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .grades-cont .grades-field {
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields button {
+  margin-left: 0.75rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  aspect-ratio: 1;
+  font-size: 0.7em;
+  padding: 0;
+  border: none;
+  background-color: white;
+  border-radius: 2px;
+  height: 20px;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields button:hover {
+  background-color: #f3f3f3;
+  cursor: pointer;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .item-field {
   margin-left: 1.75rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .item-field .remove-field-btn {
+  font-weight: 600;
+  font-size: 1.2em;
+  height: 30px;
+}
+
+.modal-cont .modal-view .add-subject-cont .subject-input-cont .subject-fields .field-group-cont {
+  margin-bottom: 1rem;
+}
+
+.modal-cont .modal-view .add-subject-cont .add {
+  background-color: #00af00;
+  color: white;
+}
+
+.modal-cont .modal-view .add-subject-cont .add:hover {
+  background-color: #009600;
 }
 
 .modal-cont .modal-view .remove-subject-cont h1 {
