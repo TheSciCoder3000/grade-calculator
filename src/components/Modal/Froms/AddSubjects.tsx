@@ -1,11 +1,10 @@
 import { Trash } from "@Components/Calculator/Table/svg";
 import { useFirestore } from "@useFirebase";
-import { ITableCommonProps, ISubjects } from "Firebase/FirebaseDb";
+import { ITableCommonProps, ISubjects, ColumnFields } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
-type FieldTypes = "grades" | "extra";
-type IFieldInputs = Record<FieldTypes, { name: string; value: string | number }[]>;
+type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: string | number }[]>;
 
 /**
  * AddSubjects modal component
@@ -19,7 +18,7 @@ const AddSubjects = () => {
         yearId: string;
         semId: string;
         indx: number | undefined;
-        fields: { type: FieldTypes; fields: string[] }[];
+        fields: { type: ColumnFields; fields: { id: string; name: string }[] }[];
     } = useControllerData();
 
     // input states
@@ -27,7 +26,7 @@ const AddSubjects = () => {
 
     // parsed table fields
     const fields = modalPayload.fields.reduce((partial, curr) => {
-        return [...partial, ...curr.fields];
+        return [...partial, ...curr.fields.map((field) => field.name)];
     }, [] as string[]);
 
     // subject name field ref
@@ -37,14 +36,19 @@ const AddSubjects = () => {
     useEffect(() => {
         if (modalPayload.fields)
             setfieldInputs((state) => {
+                console.log({ fields: modalPayload.fields });
                 return modalPayload.fields.reduce(
                     (partial, curr) => {
                         return {
                             ...partial,
                             [curr.type]: [
                                 ...(partial[curr.type] || []),
-                                ...curr.fields.map((fieldName) => {
-                                    return { name: fieldName, value: curr.type === "grades" ? 0 : "" };
+                                ...curr.fields.map((fieldProp) => {
+                                    return {
+                                        id: fieldProp.id,
+                                        name: fieldProp.name,
+                                        value: curr.type === "grades" ? 0 : "",
+                                    };
                                 }),
                             ],
                         };
@@ -66,7 +70,7 @@ const AddSubjects = () => {
         if (!userData) return console.log("user data is null or undefined");
 
         // filter out null or undefined field names
-        const fieldTypes: FieldTypes[] = ["grades", "extra"];
+        const fieldTypes: ColumnFields[] = ["grades", "extra"];
         let filteredSubjectData = fieldTypes.reduce(
             (partial, fieldName) => {
                 return {
@@ -94,11 +98,11 @@ const AddSubjects = () => {
             id: Math.random().toString(20).substring(2, 12),
         };
 
+        console.log({ NewSubjectData });
         // send updates to the database
-        dbFunctions
-            .getSubjectFunctions(userData)
-            .addSubject(NewSubjectData, modalPayload.indx)
-            .then(() => setController(null));
+        dbFunctions.getSubjectFunctions(userData).addSubject(NewSubjectData, modalPayload.indx);
+
+        setController(null);
     };
 
     /**
@@ -107,11 +111,12 @@ const AddSubjects = () => {
      * @param type - "grade" or "extra"
      * @param newFieldInputPos - (optional) position where the field input will be placed relative to the
      */
-    const addFieldInput = (type: FieldTypes, newFieldInputPos?: number) => {
+    const addFieldInput = (type: ColumnFields, newFieldInputPos?: number) => {
         if (fieldInputs[type].some((field) => field.name === "")) return;
         setfieldInputs((state) => {
             let newFields = [...state[type]];
             newFields.splice(newFieldInputPos || state[type].length, 0, {
+                id: Math.random().toString(21).substring(2, 25),
                 name: "",
                 value: type === "grades" ? 0 : "",
             });
@@ -128,7 +133,7 @@ const AddSubjects = () => {
      * @param fieldName - name of the field
      * @param newValue - new user input value
      */
-    const onInputChange = (fieldType: FieldTypes, fieldName: string, newValue: string | number) => {
+    const onInputChange = (fieldType: ColumnFields, fieldName: string, newValue: string | number) => {
         if (fieldType === "grades") {
             newValue = parseInt(newValue as string) || 0;
             if (newValue < 0) newValue = 0;
@@ -144,7 +149,7 @@ const AddSubjects = () => {
         });
     };
 
-    const onFieldNameInputChange = (fieldType: FieldTypes, newFieldName: string, indx: number) => {
+    const onFieldNameInputChange = (fieldType: ColumnFields, newFieldName: string, indx: number) => {
         setfieldInputs((state) => {
             return {
                 ...state,
@@ -156,7 +161,7 @@ const AddSubjects = () => {
         });
     };
 
-    const removeField = (fieldType: FieldTypes, fieldIndx: number) => {
+    const removeField = (fieldType: ColumnFields, fieldIndx: number) => {
         setfieldInputs((state) => {
             return {
                 ...state,

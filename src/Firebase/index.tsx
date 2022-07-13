@@ -74,7 +74,9 @@ const useFirestoreGrade = (userId: string | null | undefined) => {
 
     // subscribe to firestore event listener and updates userData state on update
     useEffect(() => {
-        if (userId) return FirebaseDb.dbListener(userId, (doc) => setUserData(doc.data() as IUserDoc));
+        if (userId) {
+            return FirebaseDb.dbListener(userId, (doc) => setUserData(doc.data() as IUserDoc));
+        }
     }, [userId]); // enable, disable or change the listener when userId value changes
 
     return {

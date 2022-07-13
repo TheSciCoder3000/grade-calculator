@@ -6,13 +6,18 @@ import { selectionHook } from "./utils";
 import { Trash, Settings } from "./svg";
 import TableSettings from "./TableSettings";
 import "./Table.css";
+import { IUpdateRowProps } from "Firebase/FirebaseDb";
 
 interface ITableProps<T extends {}> {
     DATA: T[];
     COLUMNS: Column<T>[];
     addSubjectHandler: (indx?: number) => void;
     deleteSubjectHandler: (selectedRows: T[]) => void;
-    SaveChangesHandler: (rowId: string, newRowData: { name: string; value: string | undefined }[]) => void;
+    SaveChangesHandler: (
+        rowId: string,
+        nameColData: { name: "name"; value: string },
+        otherColData: IUpdateRowProps[]
+    ) => void;
 }
 
 /**

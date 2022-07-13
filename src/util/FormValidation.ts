@@ -8,6 +8,7 @@ export default function FormValidation() {
     function isStringInputValid(inputEl: HTMLInputElement): boolean;
 
     function isStringInputValid(input: unknown) {
+        if (!input) return false;
         // initialize input string var
         let stringInput: string;
 
@@ -17,7 +18,7 @@ export default function FormValidation() {
             stringInput = input as string;
         } else {
             // else, check if input is an object if not, throw error
-            if (typeof input !== "object") throw new Error("improper arguments");
+            if (typeof input !== "object") return console.error("input element is null");
 
             // else input is a input element then get the value
             const inputEl = input as HTMLInputElement;

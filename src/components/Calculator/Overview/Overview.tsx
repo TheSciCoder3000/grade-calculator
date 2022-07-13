@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useFirebaseAuth, useFirestore } from "@useFirebase";
-import { ISubjects } from "Firebase/FirebaseDb";
+import { ISubjects, IUpdateRowProps } from "Firebase/FirebaseDb";
 import { createSubjectsColumns, useTogglerCRUD } from "./utils";
 import { useController } from "@Components/Modal";
 import GradeTable from "@Components/Calculator/Table";
@@ -33,7 +33,7 @@ const CaluclatorOverview: React.FC = () => {
     const TableColumns = useMemo(() => createSubjectsColumns(data), [data]);
 
     const fields = TableColumns.filter((col) => col.accessor !== "name").reduce((partial, curr) => {
-        const newField = curr.Header as string;
+        const newField = { id: curr.id as string, name: curr.Header as string };
         if (partial.some((field) => field.type === curr.type))
             return partial.map((field) => {
                 if (field.type === curr.type) return { ...field, fields: [...field.fields, newField] };
@@ -41,8 +41,7 @@ const CaluclatorOverview: React.FC = () => {
             });
 
         return [...partial, { type: curr.type, fields: [newField] }];
-    }, [] as { type: string; fields: string[] }[]);
-    console.log({ fields });
+    }, [] as { type: string; fields: { id: string; name: string }[] }[]);
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
@@ -75,11 +74,15 @@ const CaluclatorOverview: React.FC = () => {
 
     /**
      * Update changes made within a subject item
-     * @param newRowData - an object containing the field name and value of the updated item in a subject
+     * @param otherColData - an object containing the field name and value of the updated item in a subject
      */
-    const SaveChangesHandler = (rowId: string, newRowData: { name: string; value: string | undefined }[]) => {
+    const SaveChangesHandler = (
+        rowId: string,
+        nameColData: { name: "name"; value: string },
+        otherColData: IUpdateRowProps[]
+    ) => {
         if (!userData) throw new Error("cannot update when userData is null or undefined");
-        dbFunctions.getSubjectFunctions(userData).updateSubject(rowId, newRowData);
+        dbFunctions.getSubjectFunctions(userData).updateSubject(rowId, nameColData, otherColData);
     };
 
     return (

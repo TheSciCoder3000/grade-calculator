@@ -53,6 +53,7 @@ export interface ITableCommonProps {
 }
 
 interface IFieldProps {
+    id: string;
     name: string;
     value: string | number;
 }
@@ -98,6 +99,15 @@ export interface IAssessment extends ITableCommonProps {
     catgory: string;
     grade: number;
     extra: IFieldProps[];
+}
+
+// ======================================== Function argument types ========================================
+export type ColumnFields = "grades" | "extra";
+export interface IUpdateRowProps {
+    id: string;
+    name: string;
+    type: ColumnFields;
+    value: string | number;
 }
 
 const random = (length = 8) => Math.random().toString(16).substr(2, length);
@@ -244,36 +254,56 @@ export function initializeFirestore(app: FirebaseApp) {
          * updates the subject item
          * @param newSubjectData
          */
-        const updateSubject = (rowId: string, newRowData: { name: string; value: string | undefined }[]) => {
+        const updateSubject = (
+            rowId: string,
+            nameColData: { name: "name"; value: string },
+            otherColData: IUpdateRowProps[]
+        ) => {
+            console.log("parsing new row data", otherColData);
+
+            // map through the items subjects in userData
             const newSubjects = userData.subjects.map((subj) => {
+                // grades and extra fields counter to track what indx new fields will be inserted
+                let gradesCount = 0;
+                let extraCount = 0;
+
+                // if subject item id matches with the updated item
                 if (subj.id === rowId)
-                    return newRowData.reduce(
-                        (partial, curr) => {
-                            if (curr.name === "name") return { ...partial, name: curr.value || "" };
-                            else if (partial.grades.some((item) => item.name === curr.name))
-                                return {
-                                    ...partial,
-                                    grades: partial.grades.map((gradeItem) => {
-                                        if (gradeItem.name === curr.name)
-                                            return { ...gradeItem, value: parseInt(curr.value || "0") };
-                                        return gradeItem;
-                                    }),
-                                };
-                            else if (partial.extra.some((item) => item.name === curr.name))
-                                return {
-                                    ...partial,
-                                    extra: partial.extra.map((extraItem) => {
-                                        if (extraItem.name === curr.name)
-                                            return { ...extraItem, value: curr.value || "" };
-                                        return extraItem;
-                                    }),
-                                };
-                            return partial;
+                    // then return a new updated subject object
+                    return otherColData.reduce(
+                        // loop through every item in the updatedRowData
+                        (partial, updatedRowData) => {
+                            const { type, ...rowData } = updatedRowData;
+
+                            // increase the corresponding field counter
+                            if (type === "grades") gradesCount += 1;
+                            else extraCount += 1;
+
+                            const fieldIndx = partial[type].findIndex((field) => field.id === rowData.id);
+
+                            if (fieldIndx < 0) {
+                                let fieldDataCopy = [...partial[type]];
+                                const fieldIndx = type === "grades" ? gradesCount - 1 : extraCount - 1;
+                                fieldDataCopy.splice(fieldIndx, 0, rowData);
+                                return { ...partial, [type]: fieldDataCopy };
+                            }
+
+                            return {
+                                ...partial,
+                                [type]: [
+                                    ...partial[type].slice(0, fieldIndx - 1),
+                                    rowData,
+                                    ...partial[type].slice(fieldIndx + 1),
+                                ],
+                            };
                         },
-                        { ...subj }
+                        // initial object is a copy of the subject with the updated name
+                        { ...subj, name: nameColData.value }
                     );
                 return subj;
             });
+
+            console.log("updating with new subjects", newSubjects);
 
             return setDoc(doc(db, "users", userData.userUid), {
                 ...userData,

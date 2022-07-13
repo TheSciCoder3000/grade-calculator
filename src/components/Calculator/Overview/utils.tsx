@@ -2,7 +2,7 @@ import { useController } from "@Components/Modal";
 import { useFirestore } from "@useFirebase";
 import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
 import { useState, useEffect } from "react";
-import { Cell, Column, Row } from "react-table";
+import { Cell, Column, FilterProps, Row } from "react-table";
 import CourseCellLink from "../Table/CourseLink";
 
 // toggler crud functions
@@ -154,16 +154,33 @@ interface IColumn<T extends {}> {
  * @returns a column data type supported by the table component
  */
 export const createSubjectsColumns = (subjects: ISubjects[]) => {
-    let ExtraBlueprint = new Set<string>();
-    let GradesBlueprint = new Set<string>();
-    subjects.forEach((subject) => {
-        subject.grades.forEach((grade) => {
-            GradesBlueprint.add(grade.name);
-        });
-        subject.extra.forEach((extra) => {
-            ExtraBlueprint.add(extra.name);
-        });
-    });
+    interface fieldProps {
+        id: string;
+        name: string;
+    }
+    const fieldTypes: ["grades", "extra"] = ["grades", "extra"];
+    const columnBlueprint = fieldTypes.reduce(
+        (typePartial, type) => {
+            return {
+                ...typePartial,
+                [type]: subjects.reduce(
+                    (subjPartial, currSubj) => {
+                        const fieldSetRefs = currSubj[type];
+                        return fieldSetRefs.reduce(
+                            (fieldPartial, currField) => {
+                                if (fieldPartial.some((field) => field.id === currField.id))
+                                    return fieldPartial;
+                                return [...fieldPartial, { id: currField.id, name: currField.name }];
+                            },
+                            [...subjPartial]
+                        );
+                    },
+                    [...typePartial[type]]
+                ),
+            };
+        },
+        { grades: [], extra: [] } as { grades: fieldProps[]; extra: fieldProps[] }
+    );
 
     return [
         {
@@ -175,23 +192,25 @@ export const createSubjectsColumns = (subjects: ISubjects[]) => {
             },
             Footer: "Average",
         } as IColumn<ISubjects>,
-        ...[...ExtraBlueprint].map((extra) => {
+        ...[...columnBlueprint.extra].map((extra) => {
             return {
-                Header: extra,
-                accessor: (doc) => doc.extra.find((item) => item.name === extra)?.value,
-                Cell: ({ row }) => row.values[extra] || "",
+                id: extra.id,
+                Header: extra.name,
+                accessor: (doc) => doc.extra.find((item) => item.id === extra.id)?.value,
+                Cell: ({ row }) => row.values[extra.id] || "",
                 type: "extra",
             } as IColumn<ISubjects>;
         }),
-        ...[...GradesBlueprint].map((grade) => {
+        ...[...columnBlueprint.grades].map((grade) => {
             return {
-                Header: grade,
-                accessor: (doc) => doc.grades.find((item) => item.name === grade)?.value,
-                Cell: ({ row }) => row.values[grade],
+                id: grade.id,
+                Header: grade.name,
+                accessor: (doc) => doc.grades.find((item) => item.id === grade.id)?.value || 0,
+                Cell: ({ row }) => row.values[grade.id],
                 Footer: (prop) => {
                     const { rows } = prop;
                     const sum = rows.reduce((partialSum, row) => {
-                        const rowVal = row.values[grade] as number;
+                        const rowVal = row.values[grade.id] as number;
                         return partialSum + rowVal;
                     }, 0);
                     return <>{(sum / rows.length).toFixed(2) || 0}</>;
