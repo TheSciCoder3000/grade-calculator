@@ -5,7 +5,7 @@ import { User } from "firebase/auth";
 // import { getAnalytics } from "firebase/analytics";
 
 import { InitializeAuthentication } from "./FirebaseAuth";
-import { initializeFirestore, IUserDoc } from "./FirebaseDb";
+import { initializeFirestore, IUserDoc, IYears } from "./FirebaseDb";
 import "dotenv/config";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -70,7 +70,7 @@ const useFirestoreGrade = (userId: string | null | undefined) => {
     const [userData, setUserData] = useState<IUserDoc | null>(null);
 
     // destructure firebaseDb functions
-    const { dbListener, ...FirestoreFunctions } = FirebaseDb;
+    const { dbListener, getFirestoreFunctions, ...firestoreFunctions } = FirebaseDb;
 
     // subscribe to firestore event listener and updates userData state on update
     useEffect(() => {
@@ -85,9 +85,14 @@ const useFirestoreGrade = (userId: string | null | undefined) => {
          * **This updates every time changes within the firestore occurs.**
          */
         userData,
-        dbFunctions: { ...FirestoreFunctions },
+        dbFunctions: {
+            ...firestoreFunctions,
+            ...(userData && getFirestoreFunctions(userData)),
+        },
     };
 };
+
+export type DBFunctionType = ReturnType<typeof useFirestoreGrade>["dbFunctions"];
 
 // ===================================== Firebase Context Creation =====================================
 interface IFirebaseContext {
