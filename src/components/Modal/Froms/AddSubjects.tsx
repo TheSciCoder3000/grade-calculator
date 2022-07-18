@@ -1,10 +1,16 @@
 import { Trash } from "@Components/Calculator/Table/svg";
-import { useFirestore } from "@useFirebase";
-import { ITableCommonProps, ISubjects, ColumnFields } from "Firebase/FirebaseDb";
+import { ISubjects, ColumnFields } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
 type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: string | number }[]>;
+export interface IAddSubjectPayload {
+    yearId: string;
+    semId: string;
+    indx: number | undefined;
+    fields: { type: ColumnFields; fields: { id: string; name: string }[] }[];
+    APIAddSubject: (subjectData: ISubjects, pos?: number | undefined) => Promise<void>;
+}
 
 /**
  * AddSubjects modal component
@@ -12,14 +18,8 @@ type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: stri
  */
 const AddSubjects = () => {
     // modal data and manipulation
-    const { userData, dbFunctions } = useFirestore();
     const setController = useController();
-    const modalPayload: {
-        yearId: string;
-        semId: string;
-        indx: number | undefined;
-        fields: { type: ColumnFields; fields: { id: string; name: string }[] }[];
-    } = useControllerData();
+    const modalPayload: IAddSubjectPayload = useControllerData();
 
     // input states
     const [fieldInputs, setfieldInputs] = useState<IFieldInputs>({ grades: [], extra: [] } as IFieldInputs);
@@ -47,7 +47,7 @@ const AddSubjects = () => {
                                     return {
                                         id: fieldProp.id,
                                         name: fieldProp.name,
-                                        value: curr.type === "grades" ? 0 : "",
+                                        value: curr.type === "grades" ? 0 : undefined,
                                     };
                                 }),
                             ],
@@ -61,13 +61,11 @@ const AddSubjects = () => {
 
     /**
      * create a new subject using user input
-     * TODO: add form validation
      * @returns
      */
     const AddSubjectsHandler = () => {
         // check if subject name is empty
         if (!subjectName.current?.value) return console.log("subject name is empty");
-        if (!userData) return console.log("user data is null or undefined");
 
         // filter out null or undefined field names
         const fieldTypes: ColumnFields[] = ["grades", "extra"];
@@ -99,9 +97,11 @@ const AddSubjects = () => {
         };
 
         console.log({ NewSubjectData });
-        // send updates to the database
-        dbFunctions.getSubjectFunctions(userData).addSubject(NewSubjectData, modalPayload.indx);
 
+        // send updates to the database
+        modalPayload.APIAddSubject(NewSubjectData, modalPayload.indx);
+
+        // close modal
         setController(null);
     };
 
@@ -112,13 +112,16 @@ const AddSubjects = () => {
      * @param newFieldInputPos - (optional) position where the field input will be placed relative to the
      */
     const addFieldInput = (type: ColumnFields, newFieldInputPos?: number) => {
+        // if empty field input exists then cancel
         if (fieldInputs[type].some((field) => field.name === "")) return;
+
+        // add new empty field input
         setfieldInputs((state) => {
             let newFields = [...state[type]];
             newFields.splice(newFieldInputPos || state[type].length, 0, {
                 id: Math.random().toString(21).substring(2, 25),
                 name: "",
-                value: type === "grades" ? 0 : "",
+                value: "",
             });
             return {
                 ...state,
@@ -133,11 +136,23 @@ const AddSubjects = () => {
      * @param fieldName - name of the field
      * @param newValue - new user input value
      */
-    const onInputChange = (fieldType: ColumnFields, fieldName: string, newValue: string | number) => {
+    const onInputChange = (fieldType: ColumnFields, fieldName: string, newRawValue: string) => {
+        let newValue: string | number | undefined = newRawValue;
+
+        // if input type is grades
         if (fieldType === "grades") {
-            newValue = parseInt(newValue as string) || 0;
+            // parse into integer
+            newValue = parseInt(newValue as string);
+
+            // convert to 0 is less than 0
             if (newValue < 0) newValue = 0;
+
+            // if NaN, set to undefined
+            if (`${newValue}` === "NaN") newValue = undefined;
+        } else {
+            if (newValue.trimEnd().trimStart() === "") newValue = undefined;
         }
+
         setfieldInputs((state) => {
             return {
                 ...state,
@@ -149,6 +164,12 @@ const AddSubjects = () => {
         });
     };
 
+    /**
+     * handle changes in the input field for the subject name
+     * @param fieldType
+     * @param newFieldName
+     * @param indx
+     */
     const onFieldNameInputChange = (fieldType: ColumnFields, newFieldName: string, indx: number) => {
         setfieldInputs((state) => {
             return {
@@ -161,6 +182,11 @@ const AddSubjects = () => {
         });
     };
 
+    /**
+     * Removes a newly added field input
+     * @param fieldType
+     * @param fieldIndx
+     */
     const removeField = (fieldType: ColumnFields, fieldIndx: number) => {
         setfieldInputs((state) => {
             return {
@@ -205,11 +231,9 @@ const AddSubjects = () => {
                                 :{" "}
                                 <input
                                     type="number"
-                                    value={`${term.value || 0}`}
+                                    value={`${term.value === undefined ? "" : term.value}`}
                                     placeholder={`${term.name} Grade`}
-                                    onChange={(e) =>
-                                        onInputChange("grades", term.name, parseInt(e.target.value))
-                                    }
+                                    onChange={(e) => onInputChange("grades", term.name, e.target.value)}
                                 />{" "}
                                 {!fields.includes(term.name) && (
                                     <button
@@ -247,7 +271,7 @@ const AddSubjects = () => {
                                 :{" "}
                                 <input
                                     type="text"
-                                    value={term.value}
+                                    value={term.value === undefined ? "" : term.value}
                                     placeholder={`${term.name} value`}
                                     onChange={(e) => onInputChange("extra", term.name, e.target.value)}
                                 />{" "}

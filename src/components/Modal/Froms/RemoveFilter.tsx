@@ -1,22 +1,25 @@
-import { useFirestore } from "@useFirebase";
+import { FilterTypes } from "Firebase/FirebaseDb";
 import { useState } from "react";
 import { useAllowOutsideClick, useController, useControllerData } from "../CustomModal";
 
+export interface IRemoveFilter {
+    id: string;
+    name: string;
+    type: FilterTypes;
+    parentFilterId: string | undefined;
+    APIRemoveFilter: {
+        (filterType: "years", filterId: string): Promise<void>;
+        (filterType: "sems", filterId: string, parentFilterId: string): Promise<void>;
+    };
+}
+
 const RemoveFilter = () => {
-    const {
-        id,
-        name,
-        type,
-        parentFilterId,
-    }: { id: string; name: string; type: "sems" | "years"; parentFilterId: string } = useControllerData();
-    const { userData, dbFunctions } = useFirestore();
+    const { id, name, type, parentFilterId, APIRemoveFilter }: IRemoveFilter = useControllerData();
     const [deleting, setDeleting] = useState(false);
     const setController = useController();
     const setAllowOutsideClick = useAllowOutsideClick();
 
     const deleteFilterHandler = () => {
-        if (!userData) return;
-
         setAllowOutsideClick(false);
         setDeleting(true);
 
@@ -26,12 +29,10 @@ const RemoveFilter = () => {
             setDeleting(false);
         };
 
-        const { deleteFilter } = dbFunctions.useFilterFunctions(userData);
-
-        if (type === "years") deleteFilter(type, id).then(reset);
+        if (type === "years") APIRemoveFilter(type, id).then(reset);
         else {
             if (!parentFilterId) throw new Error("parent filter id is null or undefined");
-            deleteFilter(type, id, parentFilterId).then(reset);
+            APIRemoveFilter(type, id, parentFilterId).then(reset);
         }
     };
 

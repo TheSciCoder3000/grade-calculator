@@ -1,20 +1,19 @@
-import { useFirestore } from "@useFirebase";
-import { ISubjects } from "Firebase/FirebaseDb";
+import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
 import { useController, useControllerData } from "../CustomModal";
 
+export interface IRemoveSubjects {
+    subject: ISubjects[];
+    APIRemoveSubjects: (subjects: ISubjects[], onFinished?: (() => void) | undefined) => Promise<IUserDoc>;
+}
 const RemoveSubjects = () => {
     const setController = useController();
-    const { subject }: { subject: ISubjects[] } = useControllerData();
-    const { userData, dbFunctions } = useFirestore();
+    const { subject, APIRemoveSubjects }: IRemoveSubjects = useControllerData();
 
     /**
      * delete handler when the user confirms to delete the subject/s
-     * TODO: extend so that it also deletes assessments under the subjects
      */
     const deleteSubjectsHandler = () => {
-        if (!userData) return;
-
-        dbFunctions.getSubjectFunctions(userData).deleteSubjects(subject, () => setController(null));
+        APIRemoveSubjects(subject, () => setController(null));
     };
 
     return (
