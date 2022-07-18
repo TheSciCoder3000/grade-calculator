@@ -63,8 +63,9 @@ export default function FormValidation() {
 
         // initialize test cases
         const isNegative = numberInput < 0;
+        const isNaN = `${numberInput}` === "NaN";
 
-        return !isNegative;
+        return !(isNegative || isNaN);
     }
 
     function isEmailValid(value: string): boolean;
