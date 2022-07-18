@@ -1,12 +1,20 @@
+// utility functions
 import { useMemo } from "react";
-import { useTable, useSortBy, useRowSelect, Column } from "react-table";
-import SortIcon from "./SortIcon";
-import TableRow from "./TableRow";
+import { useTable, useSortBy, useRowSelect } from "react-table";
 import { selectionHook } from "./utils";
-import { Trash, Settings } from "./svg";
+
+// components
+import TableRow from "./TableRow";
 import TableSettings from "./TableSettings";
-import "./Table.css";
+
+// types
 import { IUpdateRowProps } from "Firebase/FirebaseDb";
+import { Column } from "react-table";
+
+// env and styles
+import { Trash } from "./svg";
+import SortIcon from "./SortIcon";
+import "./Table.css";
 
 interface ITableProps<T extends {}> {
     DATA: T[];
