@@ -1,17 +1,42 @@
-import React, { useState, useMemo, useEffect } from "react";
+// utility functions
+import React, { useState, useMemo } from "react";
 import { useFirebaseAuth, useFirestore } from "@useFirebase";
-import { ISubjects, IUpdateRowProps } from "Firebase/FirebaseDb";
-import { createSubjectsColumns, useTogglerCRUD } from "./utils";
-import { useController } from "@Components/Modal";
+import { createSubjectsColumns, useTableFunctions, useTogglerCRUD } from "./utils";
+
+// types
+import { ISubjects } from "Firebase/FirebaseDb";
+
+// Components
 import GradeTable from "@Components/Calculator/Table";
 import Toggler from "../Toggler";
+
+// env and styles
 import "./Overview.css";
 import "dotenv/config";
-import { Column } from "react-table";
 
+// ! Fake data imports [remove when integrating database]
+import { FakeSubjectData, FakeTableColumns, FakeYearData } from "./FakeOverviewData";
+
+/**
+ * Main Calculator component
+ * @returns - a JSX calculator overview component
+ */
 const CaluclatorOverview: React.FC = () => {
     // use firestore data and functions
-    const { userData, dbFunctions } = useFirestore();
+    // const { userData } = useFirestore();
+
+    // ================================== userData Isolation ==================================
+    // TODO: make the following variables a prop of a module
+    // const uid = useMemo(() => "testUser", []);
+    // const userYears = useMemo(() => userData?.years, [userData]);
+    // const subjects = useMemo(() => userData?.subjects, [userData]);
+    const uid = useMemo(() => "fake userid", []);
+    const userYears = useMemo(() => FakeYearData, []);
+    const subjects = useMemo(() => FakeSubjectData, []);
+    const tableFields = useMemo(() => FakeTableColumns.overview, []);
+
+    // ========================================================================================
+
     const { AuthStatus } = useFirebaseAuth();
 
     // initialize component states
@@ -23,86 +48,46 @@ const CaluclatorOverview: React.FC = () => {
      * filtered subject data by year and sem
      */
     const data = useMemo(() => {
-        const subjectData = userData?.subjects || ([] as ISubjects[]);
+        const subjectData = subjects || ([] as ISubjects[]);
         return subjectData.filter((subj) => subj.year === yearId && subj.sem === semId);
-    }, [yearId, semId, userData]);
+    }, [yearId, semId, subjects]);
 
     /**
      * Table columns generated using subject data
      */
-    const TableColumns = useMemo(() => createSubjectsColumns(data), [data]);
-
-    const fields = TableColumns.filter((col) => col.accessor !== "name").reduce((partial, curr) => {
-        const newField = { id: curr.id as string, name: curr.Header as string };
-        if (partial.some((field) => field.type === curr.type))
-            return partial.map((field) => {
-                if (field.type === curr.type) return { ...field, fields: [...field.fields, newField] };
-                else return field;
-            });
-
-        return [...partial, { type: curr.type, fields: [newField] }];
-    }, [] as { type: string; fields: { id: string; name: string }[] }[]);
+    const TableColumns = useMemo(() => createSubjectsColumns(tableFields), [data]);
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
-        userData,
-        (userStateData) => setYearId(userStateData.years[0].id),
-        (userStateData) => setSemId(userStateData.years[0].sems[0].id)
+        uid || null,
+        FakeYearData || [],
+        (userStateYears) => setYearId(userStateYears[0].id),
+        (userStateYears) => setSemId(userStateYears[0].sems[0].id)
     );
 
     // ================================== Table CRUD Functions ==================================
-    /**
-     * Used for toggling the modal
-     */
-    const setController = useController();
-
-    /**
-     * Adds a new subject item
-     * @param indx - optional, indicates the position of the new subject in the list of subject
-     */
-    const addSubjectHandler = (indx?: number) => {
-        setController({ target: "add-subject", data: { yearId, semId, indx, fields } });
-    };
-
-    /**
-     * Deletes the subject items
-     * @param subject - a list of subjects that are to be deleted
-     */
-    const deleteSubjectHandler = (subject: ISubjects[]) => {
-        setController({ target: "delete-subject", data: { subject } });
-    };
-
-    /**
-     * Update changes made within a subject item
-     * @param otherColData - an object containing the field name and value of the updated item in a subject
-     */
-    const SaveChangesHandler = (
-        rowId: string,
-        nameColData: { name: "name"; value: string },
-        otherColData: IUpdateRowProps[]
-    ) => {
-        if (!userData) throw new Error("cannot update when userData is null or undefined");
-        dbFunctions.getSubjectFunctions(userData).updateSubject(rowId, nameColData, otherColData);
-    };
+    const { addSubjectHandler, deleteSubjectHandler, SaveChangesHandler } = useTableFunctions(
+        TableColumns,
+        yearId,
+        semId
+    );
 
     return (
         <div className="calculator__overview-container">
-            {userData && (AuthStatus || process.env.REACT_APP_DEMO_MODE === "DEMO") ? (
+            {uid && (AuthStatus || process.env.REACT_APP_DEMO_MODE === "DEMO") ? (
                 <>
                     <h1>Course Overview</h1>
                     <div className="section-selection">
                         <Toggler
                             className="year-cont"
                             activeItem={yearId}
-                            items={userData.years}
+                            items={userYears || []}
                             addItemHandler={addItemHandler("years")}
                             removeItemHandler={removeItemHandler("years")}
                             updateItemHandler={updateItemHandler("years")}
                             onItemClick={(itemId) => {
                                 setYearId(itemId);
-                                setSemId(
-                                    userData?.years.find((year) => year.id === itemId)?.sems[0].id || ""
-                                );
+                                setSemId(userYears?.find((year) => year.id === itemId)?.sems[0].id || "");
                             }}
                         />
 
@@ -110,7 +95,7 @@ const CaluclatorOverview: React.FC = () => {
                             <Toggler
                                 className="sem-cont"
                                 activeItem={semId}
-                                items={userData.years.find((year) => year.id === yearId)?.sems || []}
+                                items={userYears?.find((year) => year.id === yearId)?.sems || []}
                                 addItemHandler={addItemHandler("sems", yearId)}
                                 removeItemHandler={removeItemHandler("sems", yearId)}
                                 updateItemHandler={updateItemHandler("sems", yearId)}

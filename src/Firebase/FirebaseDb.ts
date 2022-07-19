@@ -1,3 +1,4 @@
+import FormValidation from "@Utilities/FormValidation";
 import {
     getFirestore,
     doc,
@@ -21,6 +22,7 @@ import { FirebaseApp } from "firebase/app";
  * - CRUD functions to add, update and delete data from the database
  */
 
+// ================================================== Firestore Database type model ==================================================
 /**
  * interface schema of the data received from the firestore
  */
@@ -30,10 +32,27 @@ export interface IUserDoc {
     years: IYears[]; // collection of object containing the college year name and id
     terms: ITableCommonProps[]; // collection of object containing the term name and id
     subjects: ISubjects[]; // collection of object contianing the subject name and id
+    /**
+     * columns used by the tables, grouped by page
+     */
+    columns: {
+        overview: IColumnProps;
+        details: IColumnProps;
+    };
 }
 
 export interface IYears extends ITableCommonProps {
     sems: ITableCommonProps[];
+}
+
+/**
+ * column props grouped by column categories such as `extra` and `grades`.
+ * Each category has an array of objects that defines the id of the column
+ * and it's display name.
+ */
+export interface IColumnProps {
+    extra: ITableCommonProps[];
+    grades: ITableCommonProps[];
 }
 
 /**
@@ -52,10 +71,19 @@ export interface ITableCommonProps {
     id: string;
 }
 
+/**
+ * field properties that defines the schema of a field column.
+ * Besides the `selection` and `name` column, the rest of the fields are
+ * divided into two categories which are `grade` and `extra`. Grade fields
+ * are cells that defines the numeric score of the row item while `extra`
+ * fields are used for filtering and sorting purposes
+ */
 interface IFieldProps {
+    /**
+     * foreign key of field id
+     */
     id: string;
-    name: string;
-    value: string | number;
+    value: string | number | undefined;
 }
 
 /**
@@ -72,7 +100,8 @@ export interface ISubjects extends ITableCommonProps {
 }
 
 /**
- * interface
+ * assessment item schema that defines the properties of an
+ * assessment item located in the database.
  * - `id:` item identifier
  * - `name:` Course Name
  * - `extra:` list of extra custom fields that is displayed in the table
@@ -101,14 +130,27 @@ export interface IAssessment extends ITableCommonProps {
     extra: IFieldProps[];
 }
 
-// ======================================== Function argument types ========================================
+// ======================================== Helper Types ========================================
+/**
+ * other column fields besides `name`. It is either
+ * `grades` or `extra`
+ */
 export type ColumnFields = "grades" | "extra";
+
+export type FilterTypes = "sems" | "years";
+
+/**
+ * Properties of an object containing the changes made to a subject
+ * in the field `name` or `id` categorized by `type` and the new updated `value`
+ */
 export interface IUpdateRowProps {
     id: string;
     name: string;
     type: ColumnFields;
-    value: string | number;
+    value: string | number | null | undefined;
 }
+
+export type TableType = "overview" | "details";
 
 const random = (length = 8) => Math.random().toString(16).substr(2, length);
 
@@ -124,6 +166,7 @@ export function initializeFirestore(app: FirebaseApp) {
 
     /**
      * function that is called after the user signs up and creates an account
+     * * Used only in sign up page
      * @param userUid
      * @returns
      */
@@ -131,6 +174,7 @@ export function initializeFirestore(app: FirebaseApp) {
         const yearId = random(12);
         const semId = random(12);
         const termId = random(12);
+
         // initialize the User Doc Data
         let docData: IUserDoc = {
             userUid,
@@ -153,6 +197,26 @@ export function initializeFirestore(app: FirebaseApp) {
                     id: termId,
                 },
             ],
+            columns: {
+                overview: {
+                    grades: [
+                        {
+                            id: random(12),
+                            name: "Midterm",
+                        },
+                    ],
+                    extra: [],
+                },
+                details: {
+                    grades: [
+                        {
+                            id: random(12),
+                            name: "Grade",
+                        },
+                    ],
+                    extra: [],
+                },
+            },
         };
 
         return setDoc(dbDocRef(userUid), docData);
@@ -160,6 +224,7 @@ export function initializeFirestore(app: FirebaseApp) {
 
     /**
      * used to fetch the user's data
+     * ! currently has no use within the codebase, remove in the future
      * @param userId user's id
      * @returns a documnet snapshot
      */
@@ -169,6 +234,7 @@ export function initializeFirestore(app: FirebaseApp) {
 
     /**
      * Creates an firestore event listener that listens to any changes within the document
+     * * Only used in the firebase context wrapper when asynchronously updating the userData state
      * @param userId string containing the user's id
      * @param dbHandler a function that is triggered when changes occur in the document
      * @returns Unsubscribe method to remove the listener
@@ -176,6 +242,16 @@ export function initializeFirestore(app: FirebaseApp) {
     const dbListener = (userId: string, dbHandler: (doc: DocumentSnapshot<DocumentData>) => unknown) => {
         let unsub = onSnapshot(doc(db, "users", userId), dbHandler);
         return unsub;
+    };
+
+    // ========================================== Firestore CRUD functions ==========================================
+    const getFirestoreFunctions = (userData: IUserDoc) => {
+        return {
+            ...getAssessmentFunctions(userData.userUid),
+            ...getSubjectFunctions(userData),
+            ...getFilterFunctions(userData),
+            ...getTableColumnFunctions(userData),
+        };
     };
 
     // ========================================== Assessment CRUD functions ==========================================
@@ -259,8 +335,7 @@ export function initializeFirestore(app: FirebaseApp) {
             nameColData: { name: "name"; value: string },
             otherColData: IUpdateRowProps[]
         ) => {
-            console.log("parsing new row data", otherColData);
-
+            console.log("parsing", otherColData);
             // map through the items subjects in userData
             const newSubjects = userData.subjects.map((subj) => {
                 // grades and extra fields counter to track what indx new fields will be inserted
@@ -273,26 +348,51 @@ export function initializeFirestore(app: FirebaseApp) {
                     return otherColData.reduce(
                         // loop through every item in the updatedRowData
                         (partial, updatedRowData) => {
+                            // destructure row data object
                             const { type, ...rowData } = updatedRowData;
+                            let rowValue: string | number | undefined;
 
-                            // increase the corresponding field counter
-                            if (type === "grades") gradesCount += 1;
-                            else extraCount += 1;
+                            // if type is 'grades'
+                            if (type === "grades") {
+                                // increase grades count
+                                gradesCount += 1;
 
+                                // check if value is valid
+                                if (FormValidation().isNumberInputValid(parseInt(`${rowData.value}`)))
+                                    rowValue = rowData.value as number;
+                            } else {
+                                // increase extra count
+                                extraCount += 1;
+
+                                // check if value is valid
+                                if (FormValidation().isStringInputValid(rowData.value as string))
+                                    rowValue = rowData.value as string;
+                            }
+
+                            // if rowValue is undefined then remove field from data
+                            if (rowValue === undefined) {
+                                return {
+                                    ...partial,
+                                    [type]: partial[type].filter((item) => item.id !== rowData.id),
+                                };
+                            }
+
+                            // get the item's index if it exists
                             const fieldIndx = partial[type].findIndex((field) => field.id === rowData.id);
 
+                            // if field item does not exist then insert it in the same position from the array
                             if (fieldIndx < 0) {
                                 let fieldDataCopy = [...partial[type]];
                                 const fieldIndx = type === "grades" ? gradesCount - 1 : extraCount - 1;
-                                fieldDataCopy.splice(fieldIndx, 0, rowData);
+                                fieldDataCopy.splice(fieldIndx, 0, { ...rowData, value: rowValue });
                                 return { ...partial, [type]: fieldDataCopy };
                             }
 
                             return {
                                 ...partial,
                                 [type]: [
-                                    ...partial[type].slice(0, fieldIndx - 1),
-                                    rowData,
+                                    ...partial[type].slice(0, fieldIndx === 0 ? fieldIndx : fieldIndx - 1),
+                                    { ...rowData, value: rowValue },
                                     ...partial[type].slice(fieldIndx + 1),
                                 ],
                             };
@@ -302,8 +402,6 @@ export function initializeFirestore(app: FirebaseApp) {
                     );
                 return subj;
             });
-
-            console.log("updating with new subjects", newSubjects);
 
             return setDoc(doc(db, "users", userData.userUid), {
                 ...userData,
@@ -349,7 +447,7 @@ export function initializeFirestore(app: FirebaseApp) {
      * @param userData
      * @returns
      */
-    const useFilterFunctions = (userData: IUserDoc) => {
+    const getFilterFunctions = (userData: IUserDoc) => {
         const userId = userData.userUid;
 
         type addFilterReturnType = ReturnType<typeof setDoc>;
@@ -366,7 +464,7 @@ export function initializeFirestore(app: FirebaseApp) {
          * add filters
          */
         function addFilter(
-            filterType: "sems" | "years",
+            filterType: FilterTypes,
             filterData: IYears | ITableCommonProps,
             parentFilterId?: string
         ): addFilterReturnType {
@@ -408,7 +506,7 @@ export function initializeFirestore(app: FirebaseApp) {
          * @param newFilterData - new filter value
          */
         function updateFilters(
-            filterType: "sems" | "years",
+            filterType: FilterTypes,
             newFilterData: IFilterData,
             parentFilterId?: string
         ): Promise<void> {
@@ -467,7 +565,7 @@ export function initializeFirestore(app: FirebaseApp) {
         function deleteFilter(filterType: "years", filterId: string): Promise<void>;
         function deleteFilter(filterType: "sems", filterId: string, parentFilterId: string): Promise<void>;
 
-        function deleteFilter(filterType: "sems" | "years", filterId: string, parentFilterId?: string) {
+        function deleteFilter(filterType: FilterTypes, filterId: string, parentFilterId?: string) {
             let newYearsData = [...userData.years];
             let deleteSubjects = [];
 
@@ -505,12 +603,109 @@ export function initializeFirestore(app: FirebaseApp) {
         return { addFilter, updateFilters, deleteFilter };
     };
 
+    // ========================================== Filters CRUD functions ==========================================
+    const getTableColumnFunctions = (userData: IUserDoc) => {
+        /**
+         * adds a new column to a specific table(overview or details) and column group(grades or extra)
+         * * validates if column id is unique
+         * * optionally inserts the column data at a specified index (default: `last index`)
+         * @param TableType - `overview` or `details`
+         * @param ColumnType - `grades` or `extra`
+         * @param ColumnData  - { id: string, value: string | number }
+         * @param pos = (optional) inserts the columnData at indx position
+         */
+        function addTableColumn(
+            TableType: TableType,
+            ColumnType: ColumnFields,
+            ColumnData: ITableCommonProps,
+            pos?: number
+        ) {
+            const TableRef = userData.columns[TableType];
+            let ColumnRef = [...TableRef[ColumnType]];
+            const insertIndx = pos === undefined ? ColumnRef.length : pos;
+
+            // check if columnData is unique
+            if (ColumnRef.some((col) => col.id === ColumnData.id))
+                throw new Error(`Cannot add Table Column ${ColumnData.name} because it already exists`);
+
+            ColumnRef.splice(insertIndx, 0, ColumnData);
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                columns: {
+                    ...userData.columns,
+                    [TableType]: {
+                        ...TableRef,
+                        [ColumnType]: ColumnRef,
+                    },
+                },
+            });
+        }
+
+        /**
+         * removes a column from a specifiec table(overview or details) and column group(grades or extra)
+         * * has no validation, the function will attempt to filter out the column item otherwise no changes will occur
+         * @param TableType - `overview` or `details`
+         * @param ColumnType - `grades` or `extra`
+         * @param columnId - column id that is to be removed
+         */
+        function removeTableColumn(TableType: TableType, ColumnType: ColumnFields, columnId: string) {
+            const TableRef = userData.columns[TableType];
+            const ColumnRef = [...TableRef[ColumnType]].filter((field) => field.id !== columnId);
+
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                columns: {
+                    ...userData.columns,
+                    [TableType]: {
+                        ...TableRef,
+                        [ColumnType]: ColumnRef,
+                    },
+                },
+            });
+        }
+
+        /**
+         * updates the name of the column in the specific table(overview or details) and column group(grades or extra)
+         * @param TableType - `overview` or `details`
+         * @param ColumnType - `grades` or `extra`
+         * @param columnId - column id that is to be updated
+         * @param newName - new name of the column field
+         */
+        function updateTableColumn(
+            TableType: TableType,
+            ColumnType: ColumnFields,
+            columnId: string,
+            newName: string
+        ) {
+            const TableRef = userData.columns[TableType];
+            const ColumnRef = [...TableRef[ColumnType]];
+
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                columns: {
+                    ...userData.columns,
+                    [TableType]: {
+                        ...TableRef,
+                        [ColumnType]: ColumnRef.map((field) => {
+                            if (field.id === columnId) return { ...field, name: newName };
+                            return field;
+                        }),
+                    },
+                },
+            });
+        }
+
+        return {
+            addTableColumn,
+            removeTableColumn,
+            updateTableColumn,
+        };
+    };
+
     return {
         createUserDb,
         fetchUserData,
         dbListener,
-        useFilterFunctions,
-        getSubjectFunctions,
-        getAssessmentFunctions,
+        getFirestoreFunctions,
     };
 }

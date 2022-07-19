@@ -1,10 +1,14 @@
-import React, { useState, useRef, createRef, useEffect } from "react";
-import { Row } from "react-table";
-import FormValidation from "@Utilities/FormValidation";
-import { Edit, Save, Cancel } from "./svg";
-import { ColumnFields, IUpdateRowProps } from "Firebase/FirebaseDb";
+// utility functions
+import { useState, useEffect } from "react";
 
-interface ITableProps<T extends object = {}> {
+// types
+import { ColumnFields, IUpdateRowProps } from "Firebase/FirebaseDb";
+import { Cell, Row } from "react-table";
+
+// env and styles
+import { Edit, Save, Cancel } from "./svg";
+
+interface ITableProps<T extends {}> {
     row: Row<T>;
     indx: number;
     prepareRow: (row: Row<T>) => void;
@@ -26,94 +30,101 @@ const TableRow = <T extends { id: string }>({
     prepareRow(row);
     const [editMode, setEditMode] = useState(false);
 
-    const nameRef = useRef<HTMLInputElement>(null);
-    // initialize refs for each column field
-    const RowRefs = useRef(
+    /**
+     * state of the row component
+     * ! the value of the state here does not dictate what the UI renders
+     * * this is only used as a reference when uploading changes to the database
+     */
+    const [rowState, setRowState] = useState(
+        // filter selection cell
         row.cells
+            .filter((cell) => cell.column.id !== "selection")
             .map((cell) => {
-                const column = cell.column as typeof cell.column & { type: ColumnFields };
+                const column = cell.column as typeof cell.column & { type?: ColumnFields };
                 return {
-                    id: column.id,
-                    value: column.Header as string,
-                    type: column.type,
-                    cellRef: createRef<HTMLInputElement>(),
+                    id: column.id as string,
+                    name: column.Header as string,
+                    type: column.type || "name",
+                    value: cell.value as string | number | undefined,
                 };
             })
-            .filter((field) => !["selection", "name"].includes(field.id))
     );
-
-    // focus on the first input element when in edit mode
-    useEffect(() => {
-        if (editMode) RowRefs.current[0].cellRef.current?.focus();
-    }, [editMode]);
 
     /**
      * Calls the update function and passes the list of fields
      */
     const SaveChangesHandler = () => {
-        let updateSubject = true;
-        // disable edit mode
-        setEditMode(false);
+        // remove the name field from the state data and initialize field type as ColumnFields
+        const otherFieldData = rowState
+            .filter((field) => field.id !== "name")
+            .map((field) => {
+                return { ...field, type: field.type as ColumnFields };
+            });
 
-        // check if subject name is valid
-        const nameValue = nameRef.current?.value;
-        if (!FormValidation().isStringInputValid(nameValue || ""))
-            return console.error("cannot update subject with invalid name");
-
-        // parse other column fields
-        let newColFields = RowRefs.current
-            // parses it into an array of { id, name, type, value }
-            .reduce((partial, curr) => {
-                const fieldValueRef = curr.cellRef.current;
-
-                console.log("checking ", fieldValueRef);
-                // if input field is not empty
-                if (fieldValueRef && FormValidation().isStringInputValid(fieldValueRef)) {
-                    console.log("valid field input ", curr.value);
-                    return [
-                        ...partial,
-                        {
-                            id: curr.id,
-                            name: curr.value,
-                            type: curr.type,
-                            value:
-                                curr.type === "grades" ? parseInt(fieldValueRef.value) : fieldValueRef.value,
-                        },
-                    ];
-                }
-
-                // return default
-                return partial;
-            }, [] as IUpdateRowProps[]);
+        console.log({ otherFieldData });
 
         // update subject
-        if (updateSubject)
-            updateSubjectHandler(row.original.id, { name: "name", value: nameValue as string }, newColFields);
+        updateSubjectHandler(
+            row.original.id,
+            { name: "name", value: rowState[0].value as string },
+            otherFieldData
+        );
+
+        // disable edit mode
+        // TODO: conditionally enable or disable edit mode if user input is invalid
+        setEditMode(false);
     };
 
     /**
-     * function used to get the ref object for the edit cell
-     * @param cellId - id of the column
-     * @returns Ref Object or null
+     * updates the row state each cell change
+     * @param id - string id of the field
+     * @param newValue - updated input value
      */
-    const getCellRef = (cellId: string) => {
-        console.log("getting ref to ", cellId);
-        const otherFieldRef = RowRefs.current.find((refItem) => refItem.id === cellId);
-        if (!otherFieldRef) return cellId === "name" ? nameRef : null;
-        return otherFieldRef.cellRef;
+    const onCellChange = (id: string, newValue: string | number | undefined) => {
+        setRowState((state) => {
+            return state.map((field) => {
+                if (field.id === id) return { ...field, value: newValue };
+                return field;
+            });
+        });
+    };
+
+    /**
+     * resets the row state when the cancel button is clicked.
+     * - disables edit mode
+     * - reverts the row state to its original value
+     * * The edit cell values are automatically reseted since they are being unmounted when the edit mode is disabled
+     */
+    const resetRowFields = () => {
+        setEditMode(false);
+        setRowState(
+            row.cells
+                .filter((cell) => cell.column.id !== "selection")
+                .map((cell) => {
+                    const column = cell.column as typeof cell.column & { type?: ColumnFields };
+                    return {
+                        id: column.id as string,
+                        name: column.Header as string,
+                        type: column.type || "name",
+                        value: cell.value as string | number,
+                    };
+                })
+        );
     };
 
     return (
         <tr {...row.getRowProps()}>
-            {row.cells.map((cell) => (
-                <td {...cell.getCellProps()}>
-                    {editMode && cell.column.id !== "selection" ? (
-                        <EditCell ref={getCellRef(cell.column.id)} value={cell.value || ""} />
-                    ) : (
-                        cell.render("Cell")
-                    )}
-                </td>
-            ))}
+            {row.cells.map((cell) => {
+                return (
+                    <td {...cell.getCellProps()}>
+                        {editMode && cell.column.id !== "selection" ? (
+                            <EditCell cell={cell} onChange={onCellChange} />
+                        ) : (
+                            cell.render("Cell")
+                        )}
+                    </td>
+                );
+            })}
             <td className="row-controls">
                 {!editMode ? (
                     <div className="main-controls">
@@ -129,7 +140,7 @@ const TableRow = <T extends { id: string }>({
                         <button onClick={() => SaveChangesHandler()} className="row-save-subject">
                             <Save />
                         </button>
-                        <button onClick={() => setEditMode(false)} className="cancel-edit">
+                        <button onClick={resetRowFields} className="cancel-edit">
                             <Cancel />
                         </button>
                     </>
@@ -139,32 +150,66 @@ const TableRow = <T extends { id: string }>({
     );
 };
 
-interface IEditCell {
-    value: number | string;
+// =================================================== Edit Cell component ===================================================
+interface IEditCell<T extends {}> {
+    cell: Cell<T, string | number | undefined>;
+    onChange: (id: string, newValue: string | number | undefined) => void;
 }
-const EditCell = React.forwardRef<HTMLInputElement, IEditCell>(({ value }, ref) => {
-    const [inputValue, setInputValue] = useState(value);
+const EditCell = <T extends {}>({ cell, onChange }: IEditCell<T>) => {
+    /**
+     * Helper function for parsing cell into cell state
+     * @param rawCell
+     * @returns
+     */
+    const parseCell = (rawCell: typeof cell) => {
+        let cellInstance = rawCell.column as typeof cell.column & { type?: ColumnFields };
+        return {
+            id: cellInstance.id,
+            name: cellInstance.Header as string,
+            type: cellInstance.type || "name",
+            value: cell.value,
+        };
+    };
 
-    const setCellValue = (inputVal: string) => {
-        setInputValue(() => {
-            if (typeof value === "number") {
-                const parsedValue = parseInt(inputVal);
-                if (parsedValue >= 0) return parsedValue;
-                return 0;
+    // component's state
+    const [cellState, setCellState] = useState(parseCell(cell));
+
+    /**
+     * run onChange event on celState change
+     * * changes in the edit cell state is passed down to the parent row state
+     */
+    useEffect(() => onChange(cellState.id, cellState.value), [cellState]);
+
+    // on cell change update the cell state
+    const updateCellState = (inputVal: string) =>
+        setCellState((state) => {
+            let cellValue: string | number | undefined;
+
+            // if cell type is 'grades'
+            if (state.type === "grades") {
+                // parse cell value into int
+                cellValue = parseInt(inputVal);
+
+                // if cell value is less than 0, change into 0
+                if (cellValue < 0) cellValue = 0;
+                if (`${cellValue}` === "NaN") cellValue = undefined;
+            } else {
+                if (inputVal.trimStart().trimEnd()) cellValue = inputVal;
             }
 
-            return inputVal;
+            return {
+                ...state,
+                value: cellValue,
+            };
         });
-    };
 
     return (
         <input
-            ref={ref}
-            type={typeof value === "number" ? "number" : "text"}
-            value={inputValue}
-            onChange={(e) => setCellValue(e.target.value)}
+            type={cellState.type === "grades" ? "number" : "text"}
+            value={cellState.type === "grades" ? `${cellState.value}` : cellState.value || ""}
+            onChange={(e) => updateCellState(e.target.value)}
         />
     );
-});
+};
 
 export default TableRow;

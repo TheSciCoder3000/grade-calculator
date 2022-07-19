@@ -1,19 +1,27 @@
 import { Trash } from "@Components/Calculator/Table/svg";
-import { ISubjects, ColumnFields } from "Firebase/FirebaseDb";
+import { ISubjects, ColumnFields, ITableCommonProps, TableType as ITableType } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
 type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: string | number }[]>;
+type INewFields = Record<ColumnFields, string[]>;
 export interface IAddSubjectPayload {
     yearId: string;
     semId: string;
     indx: number | undefined;
     fields: { type: ColumnFields; fields: { id: string; name: string }[] }[];
     APIAddSubject: (subjectData: ISubjects, pos?: number | undefined) => Promise<void>;
+    APIAddTableColumns: (
+        TableType: ITableType,
+        ColumnType: ColumnFields,
+        ColumnData: ITableCommonProps,
+        pos?: number | undefined
+    ) => Promise<void>;
 }
 
 /**
  * AddSubjects modal component
+ * TODO: modal component needs to make an api call every time a new column field is added
  * @returns add subjects JSX modal component
  */
 const AddSubjects = () => {
@@ -22,7 +30,9 @@ const AddSubjects = () => {
     const modalPayload: IAddSubjectPayload = useControllerData();
 
     // input states
-    const [fieldInputs, setfieldInputs] = useState<IFieldInputs>({ grades: [], extra: [] } as IFieldInputs);
+    const [fieldInputs, setfieldInputs] = useState<IFieldInputs>({ grades: [], extra: [] });
+    // newly added field states
+    const [newFields, setNewFields] = useState<INewFields>({ grades: [], extra: [] });
 
     // parsed table fields
     const fields = modalPayload.fields.reduce((partial, curr) => {
@@ -65,7 +75,7 @@ const AddSubjects = () => {
      */
     const AddSubjectsHandler = () => {
         // check if subject name is empty
-        if (!subjectName.current?.value) return console.log("subject name is empty");
+        if (!subjectName.current?.value) return console.error("subject name is empty");
 
         // filter out null or undefined field names
         const fieldTypes: ColumnFields[] = ["grades", "extra"];
@@ -73,16 +83,21 @@ const AddSubjects = () => {
             (partial, fieldName) => {
                 return {
                     ...partial,
-                    [fieldName]: partial[fieldName].filter((field) => {
-                        // if field name is empty then exclude
-                        if (!field.name) return false;
+                    [fieldName]: partial[fieldName]
+                        .filter((field) => {
+                            // if field name is empty then exclude
+                            if (!field.name) return false;
 
-                        // if field value is empty and field name is not included in the set of fields
-                        if (!field.value && !fields.includes(field.name) && field.value !== 0) return false;
+                            // if field value is empty and field name is not included in the set of fields
+                            if (!field.value && !fields.includes(field.name) && field.value !== 0)
+                                return false;
 
-                        // else include
-                        return true;
-                    }),
+                            // else include
+                            return true;
+                        })
+                        .map((field) => {
+                            return { id: field.id, value: field.value };
+                        }),
                 };
             },
             { ...fieldInputs }
@@ -96,38 +111,11 @@ const AddSubjects = () => {
             id: Math.random().toString(20).substring(2, 12),
         };
 
-        console.log({ NewSubjectData });
-
         // send updates to the database
         modalPayload.APIAddSubject(NewSubjectData, modalPayload.indx);
 
         // close modal
         setController(null);
-    };
-
-    /**
-     * adds an empty field input by updating the field input state of the component
-     * for the user to enter a custom field name and value
-     * @param type - "grade" or "extra"
-     * @param newFieldInputPos - (optional) position where the field input will be placed relative to the
-     */
-    const addFieldInput = (type: ColumnFields, newFieldInputPos?: number) => {
-        // if empty field input exists then cancel
-        if (fieldInputs[type].some((field) => field.name === "")) return;
-
-        // add new empty field input
-        setfieldInputs((state) => {
-            let newFields = [...state[type]];
-            newFields.splice(newFieldInputPos || state[type].length, 0, {
-                id: Math.random().toString(21).substring(2, 25),
-                name: "",
-                value: "",
-            });
-            return {
-                ...state,
-                [type]: newFields,
-            };
-        });
     };
 
     /**
@@ -183,15 +171,60 @@ const AddSubjects = () => {
     };
 
     /**
+     * adds an empty field input by updating the field input state of the component
+     * for the user to enter a custom field name and value
+     * @param type - "grade" or "extra"
+     * @param newFieldInputPos - (optional) position where the field input will be placed relative to the
+     */
+    const addFieldInput = (type: ColumnFields, newFieldInputPos?: number) => {
+        // if empty field input exists then cancel
+        if (fieldInputs[type].some((field) => field.name === "")) return;
+
+        // initialize field id
+        const newFieldId = Math.random().toString(21).substring(2, 25);
+
+        // add new empty field inputs in field input state
+        setfieldInputs((state) => {
+            let newFields = [...state[type]];
+            newFields.splice(newFieldInputPos || state[type].length, 0, {
+                id: newFieldId,
+                name: "",
+                value: type === "grades" ? 0 : "",
+            });
+            return {
+                ...state,
+                [type]: newFields,
+            };
+        });
+
+        // add new empty field ids to new fields state
+        setNewFields((state) => {
+            return {
+                ...state,
+                [type]: [...state[type], newFieldId],
+            };
+        });
+    };
+
+    /**
      * Removes a newly added field input
      * @param fieldType
-     * @param fieldIndx
+     * @param fieldId
      */
-    const removeField = (fieldType: ColumnFields, fieldIndx: number) => {
+    const removeField = (fieldType: ColumnFields, fieldId: string) => {
+        // remove field from input field state
         setfieldInputs((state) => {
             return {
                 ...state,
-                [fieldType]: state[fieldType].filter((_field, indx) => indx !== fieldIndx),
+                [fieldType]: state[fieldType].filter((field) => field.id !== fieldId),
+            };
+        });
+
+        // remove field from new fields state
+        setNewFields((state) => {
+            return {
+                ...state,
+                [fieldType]: state[fieldType].filter((field) => field !== fieldId),
             };
         });
     };
@@ -223,6 +256,7 @@ const AddSubjects = () => {
                                     <input
                                         type="text"
                                         placeholder="Field Name"
+                                        value={term.name || ""}
                                         onChange={(e) =>
                                             onFieldNameInputChange("grades", e.target.value, indx)
                                         }
@@ -238,7 +272,7 @@ const AddSubjects = () => {
                                 {!fields.includes(term.name) && (
                                     <button
                                         className="remove-field-btn"
-                                        onClick={() => removeField("grades", indx)}
+                                        onClick={() => removeField("grades", term.id)}
                                     >
                                         <Trash />
                                     </button>
@@ -263,6 +297,7 @@ const AddSubjects = () => {
                                     <input
                                         type="text"
                                         placeholder="Field Name"
+                                        value={term.name || ""}
                                         onChange={(e) =>
                                             onFieldNameInputChange("extra", e.target.value, indx)
                                         }
@@ -278,7 +313,7 @@ const AddSubjects = () => {
                                 {!fields.includes(term.name) && (
                                     <button
                                         className="remove-field-btn"
-                                        onClick={() => removeField("extra", indx)}
+                                        onClick={() => removeField("extra", term.id)}
                                     >
                                         <Trash />
                                     </button>
@@ -300,14 +335,6 @@ const AddSubjects = () => {
             </div>
         </div>
     );
-};
-
-interface IFIelFormsProps<T> {
-    initialValue: { name: string; value: T }[];
-    onChange: (fields: { name: string; value: T }[]) => void;
-}
-const FieldForms = <T extends number | string>({ initialValue, onChange }: IFIelFormsProps<T>) => {
-    return <div className="grades-field-cont"></div>;
 };
 
 export default AddSubjects;
