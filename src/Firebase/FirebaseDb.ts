@@ -314,16 +314,52 @@ export function initializeFirestore(app: FirebaseApp) {
          * adds a subject to the user data
          * @param subjectData
          */
-        const addSubject = (subjectData: ISubjects, pos?: number) => {
+        interface AddColumnProps {
+            TableType: TableType;
+            ColumnData: IColumnProps;
+        }
+        const addSubject = async (subjectData: ISubjects, pos?: number, newTableColData?: AddColumnProps) => {
             const subjectsCount = userData.subjects.length;
 
             let newSubjects = [...userData.subjects];
             newSubjects.splice(pos || subjectsCount, 0, subjectData);
 
-            return setDoc(doc(db, "users", userData.userUid), {
+            // create a new userData
+            let newUserData = {
                 ...userData,
                 subjects: [...newSubjects],
-            });
+            };
+
+            // if TableType is given then add new column data
+            if (newTableColData) {
+                const { TableType, ColumnData } = newTableColData;
+                const TableRef = newUserData.columns[TableType];
+                const ColumnTypes: ColumnFields[] = ["grades", "extra"];
+                const getCurrColData = (colType: ColumnFields) => ColumnData[colType];
+
+                // update new userData
+                newUserData = {
+                    ...newUserData, // copy previous userData
+                    // insert new columns data
+                    columns: {
+                        // copy previous columns data
+                        ...newUserData.columns,
+                        // insert new columns data for key `TableType` using base `TableRef`
+                        [TableType]: ColumnTypes.reduce(
+                            (partial, currColType) => {
+                                // insert new column data in their corresponding column type key
+                                return {
+                                    ...partial,
+                                    [currColType]: [...partial[currColType], ...getCurrColData(currColType)],
+                                };
+                            },
+                            { ...TableRef }
+                        ),
+                    },
+                };
+            }
+
+            return setDoc(doc(db, "users", userData.userUid), newUserData);
         };
 
         /**

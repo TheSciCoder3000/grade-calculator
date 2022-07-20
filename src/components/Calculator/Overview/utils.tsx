@@ -24,8 +24,8 @@ const useDbFunctions = (): DBFunctionType => {
             console.log("fake delete filter", { filterType, filterId, parentFilterId }),
         updateFilters: async (filterType: any, newfilterData: any, parentFilterId?: any) =>
             console.log("fake update filter", { filterType, newfilterData, parentFilterId }),
-        addSubject: async (subjectData: any, pos?: any) =>
-            console.log("fake add subject", { subjectData, pos }),
+        addSubject: async (subjectData: any, pos?: any, newColumnData?: any) =>
+            console.log("fake add subject", { subjectData, pos, newColumnData }),
         deleteSubjects: async (AddSubjects: any, onFinished?: () => void) => {
             console.log("fake delete subjects", { AddSubjects });
             if (onFinished) onFinished();

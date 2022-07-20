@@ -9,7 +9,7 @@ export const FakeYearData = [
             },
             {
                 id: "sem2",
-                name: "2ns sem",
+                name: "2nd sem",
             },
         ],
     },

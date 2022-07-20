@@ -1,5 +1,11 @@
 import { Trash } from "@Components/Calculator/Table/svg";
-import { ISubjects, ColumnFields, ITableCommonProps, TableType as ITableType } from "Firebase/FirebaseDb";
+import {
+    ISubjects,
+    ColumnFields,
+    ITableCommonProps,
+    TableType as ITableType,
+    IColumnProps,
+} from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
@@ -10,7 +16,11 @@ export interface IAddSubjectPayload {
     semId: string;
     indx: number | undefined;
     fields: { type: ColumnFields; fields: { id: string; name: string }[] }[];
-    APIAddSubject: (subjectData: ISubjects, pos?: number | undefined) => Promise<void>;
+    APIAddSubject: (
+        subjectData: ISubjects,
+        pos?: number | undefined,
+        newColumnData?: { TableType: ITableType; ColumnData: IColumnProps }
+    ) => Promise<void>;
     APIAddTableColumns: (
         TableType: ITableType,
         ColumnType: ColumnFields,
@@ -79,7 +89,7 @@ const AddSubjects = () => {
 
         // filter out null or undefined field names
         const fieldTypes: ColumnFields[] = ["grades", "extra"];
-        let filteredSubjectData = fieldTypes.reduce(
+        const filteredSubjectData = fieldTypes.reduce(
             (partial, fieldName) => {
                 return {
                     ...partial,
@@ -103,7 +113,7 @@ const AddSubjects = () => {
             { ...fieldInputs }
         );
 
-        let NewSubjectData: ISubjects = {
+        const NewSubjectData: ISubjects = {
             ...filteredSubjectData,
             name: subjectName.current.value,
             sem: modalPayload.semId,
@@ -111,8 +121,35 @@ const AddSubjects = () => {
             id: Math.random().toString(20).substring(2, 12),
         };
 
+        const ColumnTypes: ColumnFields[] = ["grades", "extra"];
+        const newColumnData: IColumnProps = ColumnTypes.reduce(
+            (partial, currColType) => {
+                return {
+                    ...partial,
+                    [currColType]: [
+                        ...partial[currColType],
+                        ...newFields[currColType]
+                            .map((fieldId) => {
+                                const fieldName = fieldInputs[currColType].find(
+                                    (field) => field.id === fieldId
+                                )?.name;
+                                return {
+                                    id: fieldId,
+                                    name: fieldName,
+                                };
+                            })
+                            .filter((field) => !!field.name),
+                    ],
+                };
+            },
+            { grades: [], extra: [] }
+        );
+
         // send updates to the database
-        modalPayload.APIAddSubject(NewSubjectData, modalPayload.indx);
+        modalPayload.APIAddSubject(NewSubjectData, modalPayload.indx, {
+            TableType: "overview",
+            ColumnData: newColumnData,
+        });
 
         // close modal
         setController(null);
