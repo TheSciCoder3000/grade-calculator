@@ -1,5 +1,7 @@
+export { default as Add } from "./Add";
 export { default as Cancel } from "./Cancel";
 export { default as Check } from "./Check";
+export { default as DragHandle } from "./DragHandle";
 export { default as Edit } from "./Edit";
 export { default as Next } from "./Next";
 export { default as Previous } from "./Previous";
