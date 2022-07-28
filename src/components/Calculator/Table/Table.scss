@@ -9,7 +9,7 @@ $primary-color: rgb(0, 160, 0);
         justify-content: flex-end;
         position: relative;
 
-        button {
+        .table-btns {
             margin-right: 0.5rem;
             display: block;
             border: none;
@@ -29,6 +29,7 @@ $primary-color: rgb(0, 160, 0);
 
         .settings-cont {
             position: relative;
+            z-index: 999;
 
             .settings-menu {
                 position: absolute;

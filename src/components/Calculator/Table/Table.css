@@ -13,7 +13,7 @@
   position: relative;
 }
 
-.table-cont .table-controls button {
+.table-cont .table-controls .table-btns {
   margin-right: 0.5rem;
   display: block;
   border: none;
@@ -22,17 +22,18 @@
   fill: #969696;
 }
 
-.table-cont .table-controls button:hover:not(:disabled) {
+.table-cont .table-controls .table-btns:hover:not(:disabled) {
   cursor: pointer;
   fill: #6e6e6e;
 }
 
-.table-cont .table-controls button:disabled {
+.table-cont .table-controls .table-btns:disabled {
   fill: #c8c8c8;
 }
 
 .table-cont .table-controls .settings-cont {
   position: relative;
+  z-index: 999;
 }
 
 .table-cont .table-controls .settings-cont .settings-menu {
