@@ -1,0 +1,36 @@
+.alerts-cont {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.alerts-cont .alert-item {
+  margin: 1rem 2rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.alerts-cont .alert-item.alert-error {
+  background-color: #ff6969;
+  border: 1px solid #b40000;
+  color: white;
+}
+
+.alerts-cont .alert-item .cancel-btn {
+  border: none;
+  background: transparent;
+  fill: white;
+}
+
+.alerts-cont .alert-item .cancel-btn:hover {
+  fill: gainsboro;
+  cursor: pointer;
+}
+/*# sourceMappingURL=Alerts.css.map */

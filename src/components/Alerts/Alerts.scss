@@ -1,0 +1,31 @@
+.alerts-cont {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    .alert-item {
+        margin: 1rem 2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+
+        &.alert-error {
+            background-color: rgb(255, 105, 105);
+            border: 1px solid rgb(180, 0, 0);
+            color: white;
+        }
+
+        .cancel-btn {
+            border: none;
+            background: transparent;
+            fill: white;
+
+            &:hover {
+                fill: rgb(220, 220, 220);
+                cursor: pointer;
+            }
+        }
+    }
+}
