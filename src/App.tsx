@@ -5,6 +5,9 @@ import "./App.css";
 import Auth from "./pages/AuthPages";
 import Calculator from "./pages/CalculatorPages/CalculatorRoute";
 import Header from "./components/Header/Header";
+import Alerts from "@Components/Alerts";
+
+import "@Components/Alerts/Alerts.css";
 
 /**
  * Main App Component
@@ -29,7 +32,7 @@ function App() {
                         <Auth AuthFunctions={AuthFunctions} />
                     </Route>
                 </Switch>
-                <div className="app-alerts"></div>
+                <Alerts />
             </div>
         </div>
     );

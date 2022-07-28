@@ -6,14 +6,17 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter as Router } from "react-router-dom";
 import { FirebaseConetxtProvider } from "@useFirebase";
 import { ModalController } from "@Components/Modal";
+import { AlertsProvider } from "@Components/Alerts/Alerts";
 
 ReactDOM.render(
     <FirebaseConetxtProvider>
-        <ModalController>
-            <Router>
-                <App />
-            </Router>
-        </ModalController>
+        <AlertsProvider>
+            <ModalController>
+                <Router>
+                    <App />
+                </Router>
+            </ModalController>
+        </AlertsProvider>
     </FirebaseConetxtProvider>,
     document.getElementById("root")
 );
