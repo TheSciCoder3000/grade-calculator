@@ -74,7 +74,11 @@
   color: #f2f2f2;
 }
 
-.table-columns-settings .table-col-setting-actions > button.save-settings:hover {
+.table-columns-settings .table-col-setting-actions > button.save-settings:disabled {
+  cursor: not-allowed;
+}
+
+.table-columns-settings .table-col-setting-actions > button.save-settings:not(:disabled):hover {
   background-color: #00aa00;
 }
 /*# sourceMappingURL=TableSettings.css.map */
