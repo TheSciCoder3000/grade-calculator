@@ -1,14 +1,40 @@
 import { useEffect, useRef, useState } from "react";
+import TableColumns from "./Settings/TableColumns";
+import { Column } from "react-table";
+import { IColumnProps } from "Firebase/FirebaseDb";
 import { Settings } from "./svg";
+import "./Settings/TableSettings.css";
 
-const TableSettings = () => {
+interface ITableSettingsProps<T extends { id: string }> {
+    columns: Column<T>[];
+    onTableColumnsChange: (ColumnsData: IColumnProps) => void;
+}
+
+/**
+ * Modal component that will be overlayed above when the settings button of the table is clicked
+ * @param param0
+ * @returns
+ */
+const TableSettings = <T extends { id: string }>({
+    columns,
+    onTableColumnsChange,
+}: ITableSettingsProps<T>) => {
+    // display state
     const [displayMenu, setDisplayMenu] = useState(false);
 
+    // reference to the modal settings element for handling outside clicks
     const container = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const handleOutsideClick = (e: MouseEvent) => {
-            if (container.current && !container.current.contains(e.target as Node | null))
+            const target = e.target as HTMLElement | null;
+            if (
+                container.current &&
+                !container.current.contains(target) &&
+                !target?.classList.contains("settings-btn") &&
+                !target?.classList.contains("add-btn-svg")
+            ) {
                 setDisplayMenu(false);
+            }
         };
         document.addEventListener("click", handleOutsideClick);
 
@@ -17,12 +43,15 @@ const TableSettings = () => {
 
     return (
         <div ref={container} className="settings-cont">
-            <button className="settings" onClick={() => setDisplayMenu((state) => !state)}>
+            <button className="table-btns settings" onClick={() => setDisplayMenu((state) => !state)}>
                 <Settings />
             </button>
             {displayMenu && (
                 <div className="settings-menu">
                     <h3>Table Settings</h3>
+                    <div className="table-settings-cont">
+                        <TableColumns columns={columns} onTableColumnsChange={onTableColumnsChange} />
+                    </div>
                 </div>
             )}
         </div>
