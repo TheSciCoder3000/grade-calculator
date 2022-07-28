@@ -8,4 +8,8 @@ html {
 .App {
     display: flex;
     flex-direction: column;
+
+    .app-cont {
+        position: relative;
+    }
 }

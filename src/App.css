@@ -15,4 +15,8 @@ html {
       -ms-flex-direction: column;
           flex-direction: column;
 }
+
+.App .app-cont {
+  position: relative;
+}
 /*# sourceMappingURL=App.css.map */
