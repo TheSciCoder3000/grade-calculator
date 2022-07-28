@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ColumnFields, IColumnProps } from "Firebase/FirebaseDb";
 import { Column } from "react-table";
 import { Add, DragHandle } from "../svg";
+import { useSetAlertItems } from "@Components/Alerts/Alerts";
 
 interface ITableColumnsProps<T extends {}> {
     columns: (Column<T> & { type?: ColumnFields })[];
@@ -18,12 +19,14 @@ interface IColumnFieldState {
  * ! Table Column Settings Issues and fixes
  * TODO: Prevent component from removing undefined fields that have been originally initialized
  * TODO: Prevent user from creating a new column with a similar name
- * TODO: Warn user from deleting a column then creating a new column with a similar name
  * TODO: Provide the users information of the special difference between the `extra` and `grades` type columns
+ * TODO: Add an error or warning modal here
  */
 const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange }: ITableColumnsProps<T>) => {
     const [columnFields, setColumnFields] = useState<IColumnFieldState[]>(parseColumns(columns));
     const [colSync, setColSync] = useState(true);
+    const setAlertItems = useSetAlertItems();
+    const [formValidity, setFormValidity] = useState(true);
 
     useEffect(() => setColumnFields(parseColumns(columns)), [columns]);
 
@@ -34,6 +37,8 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
      * TODO: handle form validation to prevent updating empty fields
      */
     const SaveChangesHandler = () => {
+        if (!formValidity) return;
+
         // parse component state into IColumnProps type
         const ParsedColumnState = columnFields.reduce(
             (partial, curr) => {
@@ -51,27 +56,13 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
     };
 
     /**
-     * handles every changes within the column field inputs
-     * TODO: make it capable of handling index changes
-     * @param id - id of the field that's changed
-     * @param newName - new name of the id that's changed
-     * @param newPos - (optional) new position indx of the field item
-     */
-    const columnFieldChangeHandler = (id: string, newName: string, newPos?: number) => {
-        setColumnFields((state) =>
-            state.map((col) => {
-                if (col.id === id) return { ...col, name: newName === "" ? undefined : newName };
-                return col;
-            })
-        );
-    };
-
-    /**
      * handles when user clicks the add field button
      * @param colType
      * @param pos
      */
     const AddEventHandler = (colType: ColumnFields, prevItemId: string) => {
+        if (!formValidity) return;
+
         const newField = {
             id: Math.random().toString(12).substring(2, 25),
             name: undefined,
@@ -86,10 +77,64 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
         });
     };
 
+    /**
+     * handles every changes within the column field inputs
+     * TODO: make it capable of handling index changes
+     * @param id - id of the field that's changed
+     * @param newName - new name of the id that's changed
+     * @param newPos - (optional) new position indx of the field item
+     */
+    const columnFieldChangeHandler = (id: string, newName: string, included: boolean, newPos?: number) => {
+        const newColFields = columnFields.map((col) => {
+            if (col.id === id) return { ...col, name: newName === "" ? undefined : newName };
+            return col;
+        });
+
+        // update column field state
+        setColumnFields(newColFields);
+
+        // check the validity of the column fields and the item name
+        setFormValidity(testFormValidity(newColFields, newName, included));
+    };
+
+    /**
+     * Run checks if recently inputed field name is similar with previous field names
+     * @param newName
+     */
+    const BlurEventHandler = (itemName: string, included: boolean, setReFocus: () => void) => {
+        // if newName is a duplicate
+        if (!formValidity) {
+            setReFocus();
+
+            // if field name is invalid
+            if (testNameValidity(itemName, included))
+                setAlertItems((state) => [
+                    ...state,
+                    {
+                        id: Math.random().toString(12).substring(2, 21),
+                        text: `field name cannot be empty`,
+                        type: "error",
+                        duration: 5,
+                    },
+                ]);
+
+            if (testDuplicates(columnFields))
+                setAlertItems((state) => [
+                    ...state,
+                    {
+                        id: Math.random().toString(12).substring(2, 21),
+                        text: `field, "${itemName}", already exists`,
+                        type: "error",
+                        duration: 5,
+                    },
+                ]);
+        }
+    };
+
     return (
         <div className="table-columns-settings">
             {["extra", "grades"].map((colType) => (
-                <div className="col-type-cont">
+                <div key={colType} className="col-type-cont">
                     <h4>{colType === "extra" ? "Extra" : "Grades"}</h4>
                     {columnFields
                         .filter((field) => field.type === colType)
@@ -104,13 +149,18 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
                                 included={
                                     parseColumns(columns).find((item) => item.id === col.id) ? true : false
                                 }
+                                onBlur={BlurEventHandler}
                             />
                         ))}
                 </div>
             ))}
             {!colSync && (
                 <div className="table-col-setting-actions">
-                    <button className="settings-btn save-settings" onClick={SaveChangesHandler}>
+                    <button
+                        className="settings-btn save-settings"
+                        onClick={SaveChangesHandler}
+                        disabled={!formValidity}
+                    >
                         Save
                     </button>
                     <button
@@ -130,7 +180,8 @@ interface ColumnFieldSettingItemProps {
     id: string;
     name: string;
     type: ColumnFields;
-    onChange: (id: string, newName: string, newPos?: number) => void;
+    onChange: (id: string, newName: string, included: boolean, newPos?: number) => void;
+    onBlur?: (itemName: string, included: boolean, setReFocus: () => void) => void;
     onAddBtnClick: () => void;
     included: boolean;
 }
@@ -139,13 +190,40 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
     name,
     type,
     onChange,
+    onBlur,
     onAddBtnClick,
     included,
 }) => {
+    // input element ref
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const setAlertItems = useSetAlertItems();
+
+    // ========================== Refocusing component logic ==========================
+    const [reFocus, setReFocus] = useState(false);
+    useEffect(() => {
+        if (reFocus) {
+            setReFocus(false);
+            inputRef.current?.focus();
+        }
+    }, [reFocus]);
+
+    // ========================== Component event handlers ==========================
+    /**
+     * sends an external onChange event outside the component
+     */
     const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
 
-        onChange(id, inputValue);
+        onChange(id, inputValue, included);
+    };
+
+    /**
+     * Internal component event handler for handling blur events on invalid `included` fields
+     */
+    const blurHandler = (e: React.FocusEvent<HTMLInputElement>) => {
+        // execute external onBlur event
+        onBlur?.(e.target.value, included, () => setReFocus(true));
     };
 
     return (
@@ -161,8 +239,19 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
             </div>
 
             {/* Item name edit input */}
-            <input value={name} type="text" className="item-field-input" onChange={inputChangeHandler} />
-            {included && <span className="included">*</span>}
+            <input
+                ref={inputRef}
+                onBlur={blurHandler}
+                value={name}
+                type="text"
+                className="item-field-input"
+                onChange={inputChangeHandler}
+            />
+            {included && (
+                <span style={{ color: "red" }} className="included">
+                    *
+                </span>
+            )}
         </div>
     );
 };
@@ -191,5 +280,42 @@ const checkEquality = (colState: IColumnFieldState[], colComponentProps: IColumn
 
     return equality;
 };
+
+const testFormValidity = (columnFields: IColumnFieldState[], itemName: string, included: boolean) => {
+    let validity = true;
+    // if newName is a duplicate
+    if (testDuplicates(columnFields) || testNameValidity(itemName, included)) validity = false;
+
+    return validity;
+};
+
+/**
+ * function that test if there is a duplicate field name
+ * @param columnFields
+ * @returns - return true if duplicates are found and false if there are none
+ */
+const testDuplicates = (columnFields: IColumnFieldState[]) => {
+    console.log({ columnFields });
+
+    return columnFields
+        .map((item) => item.name)
+        .filter((item) => item !== undefined)
+        .reduce((hasDuplicate, curr, _indx, fieldNames) => {
+            if (fieldNames.indexOf(curr) !== fieldNames.lastIndexOf(curr)) {
+                console.log("duplicates found");
+                return true;
+            }
+            return hasDuplicate;
+        }, false);
+};
+
+/**
+ * function that tests if the field name is valid or not
+ * @param itemName
+ * @param included
+ * @returns - return true if field name is invalid and false if it is valid
+ */
+const testNameValidity = (itemName: string, included: boolean) =>
+    itemName.trimStart().trimEnd() === "" && included;
 
 export default TableColumns;
