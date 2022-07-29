@@ -8,7 +8,7 @@ import TableRow from "./TableRow";
 import TableSettings from "./TableSettings";
 
 // types
-import { IUpdateRowProps } from "Firebase/FirebaseDb";
+import { TableType as ITableType, IColumnProps, IUpdateRowProps } from "Firebase/FirebaseDb";
 import { Column } from "react-table";
 
 // env and styles
@@ -19,13 +19,14 @@ import "./Table.css";
 interface ITableProps<T extends {}> {
     DATA: T[];
     COLUMNS: Column<T>[];
-    addSubjectHandler: (indx?: number) => void;
-    deleteSubjectHandler: (selectedRows: T[]) => void;
-    SaveChangesHandler: (
+    addRowHandler: (indx?: number) => void;
+    deleteRowHandler: (selectedRows: T[]) => void;
+    updateRowHandler: (
         rowId: string,
         nameColData: { name: "name"; value: string },
         otherColData: IUpdateRowProps[]
     ) => void;
+    onTableColumnsChange: (ColumnsData: IColumnProps) => void;
 }
 
 /**
@@ -38,9 +39,10 @@ interface ITableProps<T extends {}> {
 const GradeTable = <T extends { id: string }>({
     DATA,
     COLUMNS,
-    addSubjectHandler,
-    deleteSubjectHandler,
-    SaveChangesHandler,
+    addRowHandler,
+    deleteRowHandler,
+    updateRowHandler,
+    onTableColumnsChange,
 }: ITableProps<T>) => {
     // Initialize columns
     const columns = useMemo(() => COLUMNS, [COLUMNS]);
@@ -62,16 +64,24 @@ const GradeTable = <T extends { id: string }>({
     /**
      * map selected rows to the delete function handler
      */
-    const onSubjectsDelete = () => deleteSubjectHandler(selectedFlatRows.map((row) => row.original));
+    const onSubjectsDelete = () => {
+        deleteRowHandler(selectedFlatRows.map((row) => row.original));
+        // const deletedItems = selectedFlatRows.map((row) => row.original.id);
+        // onTableDataChange(data.filter((item) => !deletedItems.includes(item.id)));
+    };
 
     return (
         <div className="table-cont">
             {/* ============================== Table Controls ============================== */}
             <div className="table-controls">
-                <button className="trash" disabled={selectedFlatRows.length === 0} onClick={onSubjectsDelete}>
+                <button
+                    className="table-btns trash"
+                    disabled={selectedFlatRows.length === 0}
+                    onClick={onSubjectsDelete}
+                >
                     <Trash />
                 </button>
-                <TableSettings />
+                <TableSettings columns={columns} onTableColumnsChange={onTableColumnsChange} />
             </div>
 
             {/* ============================== Main table ============================== */}
@@ -117,13 +127,13 @@ const GradeTable = <T extends { id: string }>({
                                 row={row}
                                 indx={indx}
                                 prepareRow={prepareRow}
-                                addSubjectHandler={addSubjectHandler}
-                                updateSubjectHandler={SaveChangesHandler}
+                                addSubjectHandler={() => addRowHandler(indx + 1)}
+                                updateSubjectHandler={updateRowHandler}
                             />
                         ))
                     ) : (
                         <tr>
-                            <td className="no-subjects-row" colSpan={3} onClick={() => addSubjectHandler()}>
+                            <td className="no-subjects-row" colSpan={3} onClick={() => addRowHandler()}>
                                 {/* TODO: modify to dynamically display the table item besides subjects */}+
                                 Add Subject
                             </td>

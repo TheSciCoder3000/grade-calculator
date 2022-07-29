@@ -55,7 +55,7 @@ const CaluclatorOverview: React.FC = () => {
     /**
      * Table columns generated using subject data
      */
-    const TableColumns = useMemo(() => createSubjectsColumns(tableFields), [data]);
+    const TableColumns = useMemo(() => createSubjectsColumns(tableFields), [tableFields]);
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
@@ -66,11 +66,8 @@ const CaluclatorOverview: React.FC = () => {
     );
 
     // ================================== Table CRUD Functions ==================================
-    const { addSubjectHandler, deleteSubjectHandler, SaveChangesHandler } = useTableFunctions(
-        TableColumns,
-        yearId,
-        semId
-    );
+    const { addSubjectHandler, deleteSubjectHandler, SaveChangesHandler, TableColumnsChangeHandler } =
+        useTableFunctions(TableColumns, yearId, semId);
 
     return (
         <div className="calculator__overview-container">
@@ -106,9 +103,10 @@ const CaluclatorOverview: React.FC = () => {
                     <GradeTable
                         DATA={data}
                         COLUMNS={TableColumns}
-                        addSubjectHandler={addSubjectHandler}
-                        deleteSubjectHandler={deleteSubjectHandler}
-                        SaveChangesHandler={SaveChangesHandler}
+                        addRowHandler={addSubjectHandler}
+                        deleteRowHandler={deleteSubjectHandler}
+                        updateRowHandler={SaveChangesHandler}
+                        onTableColumnsChange={TableColumnsChangeHandler}
                     />
                 </>
             ) : !AuthStatus ? (

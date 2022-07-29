@@ -645,26 +645,32 @@ export function initializeFirestore(app: FirebaseApp) {
          * adds a new column to a specific table(overview or details) and column group(grades or extra)
          * * validates if column id is unique
          * * optionally inserts the column data at a specified index (default: `last index`)
+         * ! DEPRECATED
          * @param TableType - `overview` or `details`
          * @param ColumnType - `grades` or `extra`
-         * @param ColumnData  - { id: string, value: string | number }
+         * @param ColumnName  - name of the column item that is to be created
          * @param pos = (optional) inserts the columnData at indx position
          */
         function addTableColumn(
             TableType: TableType,
             ColumnType: ColumnFields,
-            ColumnData: ITableCommonProps,
+            ColumnName: string,
             pos?: number
         ) {
             const TableRef = userData.columns[TableType];
             let ColumnRef = [...TableRef[ColumnType]];
             const insertIndx = pos === undefined ? ColumnRef.length : pos;
 
-            // check if columnData is unique
-            if (ColumnRef.some((col) => col.id === ColumnData.id))
-                throw new Error(`Cannot add Table Column ${ColumnData.name} because it already exists`);
+            // create unique id for new column item
+            const createId = () => Math.random().toString(21).substring(2, 21);
+            const ColumnId = ColumnRef.reduce((id, col) => {
+                if (id !== col.id) return id;
+                let newId = createId();
+                while (newId === col.id) newId = createId();
+                return newId;
+            }, createId());
 
-            ColumnRef.splice(insertIndx, 0, ColumnData);
+            ColumnRef.splice(insertIndx, 0, { id: ColumnId, name: ColumnName });
             return setDoc(doc(db, "users", userData.userUid), {
                 ...userData,
                 columns: {
@@ -680,6 +686,7 @@ export function initializeFirestore(app: FirebaseApp) {
         /**
          * removes a column from a specifiec table(overview or details) and column group(grades or extra)
          * * has no validation, the function will attempt to filter out the column item otherwise no changes will occur
+         * ! DEPRECATED
          * @param TableType - `overview` or `details`
          * @param ColumnType - `grades` or `extra`
          * @param columnId - column id that is to be removed
@@ -702,6 +709,7 @@ export function initializeFirestore(app: FirebaseApp) {
 
         /**
          * updates the name of the column in the specific table(overview or details) and column group(grades or extra)
+         * ! DEPRECATED
          * @param TableType - `overview` or `details`
          * @param ColumnType - `grades` or `extra`
          * @param columnId - column id that is to be updated
@@ -731,10 +739,27 @@ export function initializeFirestore(app: FirebaseApp) {
             });
         }
 
+        /**
+         * global table column function for adding, deleting and updating
+         * @param TableType
+         * @param ColumnsData
+         * @returns
+         */
+        function setTableColumn(TableType: TableType, ColumnsData: IColumnProps) {
+            return setDoc(doc(db, "users", userData.userUid), {
+                ...userData,
+                columns: {
+                    ...userData.columns,
+                    [TableType]: ColumnsData,
+                },
+            });
+        }
+
         return {
             addTableColumn,
             removeTableColumn,
             updateTableColumn,
+            setTableColumn,
         };
     };
 

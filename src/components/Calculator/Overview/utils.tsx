@@ -3,7 +3,16 @@ import { IAddSubjectPayload } from "@Components/Modal/Froms/AddSubjects";
 import { IRemoveFilter } from "@Components/Modal/Froms/RemoveFilter";
 import { IRemoveSubjects } from "@Components/Modal/Froms/RemoveSubjects";
 import { DBFunctionType, useFirestore } from "@useFirebase";
-import { ColumnFields, FilterTypes, ISubjects, IUpdateRowProps, IUserDoc, IYears } from "Firebase/FirebaseDb";
+import {
+    ColumnFields,
+    FilterTypes,
+    IColumnProps,
+    ISubjects,
+    IUpdateRowProps,
+    IUserDoc,
+    IYears,
+    TableType,
+} from "Firebase/FirebaseDb";
 import { useState, useEffect } from "react";
 import { Cell, Column, Row } from "react-table";
 import CourseCellLink from "../Table/CourseLink";
@@ -33,12 +42,14 @@ const useDbFunctions = (): DBFunctionType => {
         },
         updateSubject: async (rowId: any, nameColData: any, otherColData: any) =>
             console.log("fake update subjects", { rowId, nameColData, otherColData }),
-        addTableColumn: async (TableType: any, ColumnType: any, ColumnData: any, pos?: any) =>
-            console.log("fake add table column", { TableType, ColumnType, ColumnData, pos }),
+        addTableColumn: async (TableType: any, ColumnType: any, ColumnName: any, pos?: any) =>
+            console.log("fake add table column", { TableType, ColumnType, ColumnName, pos }),
         removeTableColumn: async (TableType: any, ColumnType: any, ColumnId: any) =>
             console.log("fake add table column", { TableType, ColumnType, ColumnId }),
         updateTableColumn: async (TableType: any, ColumnType: any, ColumnId: any, newName: any) =>
             console.log("fake add table column", { TableType, ColumnType, ColumnId, newName }),
+        setTableColumn: async (TableType: any, ColumnsData: any) =>
+            console.log("fake set table columns", { TableType, ColumnsData }),
     };
 };
 
@@ -202,6 +213,7 @@ interface ITableFields {
 export const createSubjectsColumns = (columnBlueprint: ITableFields) => {
     return [
         {
+            id: "name",
             Header: "Course Name",
             accessor: "name",
             Cell: (cell) => {
@@ -266,7 +278,7 @@ export const useTableFunctions = (
      * Used for toggling the modal
      */
     const setController = useController();
-    const { addSubject, deleteSubjects, updateSubject, addTableColumn } = useDbFunctions();
+    const { addSubject, deleteSubjects, updateSubject, addTableColumn, setTableColumn } = useDbFunctions();
 
     /**
      * Adds a new subject item
@@ -339,9 +351,19 @@ export const useTableFunctions = (
         updateSubject(rowId, nameColData, otherColData);
     };
 
+    /**
+     * Sends updates from table columns to the api
+     * @param ColumnsData
+     */
+    const TableColumnsChangeHandler = (ColumnsData: IColumnProps) => {
+        if (!setTableColumn) throw new Error("unable to set table columns if userData is undefined or null");
+        setTableColumn("overview", ColumnsData);
+    };
+
     return {
         addSubjectHandler,
         deleteSubjectHandler,
         SaveChangesHandler,
+        TableColumnsChangeHandler,
     };
 };

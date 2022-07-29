@@ -12,7 +12,7 @@ interface ITableProps<T extends {}> {
     row: Row<T>;
     indx: number;
     prepareRow: (row: Row<T>) => void;
-    addSubjectHandler: (indx?: number) => void;
+    addSubjectHandler: () => void;
     updateSubjectHandler: (
         rowId: string,
         nameColData: { name: "name"; value: string },
@@ -128,7 +128,7 @@ const TableRow = <T extends { id: string }>({
             <td className="row-controls">
                 {!editMode ? (
                     <div className="main-controls">
-                        <button onClick={() => addSubjectHandler(indx + 1)} className="row-add-subject">
+                        <button onClick={addSubjectHandler} className="row-add-subject">
                             +
                         </button>
                         <button onClick={() => setEditMode(true)} className="row-edit-subject">

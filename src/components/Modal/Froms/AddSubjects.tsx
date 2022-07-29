@@ -1,11 +1,5 @@
 import { Trash } from "@Components/Calculator/Table/svg";
-import {
-    ISubjects,
-    ColumnFields,
-    ITableCommonProps,
-    TableType as ITableType,
-    IColumnProps,
-} from "Firebase/FirebaseDb";
+import { ISubjects, ColumnFields, TableType as ITableType, IColumnProps } from "Firebase/FirebaseDb";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
@@ -24,7 +18,7 @@ export interface IAddSubjectPayload {
     APIAddTableColumns: (
         TableType: ITableType,
         ColumnType: ColumnFields,
-        ColumnData: ITableCommonProps,
+        ColumnName: string,
         pos?: number | undefined
     ) => Promise<void>;
 }
