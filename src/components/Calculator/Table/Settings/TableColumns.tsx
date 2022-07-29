@@ -16,11 +16,7 @@ interface IColumnFieldState {
 
 /**
  * Component that allows the users to re-arrange to add, modify, delete and re-arrange the columns of the tables
- * ! Table Column Settings Issues and fixes
- * TODO: Prevent component from removing undefined fields that have been originally initialized
- * TODO: Prevent user from creating a new column with a similar name
  * TODO: Provide the users information of the special difference between the `extra` and `grades` type columns
- * TODO: Add an error or warning modal here
  */
 const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange }: ITableColumnsProps<T>) => {
     const [columnFields, setColumnFields] = useState<IColumnFieldState[]>(parseColumns(columns));
@@ -28,13 +24,14 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
     const setAlertItems = useSetAlertItems();
     const [formValidity, setFormValidity] = useState(true);
 
+    // resets the column fields when columns props are updated
     useEffect(() => setColumnFields(parseColumns(columns)), [columns]);
 
+    // changes in the columnFields are checked and compared with columns props to check if data is synced
     useEffect(() => setColSync(checkEquality(columnFields, parseColumns(columns))), [columnFields]);
 
     /**
      * Handles parsing of column field state to be sent to the api for update request
-     * TODO: handle form validation to prevent updating empty fields
      */
     const SaveChangesHandler = () => {
         if (!formValidity) return;
@@ -43,6 +40,9 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
         const ParsedColumnState = columnFields.reduce(
             (partial, curr) => {
                 const { type, ...columnProps } = curr;
+
+                if (columnProps.name === undefined) return partial;
+
                 return {
                     ...partial,
                     [type]: [...partial[type], columnProps],
@@ -295,8 +295,6 @@ const testFormValidity = (columnFields: IColumnFieldState[], itemName: string, i
  * @returns - return true if duplicates are found and false if there are none
  */
 const testDuplicates = (columnFields: IColumnFieldState[]) => {
-    console.log({ columnFields });
-
     return columnFields
         .map((item) => item.name)
         .filter((item) => item !== undefined)
