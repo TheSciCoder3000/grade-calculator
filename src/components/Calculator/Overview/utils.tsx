@@ -27,29 +27,29 @@ import CourseCellLink from "../Table/CourseLink";
 const useDbFunctions = (): DBFunctionType => {
     return {
         ...useFirestore().dbFunctions,
-        addFilter: async (filterType: any, filterData: any, parentFilterId?: any) =>
-            console.log("fake add filter", { filterType, filterData, parentFilterId }),
-        deleteFilter: async (filterType: any, filterId: any, parentFilterId?: any) =>
-            console.log("fake delete filter", { filterType, filterId, parentFilterId }),
-        updateFilters: async (filterType: any, newfilterData: any, parentFilterId?: any) =>
-            console.log("fake update filter", { filterType, newfilterData, parentFilterId }),
-        addSubject: async (subjectData: any, pos?: any, newColumnData?: any) =>
-            console.log("fake add subject", { subjectData, pos, newColumnData }),
-        deleteSubjects: async (AddSubjects: any, onFinished?: () => void) => {
-            console.log("fake delete subjects", { AddSubjects });
-            if (onFinished) onFinished();
-            return {} as IUserDoc;
-        },
-        updateSubject: async (rowId: any, nameColData: any, otherColData: any) =>
-            console.log("fake update subjects", { rowId, nameColData, otherColData }),
-        addTableColumn: async (TableType: any, ColumnType: any, ColumnName: any, pos?: any) =>
-            console.log("fake add table column", { TableType, ColumnType, ColumnName, pos }),
-        removeTableColumn: async (TableType: any, ColumnType: any, ColumnId: any) =>
-            console.log("fake add table column", { TableType, ColumnType, ColumnId }),
-        updateTableColumn: async (TableType: any, ColumnType: any, ColumnId: any, newName: any) =>
-            console.log("fake add table column", { TableType, ColumnType, ColumnId, newName }),
-        setTableColumn: async (TableType: any, ColumnsData: any) =>
-            console.log("fake set table columns", { TableType, ColumnsData }),
+        // addFilter: async (filterType: any, filterData: any, parentFilterId?: any) =>
+        //     console.log("fake add filter", { filterType, filterData, parentFilterId }),
+        // deleteFilter: async (filterType: any, filterId: any, parentFilterId?: any) =>
+        //     console.log("fake delete filter", { filterType, filterId, parentFilterId }),
+        // updateFilters: async (filterType: any, newfilterData: any, parentFilterId?: any) =>
+        //     console.log("fake update filter", { filterType, newfilterData, parentFilterId }),
+        // addSubject: async (subjectData: any, pos?: any, newColumnData?: any) =>
+        //     console.log("fake add subject", { subjectData, pos, newColumnData }),
+        // deleteSubjects: async (AddSubjects: any, onFinished?: () => void) => {
+        //     console.log("fake delete subjects", { AddSubjects });
+        //     if (onFinished) onFinished();
+        //     return {} as IUserDoc;
+        // },
+        // updateSubject: async (rowId: any, nameColData: any, otherColData: any) =>
+        //     console.log("fake update subjects", { rowId, nameColData, otherColData }),
+        // addTableColumn: async (TableType: any, ColumnType: any, ColumnName: any, pos?: any) =>
+        //     console.log("fake add table column", { TableType, ColumnType, ColumnName, pos }),
+        // removeTableColumn: async (TableType: any, ColumnType: any, ColumnId: any) =>
+        //     console.log("fake add table column", { TableType, ColumnType, ColumnId }),
+        // updateTableColumn: async (TableType: any, ColumnType: any, ColumnId: any, newName: any) =>
+        //     console.log("fake add table column", { TableType, ColumnType, ColumnId, newName }),
+        // setTableColumn: async (TableType: any, ColumnsData: any) =>
+        //     console.log("fake set table columns", { TableType, ColumnsData }),
     };
 };
 
@@ -62,11 +62,7 @@ type SetStateType = (userStateYears: IYears[]) => void;
  * @param setTogglers - functions that are run when initializing the togglers
  * @returns toggler CRUD functions
  */
-export const useTogglerCRUD = (
-    userId: string | null,
-    yearsData: IYears[],
-    ...setTogglers: SetStateType[]
-) => {
+export const useTogglerCRUD = (userId: string, yearsData: IYears[], ...setTogglers: SetStateType[]) => {
     const setController = useController();
     const { addFilter, deleteFilter, updateFilters } = useDbFunctions();
 
