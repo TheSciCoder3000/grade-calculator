@@ -56,8 +56,6 @@ const Alerts: React.FC<AlertsProps> = () => {
             setToBeDeleted(itemsCopy);
 
             setAlertItems((state) => state.filter((item) => item.id !== deletedId));
-
-            console.log({ deletedId });
         }
     }, [toBeDeleted]);
 
