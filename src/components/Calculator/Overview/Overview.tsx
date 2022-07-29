@@ -1,10 +1,10 @@
 // utility functions
 import React, { useState, useMemo } from "react";
-import { useFirebaseAuth, useFirestore } from "@useFirebase";
+import { useFirebaseAuth } from "@useFirebase";
 import { createSubjectsColumns, useTableFunctions, useTogglerCRUD } from "./utils";
 
 // types
-import { ISubjects } from "Firebase/FirebaseDb";
+import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
 
 // Components
 import GradeTable from "@Components/Calculator/Table";
@@ -17,23 +17,24 @@ import "dotenv/config";
 // ! Fake data imports [remove when integrating database]
 import { FakeSubjectData, FakeTableColumns, FakeYearData } from "./FakeOverviewData";
 
+interface CalculatorOverviewProps {
+    userData: IUserDoc;
+}
 /**
  * Main Calculator component
  * @returns - a JSX calculator overview component
  */
-const CaluclatorOverview: React.FC = () => {
-    // use firestore data and functions
-    // const { userData } = useFirestore();
-
+const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => {
     // ================================== userData Isolation ==================================
     // TODO: make the following variables a prop of a module
-    // const uid = useMemo(() => "testUser", []);
-    // const userYears = useMemo(() => userData?.years, [userData]);
-    // const subjects = useMemo(() => userData?.subjects, [userData]);
-    const uid = useMemo(() => "fake userid", []);
-    const userYears = useMemo(() => FakeYearData, []);
-    const subjects = useMemo(() => FakeSubjectData, []);
-    const tableFields = useMemo(() => FakeTableColumns.overview, []);
+    const uid = useMemo(() => userData.userUid, []);
+    const userYears = useMemo(() => userData.years, [userData]);
+    const subjects = useMemo(() => userData.subjects, [userData]);
+    const tableFields = useMemo(() => userData.columns.overview, [userData]);
+    // const uid = useMemo(() => "fake userid", []);
+    // const userYears = useMemo(() => FakeYearData, []);
+    // const subjects = useMemo(() => FakeSubjectData, []);
+    // const tableFields = useMemo(() => FakeTableColumns.overview, []);
 
     // ========================================================================================
 
@@ -55,12 +56,15 @@ const CaluclatorOverview: React.FC = () => {
     /**
      * Table columns generated using subject data
      */
-    const TableColumns = useMemo(() => createSubjectsColumns(tableFields), [tableFields]);
+    const TableColumns = useMemo(
+        () => (tableFields ? createSubjectsColumns(tableFields) : []),
+        [tableFields]
+    );
 
     // ================================== Toggler CRUD Functions ==================================
     const { addItemHandler, removeItemHandler, updateItemHandler } = useTogglerCRUD(
-        uid || null,
-        FakeYearData || [],
+        uid,
+        userYears,
         (userStateYears) => setYearId(userStateYears[0].id),
         (userStateYears) => setSemId(userStateYears[0].sems[0].id)
     );

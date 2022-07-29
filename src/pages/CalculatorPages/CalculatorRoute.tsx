@@ -5,6 +5,7 @@ import CalculatorOverview from "@Components/Calculator/Overview";
 import AddSubjects from "@Components/Modal/Froms/AddSubjects";
 import RemoveSubjects from "@Components/Modal/Froms/RemoveSubjects";
 import RemoveFilter from "@Components/Modal/Froms/RemoveFilter";
+import { useFirestore } from "@useFirebase";
 
 /**
  * Calculator Route Component,
@@ -12,10 +13,11 @@ import RemoveFilter from "@Components/Modal/Froms/RemoveFilter";
  * @returns JSX Element
  */
 function CalculatorRoute() {
+    const { userData } = useFirestore();
     return (
         <div className="calculator-app">
             <Route exact path="/calculator">
-                <CalculatorOverview />
+                {userData ? <CalculatorOverview userData={userData} /> : <>Loading...</>}
             </Route>
             <Route path="/calculator/:subjectId">
                 <CalculatorDetails />
