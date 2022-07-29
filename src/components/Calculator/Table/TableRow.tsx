@@ -61,8 +61,6 @@ const TableRow = <T extends { id: string }>({
                 return { ...field, type: field.type as ColumnFields };
             });
 
-        console.log({ otherFieldData });
-
         // update subject
         updateSubjectHandler(
             row.original.id,

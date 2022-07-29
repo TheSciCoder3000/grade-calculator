@@ -3,7 +3,7 @@ import { ISubjects, ColumnFields, TableType as ITableType, IColumnProps } from "
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 
-type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: string | number }[]>;
+type IFieldInputs = Record<ColumnFields, { id: string; name: string; value: string | number | undefined }[]>;
 type INewFields = Record<ColumnFields, string[]>;
 export interface IAddSubjectPayload {
     yearId: string;
@@ -50,7 +50,6 @@ const AddSubjects = () => {
     useEffect(() => {
         if (modalPayload.fields)
             setfieldInputs((state) => {
-                console.log({ fields: modalPayload.fields });
                 return modalPayload.fields.reduce(
                     (partial, curr) => {
                         return {
@@ -95,6 +94,8 @@ const AddSubjects = () => {
                             // if field value is empty and field name is not included in the set of fields
                             if (!field.value && !fields.includes(field.name) && field.value !== 0)
                                 return false;
+
+                            if (field.value === undefined) return false;
 
                             // else include
                             return true;

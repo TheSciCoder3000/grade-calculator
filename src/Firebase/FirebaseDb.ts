@@ -371,7 +371,6 @@ export function initializeFirestore(app: FirebaseApp) {
             nameColData: { name: "name"; value: string },
             otherColData: IUpdateRowProps[]
         ) => {
-            console.log("parsing", otherColData);
             // map through the items subjects in userData
             const newSubjects = userData.subjects.map((subj) => {
                 // grades and extra fields counter to track what indx new fields will be inserted
@@ -419,15 +418,15 @@ export function initializeFirestore(app: FirebaseApp) {
                             // if field item does not exist then insert it in the same position from the array
                             if (fieldIndx < 0) {
                                 let fieldDataCopy = [...partial[type]];
-                                const fieldIndx = type === "grades" ? gradesCount - 1 : extraCount - 1;
-                                fieldDataCopy.splice(fieldIndx, 0, { ...rowData, value: rowValue });
+                                const insertFieldIndx = type === "grades" ? gradesCount - 1 : extraCount - 1;
+                                fieldDataCopy.splice(insertFieldIndx, 0, { ...rowData, value: rowValue });
                                 return { ...partial, [type]: fieldDataCopy };
                             }
 
                             return {
                                 ...partial,
                                 [type]: [
-                                    ...partial[type].slice(0, fieldIndx === 0 ? fieldIndx : fieldIndx - 1),
+                                    ...partial[type].slice(0, fieldIndx === 0 ? fieldIndx : fieldIndx),
                                     { ...rowData, value: rowValue },
                                     ...partial[type].slice(fieldIndx + 1),
                                 ],
