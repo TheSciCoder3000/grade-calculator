@@ -26,7 +26,6 @@ interface CalculatorOverviewProps {
  */
 const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => {
     // ================================== userData Isolation ==================================
-    // TODO: make the following variables a prop of a module
     const uid = useMemo(() => userData.userUid, []);
     const userYears = useMemo(() => userData.years, [userData]);
     const subjects = useMemo(() => userData.subjects, [userData]);

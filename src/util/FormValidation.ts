@@ -1,6 +1,5 @@
 /**
  * function that validates user inputs
- * TODO: add warning prompts there is an invalid input
  * @returns a list of functions to validate user inputs
  */
 export default function FormValidation() {

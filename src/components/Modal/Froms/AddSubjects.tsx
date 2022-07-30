@@ -25,7 +25,6 @@ export interface IAddSubjectPayload {
 
 /**
  * AddSubjects modal component
- * TODO: modal component needs to make an api call every time a new column field is added
  * @returns add subjects JSX modal component
  */
 const AddSubjects = () => {

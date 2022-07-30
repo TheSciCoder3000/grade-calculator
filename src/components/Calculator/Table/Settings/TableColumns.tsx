@@ -17,6 +17,7 @@ interface IColumnFieldState {
 /**
  * Component that allows the users to re-arrange to add, modify, delete and re-arrange the columns of the tables
  * TODO: Provide the users information of the special difference between the `extra` and `grades` type columns
+ * TODO: Provide drag and arrange functionality
  */
 const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange }: ITableColumnsProps<T>) => {
     const [columnFields, setColumnFields] = useState<IColumnFieldState[]>(parseColumns(columns));
@@ -300,7 +301,6 @@ const testDuplicates = (columnFields: IColumnFieldState[]) => {
         .filter((item) => item !== undefined)
         .reduce((hasDuplicate, curr, _indx, fieldNames) => {
             if (fieldNames.indexOf(curr) !== fieldNames.lastIndexOf(curr)) {
-                console.log("duplicates found");
                 return true;
             }
             return hasDuplicate;
