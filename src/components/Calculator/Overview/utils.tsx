@@ -274,7 +274,8 @@ export const useTableFunctions = (
      * Used for toggling the modal
      */
     const setController = useController();
-    const { addSubject, deleteSubjects, updateSubject, addTableColumn, setTableColumn } = useDbFunctions();
+    const { addSubject, deleteSubjects, updateSubject, addTableColumn, setTableColumn, removeTableColumn } =
+        useDbFunctions();
 
     /**
      * Adds a new subject item
@@ -356,10 +357,17 @@ export const useTableFunctions = (
         setTableColumn("overview", ColumnsData);
     };
 
+    const DeleteTableColumnHandler = (ColumnType: ColumnFields, columnId: string) => {
+        if (!removeTableColumn)
+            throw new Error("unable to delete a table column item if userData is undefined or null");
+        removeTableColumn("overview", ColumnType, columnId);
+    };
+
     return {
         addSubjectHandler,
         deleteSubjectHandler,
         SaveChangesHandler,
         TableColumnsChangeHandler,
+        DeleteTableColumnHandler,
     };
 };

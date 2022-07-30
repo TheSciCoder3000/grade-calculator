@@ -28,9 +28,8 @@ import { FirebaseApp } from "firebase/app";
  */
 export interface IUserDoc {
     userUid: string; // User's id
-    // name: string                                                         // user's name
     years: IYears[]; // collection of object containing the college year name and id
-    terms: ITableCommonProps[]; // collection of object containing the term name and id
+    terms: ItemCommonProps[]; // collection of object containing the term name and id
     subjects: ISubjects[]; // collection of object contianing the subject name and id
     /**
      * columns used by the tables, grouped by page
@@ -41,8 +40,52 @@ export interface IUserDoc {
     };
 }
 
-export interface IYears extends ITableCommonProps {
-    sems: ITableCommonProps[];
+export interface IYears extends ItemCommonProps {
+    sems: ItemCommonProps[];
+}
+
+/**
+ * Subject interface that extends from the IUserField Interface.
+ * Adds the following properties:
+ * - `mid`: avg midterm grade
+ * - `final`: avg finals grade
+ */
+export interface ISubjects extends ItemCommonProps {
+    year: string;
+    sem: string;
+    grades: IFieldProps[];
+    extra: IFieldProps[];
+}
+
+/**
+ * assessment item schema that defines the properties of an
+ * assessment item located in the database.
+ * - `id:` item identifier
+ * - `name:` Course Name
+ * - `extra:` list of extra custom fields that is displayed in the table
+ * - `subj`: subject id key
+ * - `term`: term id key
+ * - `type`: type name
+ * - `grade`: assessment score
+ */
+export interface IAssessment extends ItemCommonProps {
+    /**
+     * subject id key (should be included inside the subject).
+     * * **Item query identifier**
+     */
+    subj: string;
+    /**
+     * term id key (should be included inside the terms )
+     * * **Used to filter which items will be displayed first**
+     */
+    term: string;
+    /**
+     * assessment category (ex. Enabling, Summative, Formative, Class Participation, etc.)
+     * * **Used to determine which table the item will be placed**
+     */
+    catgory: string;
+    grades: IFieldProps[];
+    extra: IFieldProps[];
 }
 
 /**
@@ -51,8 +94,8 @@ export interface IYears extends ITableCommonProps {
  * and it's display name.
  */
 export interface IColumnProps {
-    extra: ITableCommonProps[];
-    grades: ITableCommonProps[];
+    extra: ItemCommonProps[];
+    grades: ItemCommonProps[];
 }
 
 /**
@@ -60,7 +103,7 @@ export interface IColumnProps {
  * - `name`: string that will be displayed on the ui
  * - `id`: used for querying in the database
  */
-export interface ITableCommonProps {
+interface ItemCommonProps {
     /**
      * display name of item
      */
@@ -86,50 +129,6 @@ interface IFieldProps {
     value: string | number | undefined;
 }
 
-/**
- * Subject interface that extends from the IUserField Interface.
- * Adds the following properties:
- * - `mid`: avg midterm grade
- * - `final`: avg finals grade
- */
-export interface ISubjects extends ITableCommonProps {
-    year: string;
-    sem: string;
-    grades: IFieldProps[];
-    extra: IFieldProps[];
-}
-
-/**
- * assessment item schema that defines the properties of an
- * assessment item located in the database.
- * - `id:` item identifier
- * - `name:` Course Name
- * - `extra:` list of extra custom fields that is displayed in the table
- * - `subj`: subject id key
- * - `term`: term id key
- * - `type`: type name
- * - `grade`: assessment score
- */
-export interface IAssessment extends ITableCommonProps {
-    /**
-     * subject id key (should be included inside the subject).
-     * * **Item query identifier**
-     */
-    subj: string;
-    /**
-     * term id key (should be included inside the terms )
-     * * **Used to filter which items will be displayed first**
-     */
-    term: string;
-    /**
-     * assessment category (ex. Enabling, Summative, Formative, Class Participation, etc.)
-     * * **Used to determine which table the item will be placed**
-     */
-    catgory: string;
-    grade: number;
-    extra: IFieldProps[];
-}
-
 // ======================================== Helper Types ========================================
 /**
  * other column fields besides `name`. It is either
@@ -138,6 +137,8 @@ export interface IAssessment extends ITableCommonProps {
 export type ColumnFields = "grades" | "extra";
 
 export type FilterTypes = "sems" | "years";
+
+export type TableType = "overview" | "details";
 
 /**
  * Properties of an object containing the changes made to a subject
@@ -149,8 +150,6 @@ export interface IUpdateRowProps {
     type: ColumnFields;
     value: string | number | null | undefined;
 }
-
-export type TableType = "overview" | "details";
 
 const random = (length = 8) => Math.random().toString(16).substr(2, length);
 
@@ -491,7 +490,7 @@ export function initializeFirestore(app: FirebaseApp) {
         function addFilter(filterType: "years", filterData: IYears): addFilterReturnType;
         function addFilter(
             filterType: "sems",
-            filterData: ITableCommonProps,
+            filterData: ItemCommonProps,
             parentFilterId: string
         ): addFilterReturnType;
 
@@ -500,7 +499,7 @@ export function initializeFirestore(app: FirebaseApp) {
          */
         function addFilter(
             filterType: FilterTypes,
-            filterData: IYears | ITableCommonProps,
+            filterData: IYears | ItemCommonProps,
             parentFilterId?: string
         ): addFilterReturnType {
             if (filterType === "years") {
@@ -514,7 +513,7 @@ export function initializeFirestore(app: FirebaseApp) {
             if (yearIndx === -1) throw new Error(`parent filter id ${parentFilterId} does not exist`);
 
             const yearsCopy = [...userData.years];
-            yearsCopy[yearIndx].sems.push(filterData as ITableCommonProps);
+            yearsCopy[yearIndx].sems.push(filterData as ItemCommonProps);
             return setDoc(doc(db, "users", userId), {
                 ...userData,
                 years: [...yearsCopy],
@@ -685,25 +684,65 @@ export function initializeFirestore(app: FirebaseApp) {
         /**
          * removes a column from a specifiec table(overview or details) and column group(grades or extra)
          * * has no validation, the function will attempt to filter out the column item otherwise no changes will occur
-         * ! DEPRECATED
+         * TODO: if table type is 'overview' then delete the field values of the subjects
+         * TODO: if table type is 'details' then delete the field values of the assessments
          * @param TableType - `overview` or `details`
          * @param ColumnType - `grades` or `extra`
          * @param columnId - column id that is to be removed
          */
-        function removeTableColumn(TableType: TableType, ColumnType: ColumnFields, columnId: string) {
+        async function removeTableColumn(TableType: TableType, ColumnType: ColumnFields, columnId: string) {
+            console.log(`deleting field "${columnId}" in type "${ColumnType}" at table "${TableType}"`);
             const TableRef = userData.columns[TableType];
             const ColumnRef = [...TableRef[ColumnType]].filter((field) => field.id !== columnId);
 
-            return setDoc(doc(db, "users", userData.userUid), {
-                ...userData,
-                columns: {
-                    ...userData.columns,
-                    [TableType]: {
-                        ...TableRef,
-                        [ColumnType]: ColumnRef,
-                    },
+            // update columns data
+            const newColumnsData = {
+                ...userData.columns,
+                [TableType]: {
+                    ...TableRef,
+                    [ColumnType]: ColumnRef,
                 },
-            });
+            };
+
+            // create a new user data copy and add the updated columns data
+            let newUserData = { ...userData, columns: newColumnsData };
+
+            // update subject data if table type is 'overview'
+            if (TableType === "overview") {
+                newUserData = {
+                    ...newUserData,
+                    subjects: userData.subjects.map((subject) => {
+                        return {
+                            ...subject,
+                            [ColumnType]: subject[ColumnType].filter((col) => col.id !== columnId),
+                        };
+                    }),
+                };
+            } else {
+                // else update the all the assessments
+                await getDocs(collection(db, "users", userData.userUid, "assessments")).then((snapshot) => {
+                    const batch = writeBatch(db);
+
+                    // loop through each document in the collection
+                    snapshot.docs.forEach((doc) => {
+                        const data = doc.data() as IAssessment;
+
+                        // if assessment item does not have the column field then skip batch update
+                        // this prevents unnecessary updates and reduces the write counts to the firebase
+                        if (!data[ColumnType].some((col) => col.id === columnId)) return;
+
+                        batch.update(doc.ref, {
+                            ...data,
+                            [ColumnType]: data[ColumnType].filter((col) => col.id !== columnId),
+                        });
+                    });
+
+                    return batch.commit();
+                });
+            }
+
+            console.log({ newUserData });
+            return setDoc(doc(db, "users", userData.userUid), newUserData);
         }
 
         /**

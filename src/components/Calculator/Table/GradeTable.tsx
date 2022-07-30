@@ -8,7 +8,7 @@ import TableRow from "./TableRow";
 import TableSettings from "./TableSettings";
 
 // types
-import { TableType as ITableType, IColumnProps, IUpdateRowProps } from "Firebase/FirebaseDb";
+import { TableType as ITableType, IColumnProps, IUpdateRowProps, ColumnFields } from "Firebase/FirebaseDb";
 import { Column } from "react-table";
 
 // env and styles
@@ -27,6 +27,7 @@ interface ITableProps<T extends {}> {
         otherColData: IUpdateRowProps[]
     ) => void;
     onTableColumnsChange: (ColumnsData: IColumnProps) => void;
+    onTableColumnDelete: (ColumnType: ColumnFields, columnId: string) => void;
 }
 
 /**
@@ -43,6 +44,7 @@ const GradeTable = <T extends { id: string }>({
     deleteRowHandler,
     updateRowHandler,
     onTableColumnsChange,
+    onTableColumnDelete,
 }: ITableProps<T>) => {
     // Initialize columns
     const columns = useMemo(() => COLUMNS, [COLUMNS]);
@@ -66,8 +68,6 @@ const GradeTable = <T extends { id: string }>({
      */
     const onSubjectsDelete = () => {
         deleteRowHandler(selectedFlatRows.map((row) => row.original));
-        // const deletedItems = selectedFlatRows.map((row) => row.original.id);
-        // onTableDataChange(data.filter((item) => !deletedItems.includes(item.id)));
     };
 
     return (
@@ -81,7 +81,11 @@ const GradeTable = <T extends { id: string }>({
                 >
                     <Trash />
                 </button>
-                <TableSettings columns={columns} onTableColumnsChange={onTableColumnsChange} />
+                <TableSettings
+                    columns={columns}
+                    onTableColumnsChange={onTableColumnsChange}
+                    onTableColumnDelete={onTableColumnDelete}
+                />
             </div>
 
             {/* ============================== Main table ============================== */}

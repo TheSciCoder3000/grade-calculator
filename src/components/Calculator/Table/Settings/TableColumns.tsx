@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ColumnFields, IColumnProps } from "Firebase/FirebaseDb";
+import { ColumnFields, IColumnProps, TableType as ITableType } from "Firebase/FirebaseDb";
 import { Column } from "react-table";
 import { Add, DragHandle } from "../svg";
 import { useSetAlertItems } from "@Components/Alerts/Alerts";
+import { Cancel } from "@Svg";
 
 interface ITableColumnsProps<T extends {}> {
     columns: (Column<T> & { type?: ColumnFields })[];
     onTableColumnsChange: (ColumnsData: IColumnProps) => void;
+    setEnableOutsideClick: React.Dispatch<React.SetStateAction<boolean>>;
+    onTableColumnDelete: (ColumnType: ColumnFields, columnId: string) => void;
 }
 interface IColumnFieldState {
     id: string;
@@ -19,7 +22,12 @@ interface IColumnFieldState {
  * TODO: Provide the users information of the special difference between the `extra` and `grades` type columns
  * TODO: Provide drag and arrange functionality
  */
-const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange }: ITableColumnsProps<T>) => {
+const TableColumns = <T extends { id: string }>({
+    columns,
+    onTableColumnsChange,
+    setEnableOutsideClick,
+    onTableColumnDelete,
+}: ITableColumnsProps<T>) => {
     const [columnFields, setColumnFields] = useState<IColumnFieldState[]>(parseColumns(columns));
     const [colSync, setColSync] = useState(true);
     const setAlertItems = useSetAlertItems();
@@ -132,6 +140,10 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
         }
     };
 
+    const deleteFieldItemHandler = (columnType: ColumnFields, fieldId: string) => {
+        onTableColumnDelete(columnType, fieldId);
+    };
+
     return (
         <div className="table-columns-settings">
             {["extra", "grades"].map((colType) => (
@@ -147,6 +159,7 @@ const TableColumns = <T extends { id: string }>({ columns, onTableColumnsChange 
                                 type={col.type}
                                 onChange={columnFieldChangeHandler}
                                 onAddBtnClick={() => AddEventHandler(colType as ColumnFields, col.id)}
+                                onDeleteBtnClick={() => deleteFieldItemHandler(col.type, col.id)}
                                 included={
                                     parseColumns(columns).find((item) => item.id === col.id) ? true : false
                                 }
@@ -184,6 +197,7 @@ interface ColumnFieldSettingItemProps {
     onChange: (id: string, newName: string, included: boolean, newPos?: number) => void;
     onBlur?: (itemName: string, included: boolean, setReFocus: () => void) => void;
     onAddBtnClick: () => void;
+    onDeleteBtnClick: () => void;
     included: boolean;
 }
 const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
@@ -193,6 +207,7 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
     onChange,
     onBlur,
     onAddBtnClick,
+    onDeleteBtnClick,
     included,
 }) => {
     // input element ref
@@ -253,6 +268,9 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
                     *
                 </span>
             )}
+            <button className="delete-field-item" onClick={onDeleteBtnClick}>
+                <Cancel />
+            </button>
         </div>
     );
 };

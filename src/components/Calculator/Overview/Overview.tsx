@@ -69,8 +69,13 @@ const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => 
     );
 
     // ================================== Table CRUD Functions ==================================
-    const { addSubjectHandler, deleteSubjectHandler, SaveChangesHandler, TableColumnsChangeHandler } =
-        useTableFunctions(TableColumns, yearId, semId);
+    const {
+        addSubjectHandler,
+        deleteSubjectHandler,
+        SaveChangesHandler,
+        TableColumnsChangeHandler,
+        DeleteTableColumnHandler,
+    } = useTableFunctions(TableColumns, yearId, semId);
 
     return (
         <div className="calculator__overview-container">
@@ -110,6 +115,7 @@ const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => 
                         deleteRowHandler={deleteSubjectHandler}
                         updateRowHandler={SaveChangesHandler}
                         onTableColumnsChange={TableColumnsChangeHandler}
+                        onTableColumnDelete={DeleteTableColumnHandler}
                     />
                 </>
             ) : !AuthStatus ? (

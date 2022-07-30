@@ -1,13 +1,19 @@
+// components and hooks
 import { useEffect, useRef, useState } from "react";
 import TableColumns from "./Settings/TableColumns";
+
+// types
 import { Column } from "react-table";
-import { IColumnProps } from "Firebase/FirebaseDb";
+import { IColumnProps, ColumnFields } from "Firebase/FirebaseDb";
+
+// assets and styles
 import { Settings } from "./svg";
 import "./Settings/TableSettings.css";
 
 interface ITableSettingsProps<T extends { id: string }> {
     columns: Column<T>[];
     onTableColumnsChange: (ColumnsData: IColumnProps) => void;
+    onTableColumnDelete: (ColumnType: ColumnFields, columnId: string) => void;
 }
 
 /**
@@ -18,13 +24,17 @@ interface ITableSettingsProps<T extends { id: string }> {
 const TableSettings = <T extends { id: string }>({
     columns,
     onTableColumnsChange,
+    onTableColumnDelete,
 }: ITableSettingsProps<T>) => {
     // display state
     const [displayMenu, setDisplayMenu] = useState(false);
+    const [enableOutsideClick, setEnableOutsideClick] = useState(false);
 
     // reference to the modal settings element for handling outside clicks
     const container = useRef<HTMLDivElement>(null);
     useEffect(() => {
+        if (enableOutsideClick) return;
+
         const handleOutsideClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement | null;
             if (
@@ -50,7 +60,12 @@ const TableSettings = <T extends { id: string }>({
                 <div className="settings-menu">
                     <h3>Table Settings</h3>
                     <div className="table-settings-cont">
-                        <TableColumns columns={columns} onTableColumnsChange={onTableColumnsChange} />
+                        <TableColumns
+                            columns={columns}
+                            setEnableOutsideClick={setEnableOutsideClick}
+                            onTableColumnsChange={onTableColumnsChange}
+                            onTableColumnDelete={onTableColumnDelete}
+                        />
                     </div>
                 </div>
             )}
