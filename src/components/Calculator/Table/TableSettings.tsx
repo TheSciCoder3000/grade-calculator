@@ -41,7 +41,8 @@ const TableSettings = <T extends { id: string }>({
                 container.current &&
                 !container.current.contains(target) &&
                 !target?.classList.contains("settings-btn") &&
-                !target?.classList.contains("add-btn-svg")
+                !target?.nodeName.includes("path") &&
+                !target?.classList.contains("temp-btn-settings")
             ) {
                 setDisplayMenu(false);
             }
