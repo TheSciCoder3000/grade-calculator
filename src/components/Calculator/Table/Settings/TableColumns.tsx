@@ -69,7 +69,7 @@ const TableColumns = <T extends { id: string }>({
      * @param colType
      * @param pos
      */
-    const AddEventHandler = (colType: ColumnFields, prevItemId: string) => {
+    const AddEventHandler = (colType: ColumnFields, prevItemId?: string) => {
         if (!formValidity) return;
 
         const newField = {
@@ -77,12 +77,31 @@ const TableColumns = <T extends { id: string }>({
             name: undefined,
             type: colType,
         };
+
         setColumnFields((state) => {
-            return state.reduce((partial, curr) => {
-                if (curr.name === undefined) return partial;
-                if (curr.id === prevItemId) return [...partial, curr, newField];
-                return [...partial, curr];
-            }, [] as typeof state);
+            const firstItemIndx = state.findIndex((item) => item.type === "grades");
+
+            // conditionally insert the newField into the array
+            return state.reduce(
+                (partial, curr, indx) => {
+                    // remove previous undefined field items by excluding it from the array
+                    if (curr.name === undefined) return partial;
+
+                    // if the item id matches the prevId then insert the newField after it
+                    if (curr.id === prevItemId) return [...partial, curr, newField];
+                    // else if the prevItem is undefined and colType is set to 'Grades' then add the newField onto the given index
+                    else if (prevItemId === undefined && colType === "grades") {
+                        if (firstItemIndx === -1 && indx === state.length - 1)
+                            return [...partial, newField, curr];
+                        else if (indx === firstItemIndx) return [...partial, newField, curr];
+                    }
+
+                    // otherwise, just add the current field item by default
+                    return [...partial, curr];
+                },
+                // set the starter array with newField if colType is 'extra' and prevItem is undefined
+                (colType === "extra" && prevItemId === undefined ? [newField] : []) as typeof state
+            );
         });
     };
 
@@ -140,15 +159,27 @@ const TableColumns = <T extends { id: string }>({
         }
     };
 
-    const deleteFieldItemHandler = (columnType: ColumnFields, fieldId: string) => {
-        onTableColumnDelete(columnType, fieldId);
+    const deleteFieldItemHandler = (columnType: ColumnFields, fieldId: string, included: boolean) => {
+        if (included) onTableColumnDelete(columnType, fieldId);
+        else
+            setColumnFields((state) => {
+                return state.filter((col) => col.id !== fieldId);
+            });
     };
 
     return (
         <div className="table-columns-settings">
             {["extra", "grades"].map((colType) => (
                 <div key={colType} className="col-type-cont">
-                    <h4>{colType === "extra" ? "Extra" : "Grades"}</h4>
+                    <div className="field-header-cont">
+                        <h4>{colType === "extra" ? "Extra" : "Grades"}</h4>
+                        <button
+                            className="settings-btn add-field-item"
+                            onClick={() => AddEventHandler(colType as ColumnFields)}
+                        >
+                            <Add />
+                        </button>
+                    </div>
                     {columnFields
                         .filter((field) => field.type === colType)
                         .map((col) => (
@@ -159,7 +190,15 @@ const TableColumns = <T extends { id: string }>({
                                 type={col.type}
                                 onChange={columnFieldChangeHandler}
                                 onAddBtnClick={() => AddEventHandler(colType as ColumnFields, col.id)}
-                                onDeleteBtnClick={() => deleteFieldItemHandler(col.type, col.id)}
+                                onDeleteBtnClick={() =>
+                                    deleteFieldItemHandler(
+                                        col.type,
+                                        col.id,
+                                        parseColumns(columns).find((item) => item.id === col.id)
+                                            ? true
+                                            : false
+                                    )
+                                }
                                 included={
                                     parseColumns(columns).find((item) => item.id === col.id) ? true : false
                                 }
@@ -249,8 +288,8 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
                 <div className="btn-cont drag-icon-cont">
                     <DragHandle />
                 </div>
-                <div className="btn-cont add-item-field-cont" onClick={onAddBtnClick}>
-                    <Add className="add-btn-svg" />
+                <div className="btn-cont add-item-field-cont temp-btn-settings" onClick={onAddBtnClick}>
+                    <Add className="btn-svg temp-btn-settings" />
                 </div>
             </div>
 
@@ -268,8 +307,8 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
                     *
                 </span>
             )}
-            <button className="delete-field-item" onClick={onDeleteBtnClick}>
-                <Cancel />
+            <button className="delete-field-item temp-btn-settings" onClick={onDeleteBtnClick}>
+                <Cancel className="btn-svg temp-btn-settings" />
             </button>
         </div>
     );
