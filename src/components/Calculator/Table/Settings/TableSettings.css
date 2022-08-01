@@ -4,9 +4,33 @@
   background-color: white;
 }
 
-.table-columns-settings h4 {
+.table-columns-settings .field-header-cont {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.table-columns-settings .field-header-cont h4 {
   font-weight: 400;
   margin: 0;
+}
+
+.table-columns-settings .field-header-cont .add-field-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  fill: #787878;
+  border: none;
+  background: transparent;
+  margin-left: 0.5rem;
+}
+
+.table-columns-settings .field-header-cont .add-field-item:hover {
+  fill: black;
+  cursor: pointer;
 }
 
 .table-columns-settings .col-type-cont {
@@ -49,6 +73,23 @@
 .table-columns-settings .col-field-item .item-field-controls .btn-cont.drag-icon-cont {
   cursor: -webkit-grab;
   cursor: grab;
+}
+
+.table-columns-settings .col-field-item .delete-field-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border: none;
+  background: transparent;
+  fill: #787878;
+}
+
+.table-columns-settings .col-field-item .delete-field-item:hover {
+  fill: black;
+  cursor: pointer;
 }
 
 .table-columns-settings .table-col-setting-actions {

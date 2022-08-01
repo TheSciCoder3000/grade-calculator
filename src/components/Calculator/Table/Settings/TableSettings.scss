@@ -3,9 +3,26 @@
     margin-left: 1rem;
     background-color: white;
 
-    h4 {
-        font-weight: 400;
-        margin: 0;
+    .field-header-cont {
+        display: flex;
+
+        h4 {
+            font-weight: 400;
+            margin: 0;
+        }
+        .add-field-item {
+            display: flex;
+            align-items: center;
+            fill: rgb(120, 120, 120);
+            border: none;
+            background: transparent;
+            margin-left: 0.5rem;
+
+            &:hover {
+                fill: black;
+                cursor: pointer;
+            }
+        }
     }
 
     .col-type-cont {
@@ -38,6 +55,18 @@
                 &.drag-icon-cont {
                     cursor: grab;
                 }
+            }
+        }
+        .delete-field-item {
+            display: flex;
+            align-items: center;
+            border: none;
+            background: transparent;
+            fill: rgb(120, 120, 120);
+
+            &:hover {
+                fill: black;
+                cursor: pointer;
             }
         }
     }
