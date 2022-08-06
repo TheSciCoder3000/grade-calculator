@@ -35,20 +35,10 @@ const TableRow = <T extends { id: string }>({
      * ! the value of the state here does not dictate what the UI renders
      * * this is only used as a reference when uploading changes to the database
      */
-    const [rowState, setRowState] = useState(
-        // filter selection cell
-        row.cells
-            .filter((cell) => cell.column.id !== "selection")
-            .map((cell) => {
-                const column = cell.column as typeof cell.column & { type?: ColumnFields };
-                return {
-                    id: column.id as string,
-                    name: column.Header as string,
-                    type: column.type || "name",
-                    value: cell.value as string | number | undefined,
-                };
-            })
-    );
+    const [rowState, setRowState] = useState(parseRow(row));
+
+    // refresh row state when rows props updates
+    useEffect(() => resetRowFields(), [row]);
 
     /**
      * Calls the update function and passes the list of fields
@@ -95,19 +85,7 @@ const TableRow = <T extends { id: string }>({
      */
     const resetRowFields = () => {
         setEditMode(false);
-        setRowState(
-            row.cells
-                .filter((cell) => cell.column.id !== "selection")
-                .map((cell) => {
-                    const column = cell.column as typeof cell.column & { type?: ColumnFields };
-                    return {
-                        id: column.id as string,
-                        name: column.Header as string,
-                        type: column.type || "name",
-                        value: cell.value as string | number,
-                    };
-                })
-        );
+        setRowState(parseRow(row));
     };
 
     return (
@@ -209,5 +187,19 @@ const EditCell = <T extends {}>({ cell, onChange }: IEditCell<T>) => {
         />
     );
 };
+
+// =================================================== Helper Functions ===================================================
+const parseRow = <T extends { id: string }>(row: Row<T>) =>
+    row.cells
+        .filter((cell) => cell.column.id !== "selection")
+        .map((cell) => {
+            const column = cell.column as typeof cell.column & { type?: ColumnFields };
+            return {
+                id: column.id as string,
+                name: column.Header as string,
+                type: column.type || "name",
+                value: cell.value as string | number | undefined,
+            };
+        });
 
 export default TableRow;
