@@ -6,6 +6,7 @@ import AddSubjects from "@Components/Modal/Froms/AddSubjects";
 import RemoveSubjects from "@Components/Modal/Froms/RemoveSubjects";
 import RemoveFilter from "@Components/Modal/Froms/RemoveFilter";
 import { useFirestore } from "@useFirebase";
+import { IUserDoc } from "Firebase/FirebaseDb";
 
 /**
  * Calculator Route Component,
@@ -14,6 +15,7 @@ import { useFirestore } from "@useFirebase";
  */
 function CalculatorRoute() {
     const { userData } = useFirestore();
+    // const userData = {} as IUserDoc;
     return (
         <div className="calculator-app">
             <Route exact path="/calculator">
