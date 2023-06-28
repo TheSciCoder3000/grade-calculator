@@ -26,7 +26,11 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp }) => {
             console.log('authenticating user')
             onSignUp(email.current.value, password.current.value)
                 .then(user => {
+                    console.log("user: ", user)
                     if (user) dbFunctions.fetchUserData(user.uid)
+                        .then((doc) => {
+                            if (!doc.data()) dbFunctions.createUserDb(user.uid)
+                        })
                     history.push('/')
                 })
                 .catch(() => setSigning(false))

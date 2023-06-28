@@ -39,6 +39,7 @@ export function InitializeAuthentication(app: FirebaseApp) {
     const AuthSignUp = async (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
+                console.log(userCredential.user)
                 return userCredential.user;
             })
             .catch((error) => {
