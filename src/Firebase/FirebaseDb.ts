@@ -7,7 +7,6 @@ import {
     onSnapshot,
     DocumentSnapshot,
     DocumentData,
-    deleteDoc,
     query,
     where,
     collection,
@@ -151,6 +150,11 @@ export interface IUpdateRowProps {
     value: string | number | null | undefined;
 }
 
+/**
+ * uid generator
+ * @param length  number of chars of the uid
+ * @returns unique id string
+ */
 const random = (length = 8) => Math.random().toString(16).substr(2, length);
 
 /**

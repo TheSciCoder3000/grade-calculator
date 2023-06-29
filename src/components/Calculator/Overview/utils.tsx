@@ -371,3 +371,6 @@ export const useTableFunctions = (
         DeleteTableColumnHandler,
     };
 };
+
+
+export type TableFunctionReturnType = ReturnType<typeof useTableFunctions>

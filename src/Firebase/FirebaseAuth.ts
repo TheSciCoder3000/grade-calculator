@@ -39,7 +39,6 @@ export function InitializeAuthentication(app: FirebaseApp) {
     const AuthSignUp = async (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                console.log(userCredential.user)
                 return userCredential.user;
             })
             .catch((error) => {
@@ -55,7 +54,6 @@ export function InitializeAuthentication(app: FirebaseApp) {
      * @returns a promise of the sign out procedure
      */
     const AuthSignOut = async () => {
-        console.log("signing out");
         return signOut(auth);
     };
 
@@ -68,7 +66,6 @@ export function InitializeAuthentication(app: FirebaseApp) {
     const AuthLogIn = async (email: string, password: string) => {
         return signInWithEmailAndPassword(auth, email, password)
             .then((userCredentials) => {
-                console.log("User has successfuly logged in");
                 return userCredentials.user;
             })
             .catch((error) => {
