@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 // types
-import { ColumnFields, IUpdateRowProps } from "Firebase/FirebaseDb";
+import { ColumnFields, IUpdateRowProps } from "Firebase/TypesInterface";
 import { Cell, Row } from "react-table";
 
 // env and styles

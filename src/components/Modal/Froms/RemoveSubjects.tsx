@@ -1,4 +1,4 @@
-import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
+import { ISubjects, IUserDoc } from "Firebase/TypesInterface";
 import { useController, useControllerData } from "../CustomModal";
 
 export interface IRemoveSubjects {

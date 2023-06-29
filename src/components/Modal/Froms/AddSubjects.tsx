@@ -1,5 +1,5 @@
 import { Trash } from "@Components/Calculator/Table/svg";
-import { ISubjects, ColumnFields, TableType as ITableType, IColumnProps } from "Firebase/FirebaseDb";
+import { ISubjects, ColumnFields, TableType as ITableType, IColumnProps } from "Firebase/TypesInterface";
 import { useEffect, useRef, useState } from "react";
 import { useController, useControllerData } from "../CustomModal";
 

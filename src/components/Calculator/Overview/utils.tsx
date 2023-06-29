@@ -9,10 +9,8 @@ import {
     IColumnProps,
     ISubjects,
     IUpdateRowProps,
-    IUserDoc,
     IYears,
-    TableType,
-} from "Firebase/FirebaseDb";
+} from "Firebase/TypesInterface";
 import { useState, useEffect } from "react";
 import { Cell, Column, Row } from "react-table";
 import CourseCellLink from "../Table/CourseLink";

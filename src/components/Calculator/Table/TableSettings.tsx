@@ -4,7 +4,7 @@ import TableColumns from "./Settings/TableColumns";
 
 // types
 import { Column } from "react-table";
-import { IColumnProps, ColumnFields } from "Firebase/FirebaseDb";
+import { IColumnProps, ColumnFields } from "Firebase/TypesInterface";
 
 // assets and styles
 import { Settings } from "./svg";

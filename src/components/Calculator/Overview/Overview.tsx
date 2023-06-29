@@ -4,7 +4,7 @@ import { useFirebaseAuth } from "@useFirebase";
 import { createSubjectsColumns, useTableFunctions, useTogglerCRUD } from "./utils";
 
 // types
-import { ISubjects, IUserDoc } from "Firebase/FirebaseDb";
+import { ISubjects, IUserDoc } from "Firebase/TypesInterface";
 
 // Components
 import GradeTable from "@Components/Calculator/Table";

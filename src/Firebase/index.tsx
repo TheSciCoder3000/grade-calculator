@@ -5,7 +5,8 @@ import { User } from "firebase/auth";
 // import { getAnalytics } from "firebase/analytics";
 
 import { InitializeAuthentication } from "./FirebaseAuth";
-import { initializeFirestore, IUserDoc, IYears } from "./FirebaseDb";
+import { initializeFirestore } from "./FirebaseDb";
+import { IUserDoc, IYears } from "./TypesInterface";
 import "dotenv/config";
 
 // https://firebase.google.com/docs/web/setup#available-libraries

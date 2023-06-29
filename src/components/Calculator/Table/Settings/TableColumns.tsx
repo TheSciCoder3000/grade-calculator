@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ColumnFields, IColumnProps, TableType as ITableType } from "Firebase/FirebaseDb";
+import { ColumnFields, IColumnProps, TableType as ITableType } from "Firebase/TypesInterface";
 import { Column } from "react-table";
 import { Add, DragHandle } from "../svg";
 import { useSetAlertItems } from "@Components/Alerts/Alerts";

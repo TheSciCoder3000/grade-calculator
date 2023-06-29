@@ -8,7 +8,7 @@ import TableRow from "./TableRow";
 import TableSettings from "./TableSettings";
 
 // types
-import { TableType as ITableType, IColumnProps, IUpdateRowProps, ColumnFields, ISubjects } from "Firebase/FirebaseDb";
+import { ISubjects } from "Firebase/TypesInterface";
 import { Column } from "react-table";
 
 // env and styles

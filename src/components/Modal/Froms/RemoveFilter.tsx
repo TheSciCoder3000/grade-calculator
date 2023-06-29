@@ -1,4 +1,4 @@
-import { FilterTypes } from "Firebase/FirebaseDb";
+import { FilterTypes } from "Firebase/TypesInterface";
 import { useState } from "react";
 import { useAllowOutsideClick, useController, useControllerData } from "../CustomModal";
 
