@@ -8,26 +8,19 @@ import TableRow from "./TableRow";
 import TableSettings from "./TableSettings";
 
 // types
-import { TableType as ITableType, IColumnProps, IUpdateRowProps, ColumnFields } from "Firebase/FirebaseDb";
+import { TableType as ITableType, IColumnProps, IUpdateRowProps, ColumnFields, ISubjects } from "Firebase/FirebaseDb";
 import { Column } from "react-table";
 
 // env and styles
 import { Trash } from "./svg";
 import SortIcon from "./SortIcon";
 import "./Table.css";
+import { TableFunctionReturnType } from "../Overview/utils";
 
 interface ITableProps<T extends {}> {
     DATA: T[];
     COLUMNS: Column<T>[];
-    addRowHandler: (indx?: number) => void;
-    deleteRowHandler: (selectedRows: T[]) => void;
-    updateRowHandler: (
-        rowId: string,
-        nameColData: { name: "name"; value: string },
-        otherColData: IUpdateRowProps[]
-    ) => void;
-    onTableColumnsChange: (ColumnsData: IColumnProps) => void;
-    onTableColumnDelete: (ColumnType: ColumnFields, columnId: string) => void;
+    TableFunctions: TableFunctionReturnType
 }
 
 /**
@@ -37,20 +30,24 @@ interface ITableProps<T extends {}> {
  * @param {ITableProps} TableProps
  * @returns Reusable Table JSX Component
  */
-const GradeTable = <T extends { id: string }>({
+const GradeTable = <T extends ISubjects>({
     DATA,
     COLUMNS,
-    addRowHandler,
-    deleteRowHandler,
-    updateRowHandler,
-    onTableColumnsChange,
-    onTableColumnDelete,
+    TableFunctions
 }: ITableProps<T>) => {
     // Initialize columns
     const columns = useMemo(() => COLUMNS, [COLUMNS]);
 
     // Intialize Data
     const data = useMemo(() => DATA, [DATA]);
+
+    const {
+        addSubjectHandler: addRowHandler,
+        deleteSubjectHandler: deleteRowHandler,
+        SaveChangesHandler: updateRowHandler,
+        TableColumnsChangeHandler: onTableColumnsChange,
+        DeleteTableColumnHandler: onTableColumnDelete
+    } = TableFunctions;
 
     // Initialize table props from react table
     const {
@@ -67,7 +64,9 @@ const GradeTable = <T extends { id: string }>({
      * map selected rows to the delete function handler
      */
     const onSubjectsDelete = () => {
-        deleteRowHandler(selectedFlatRows.map((row) => row.original));
+        deleteRowHandler(selectedFlatRows.map((row) => {
+            return row.original
+        }));
     };
 
     return (
