@@ -11,11 +11,11 @@ The following technologies were used for this project:
 
 ## About the Project
 
-The project is a simple grade calculator with a complex UI architecture. The project is built using the React Js Library to showcase my skills in React and web application development. The Web App is made for college students in mind to track their grades and progress. The project has two modes of presenting the user's data.
+The project is a simple grade calculator with an extensive UI manipulation. The project is built using the React Js Library to showcase my skills in React and web application development. The Web App is made for college students in mind to track their grades and progress. The project has two modes of presenting the user's data.
 
 ### Overview Mode
 
-Overview mode is used to display the user's overall subject data in a table format. The data is organized by a layer of filters, `years` and `sems`, to organize the subjects similar to the student's college education structure.
+Overview mode is used to display the user's subject summary in a table format. The data is cathegorized and organized into `years` and `sems` where each `year` can have multiple `sems` and each `sem` has a collection of subjects. Overview mode only displays a summary of the subject's grades, further details of a subject's progress can be seen in the `Subject Mode`. 
 
 ### Subject Mode _`[In Progress]`_
 
@@ -29,7 +29,8 @@ This difficulty lead me to consider learning some code design principles as to m
 
 ## Running this Repository
 
-You can view this project using the link demo [link here]() or run the repository in your local machine by following the instructions below.
+You can view this project using the link demo [link here](grade-calculator-3000.firebaseapp.com) or run the repository in your local machine by following the instructions below.
+`Reminder: Don't forget to setup the environment variables to connect to the firebase database`
 
 ### 1. Clone the Repository
 
