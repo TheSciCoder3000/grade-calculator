@@ -3,123 +3,86 @@
   margin-left: 1rem;
   background-color: white;
 }
-
 .table-columns-settings .field-header-cont {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
 }
-
 .table-columns-settings .field-header-cont h4 {
   font-weight: 400;
   margin: 0;
 }
-
 .table-columns-settings .field-header-cont .add-field-item {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  fill: #787878;
+  align-items: center;
+  fill: rgb(120, 120, 120);
   border: none;
   background: transparent;
   margin-left: 0.5rem;
 }
-
 .table-columns-settings .field-header-cont .add-field-item:hover {
   fill: black;
   cursor: pointer;
 }
-
 .table-columns-settings .col-type-cont {
   margin-bottom: 1rem;
 }
-
 .table-columns-settings .col-field-item {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   margin-top: 0.6rem;
   font-size: 1.1em;
 }
-
 .table-columns-settings .col-field-item input {
   padding: 0.2rem 0.4rem;
   outline: none;
 }
-
 .table-columns-settings .col-field-item .item-field-controls {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   margin-right: 0.2rem;
 }
-
 .table-columns-settings .col-field-item .item-field-controls .btn-cont {
   margin-right: 0.15rem;
-  fill: #787878;
+  fill: rgb(120, 120, 120);
 }
-
 .table-columns-settings .col-field-item .item-field-controls .btn-cont:hover {
   fill: black;
   cursor: pointer;
 }
-
 .table-columns-settings .col-field-item .item-field-controls .btn-cont.drag-icon-cont {
-  cursor: -webkit-grab;
   cursor: grab;
 }
-
 .table-columns-settings .col-field-item .delete-field-item {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   border: none;
   background: transparent;
-  fill: #787878;
+  fill: rgb(120, 120, 120);
 }
-
 .table-columns-settings .col-field-item .delete-field-item:hover {
   fill: black;
   cursor: pointer;
 }
-
 .table-columns-settings .table-col-setting-actions {
   margin: 1rem 0;
 }
-
 .table-columns-settings .table-col-setting-actions > button {
   margin-right: 1rem;
-  border: 1px solid #bcbcbc;
+  border: 1px solid rgb(188, 188, 188);
   border-radius: 3px;
   padding: 0.35rem 0.85rem;
-  background-color: #f8f8f8;
+  background-color: rgb(248, 248, 248);
   cursor: pointer;
 }
-
 .table-columns-settings .table-col-setting-actions > button:hover {
-  background-color: #ebebeb;
+  background-color: rgb(235, 235, 235);
 }
-
 .table-columns-settings .table-col-setting-actions > button.save-settings {
-  background-color: #00b400;
-  border: 1px solid #00b400;
-  color: #f2f2f2;
+  background-color: rgb(0, 180, 0);
+  border: 1px solid rgb(0, 180, 0);
+  color: rgb(242, 242, 242);
 }
-
 .table-columns-settings .table-col-setting-actions > button.save-settings:disabled {
   cursor: not-allowed;
 }
-
 .table-columns-settings .table-col-setting-actions > button.save-settings:not(:disabled):hover {
-  background-color: #00aa00;
+  background-color: rgb(0, 170, 0);
 }
-/*# sourceMappingURL=TableSettings.css.map */
