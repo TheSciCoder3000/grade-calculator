@@ -10,12 +10,8 @@ import { ISubjects, IUserDoc } from "Firebase/TypesInterface";
 import GradeTable from "@Components/Calculator/Table";
 import Toggler from "../Toggler";
 
-// env and styles
-import "./Overview.css";
-// import "dotenv/config";
-
 // ! Fake data imports [remove when integrating database]
-import { FakeSubjectData, FakeTableColumns, FakeYearData } from "./FakeOverviewData";
+// import { FakeSubjectData, FakeTableColumns, FakeYearData } from "./FakeOverviewData";
 
 interface CalculatorOverviewProps {
     userData: IUserDoc;
@@ -26,6 +22,7 @@ interface CalculatorOverviewProps {
  */
 const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => {
     // ================================== userData Isolation ==================================
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const uid = useMemo(() => userData.userUid, []);
     const userYears = useMemo(() => userData.years, [userData]);
     const subjects = useMemo(() => userData.subjects, [userData]);
@@ -72,11 +69,11 @@ const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => 
     const TableFunctions = useTableFunctions(TableColumns, yearId, semId);
 
     return (
-        <div className="calculator__overview-container">
+        <div className="px-32 py-12">
             {uid && (AuthStatus || process.env.REACT_APP_DEMO_MODE === "DEMO") ? (
                 <>
-                    <h1>Course Overview</h1>
-                    <div className="section-selection">
+                    <h1 className="font-medium text-5xl pb-8">Course Overview</h1>
+                    <div className="space-y-4">
                         <Toggler
                             className="year-cont"
                             activeItem={yearId}

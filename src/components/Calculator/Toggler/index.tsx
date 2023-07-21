@@ -39,6 +39,7 @@ const Toggler: React.FC<ITogglerProps> = ({
             if (itemCount.current > items.length && items[0]) onItemClick(items[0].id);
             itemCount.current = items.length;
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [items]);
 
     // Focus onto the input field upon rendering the input field for creating toggler items
@@ -114,18 +115,20 @@ const Toggler: React.FC<ITogglerProps> = ({
         if (editMode && editFields.current) editFields.current[editMode].focus();
     }, [editMode]);
 
+
     return (
-        <div className={`toggler-cont ${className}`}>
+        <div className={`flex space-x-4 text-sm`}>
             {items.map((item) => (
                 <div
+                    className={`px-5 py-[7px] flex items-center select-none space-x-3 border border-gray-300 rounded-full ${activeItem === item.id && " bg-green-600 text-white border-green-600"}`}
                     key={`${item.name}-${item.id}`}
                     onClick={() => activeItem !== item.id && onItemClick(item.id)}
                     onDoubleClick={() => dbClickHandler(item.id, item.name)}
-                    className={`item-cont ${activeItem === item.id && "active-item"}`}
                     style={items.length === 1 ? { paddingRight: "1.25rem" } : {}}
                 >
-                    {editMode === item.id ? "" : item.name}
+                    {editMode !== item.id && (<span className="cursor-text">{item.name}</span>)}
                     <input
+                        className={`bg-green-600 outline-none ${activeItem === item.id && "text-white"}`}
                         type="text"
                         ref={(el) => addEditFieldRefs(el, item.id)}
                         onBlur={() => setEditMode(null)}
@@ -133,7 +136,7 @@ const Toggler: React.FC<ITogglerProps> = ({
                         onKeyDown={(e) => onEditKeyHandler(e, item.id)}
                     />
                     {items.length > 1 && (
-                        <div className="delete-cont" onClick={() => removeItemHandler(item.id)}>
+                        <div className={activeItem === item.id ? "fill-white" : "fill-gray-400"} onClick={() => removeItemHandler(item.id)}>
                             <Cancel />
                         </div>
                     )}
@@ -141,9 +144,9 @@ const Toggler: React.FC<ITogglerProps> = ({
             ))}
             {toggleFieldInput && (
                 <input
+                    className="w-[8rem] px-4 rounded-full border outline-none border-gray-300"
                     ref={fieldInput}
                     type="text"
-                    className="field-input"
                     value={fieldInputText}
                     onChange={(e) => setFieldInputText(e.target.value)}
                     onBlur={() => resetInputField()}
