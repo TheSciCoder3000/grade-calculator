@@ -12,7 +12,7 @@ import Toggler from "../Toggler";
 
 // env and styles
 import "./Overview.css";
-import "dotenv/config";
+// import "dotenv/config";
 
 // ! Fake data imports [remove when integrating database]
 import { FakeSubjectData, FakeTableColumns, FakeYearData } from "./FakeOverviewData";

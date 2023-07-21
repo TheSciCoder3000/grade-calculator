@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import "dotenv/config";
 import { initializeApp } from "firebase/app";
 import { User } from "firebase/auth";
 // import { getAnalytics } from "firebase/analytics";
@@ -7,7 +6,7 @@ import { User } from "firebase/auth";
 import { InitializeAuthentication } from "./FirebaseAuth";
 import { initializeFirestore } from "./FirebaseDb";
 import { IUserDoc, IYears } from "./TypesInterface";
-import "dotenv/config";
+// import "dotenv/config";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 

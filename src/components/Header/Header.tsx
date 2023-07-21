@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { AuthStatusType, SignOutType } from "@useFirebase";
 import AccountIcon from "./account_circle.svg";
 import "./css/Header.css";
-import "dotenv/config";
+// import "dotenv/config";
 
 interface HeaderProps {
     IsSignedIn: AuthStatusType;
