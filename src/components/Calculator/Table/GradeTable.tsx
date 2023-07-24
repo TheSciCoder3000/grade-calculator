@@ -138,9 +138,11 @@ const GradeTable = <T extends ISubjects>({
                             ))
                         ) : (
                             <tr>
-                                <td className="no-subjects-row" colSpan={3} onClick={() => addRowHandler()}>
-                                    {/* TODO: modify to dynamically display the table item besides subjects */}+
-                                    Add Subject
+                                <td colSpan={columns.length + 1} onClick={() => addRowHandler()}>
+                                    <div className="flex justify-center items-center text-gray-500 hover:text-gray-400 hover:bg-gray-50 col-span-3 hover:cursor-pointer border rounded-md shadow p-3">
+                                        {/* TODO: modify to dynamically display the table item besides subjects */}+
+                                        Add Subject
+                                    </div>
                                 </td>
                             </tr>
                         )}
