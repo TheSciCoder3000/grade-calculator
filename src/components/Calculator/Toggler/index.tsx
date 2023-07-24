@@ -120,7 +120,7 @@ const Toggler: React.FC<ITogglerProps> = ({
         <div className={`flex space-x-4 text-sm`}>
             {items.map((item) => (
                 <div
-                    className={`px-5 py-[7px] flex items-center select-none space-x-3 border border-gray-300 rounded-full ${activeItem === item.id && " bg-green-600 text-white border-green-600"}`}
+                    className={`px-5 py-[7px] flex shadow-sm items-center select-none space-x-3 border border-gray-300 rounded-full ${activeItem === item.id && " bg-green-600 text-white border-green-600"}`}
                     key={`${item.name}-${item.id}`}
                     onClick={() => activeItem !== item.id && onItemClick(item.id)}
                     onDoubleClick={() => dbClickHandler(item.id, item.name)}
@@ -137,7 +137,7 @@ const Toggler: React.FC<ITogglerProps> = ({
                     />
                     {items.length > 1 && (
                         <div className={activeItem === item.id ? "fill-white" : "fill-gray-400"} onClick={() => removeItemHandler(item.id)}>
-                            <Cancel />
+                            <Cancel className="cursor-pointer hover:fill-gray-500" />
                         </div>
                     )}
                 </div>

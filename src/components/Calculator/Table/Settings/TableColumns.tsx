@@ -168,56 +168,58 @@ const TableColumns = <T extends { id: string }>({
     };
 
     return (
-        <div className="table-columns-settings">
+        <div className="space-y-5 mb-4">
             {["extra", "grades"].map((colType) => (
-                <div key={colType} className="col-type-cont">
-                    <div className="field-header-cont">
+                <div key={colType} className="">
+                    <div className="flex space-x-2">
                         <h4>{colType === "extra" ? "Extra" : "Grades"}</h4>
                         <button
                             className="settings-btn add-field-item"
                             onClick={() => AddEventHandler(colType as ColumnFields)}
                         >
-                            <Add />
+                            <Add className="fill-gray-400 hover:fill-gray-500 cursor-pointer" />
                         </button>
                     </div>
-                    {columnFields
-                        .filter((field) => field.type === colType)
-                        .map((col) => (
-                            <ColumnFieldSettingItem
-                                key={col.id}
-                                id={col.id}
-                                name={col.name || ""}
-                                type={col.type}
-                                onChange={columnFieldChangeHandler}
-                                onAddBtnClick={() => AddEventHandler(colType as ColumnFields, col.id)}
-                                onDeleteBtnClick={() =>
-                                    deleteFieldItemHandler(
-                                        col.type,
-                                        col.id,
-                                        parseColumns(columns).find((item) => item.id === col.id)
-                                            ? true
-                                            : false
-                                    )
-                                }
-                                included={
-                                    parseColumns(columns).find((item) => item.id === col.id) ? true : false
-                                }
-                                onBlur={BlurEventHandler}
-                            />
-                        ))}
+                    <div className="space-y-1">
+                        {columnFields
+                            .filter((field) => field.type === colType)
+                            .map((col) => (
+                                <ColumnFieldSettingItem
+                                    key={col.id}
+                                    id={col.id}
+                                    name={col.name || ""}
+                                    type={col.type}
+                                    onChange={columnFieldChangeHandler}
+                                    onAddBtnClick={() => AddEventHandler(colType as ColumnFields, col.id)}
+                                    onDeleteBtnClick={() =>
+                                        deleteFieldItemHandler(
+                                            col.type,
+                                            col.id,
+                                            parseColumns(columns).find((item) => item.id === col.id)
+                                                ? true
+                                                : false
+                                        )
+                                    }
+                                    included={
+                                        parseColumns(columns).find((item) => item.id === col.id) ? true : false
+                                    }
+                                    onBlur={BlurEventHandler}
+                                />
+                            ))}
+                    </div>
                 </div>
             ))}
             {!colSync && (
-                <div className="table-col-setting-actions">
+                <div className="flex justify-end space-x-2">
                     <button
-                        className="settings-btn save-settings"
+                        className="bg-green-500 hover:bg-green-400 text-white px-4 py-1.5 rounded-md"
                         onClick={SaveChangesHandler}
                         disabled={!formValidity}
                     >
                         Save
                     </button>
                     <button
-                        className="settings-btn cancel-settings"
+                        className="bg-gray-200 hover:bg-gray-100 text-gray-600 px-4 py-1.5 rounded-md"
                         onClick={() => setColumnFields(parseColumns(columns))}
                     >
                         Cancel
@@ -282,14 +284,14 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
     };
 
     return (
-        <div className="col-field-item">
+        <div className="flex space-x-3 border border-gray-300 px-2 py-1 rounded-md">
             {/* Item controls */}
-            <div className="item-field-controls">
-                <div className="btn-cont drag-icon-cont">
-                    <DragHandle />
+            <div className="flex">
+                <div className="flex items-center">
+                    <DragHandle className="cursor-grab fill-gray-400 hover:fill-gray-500" />
                 </div>
-                <div className="btn-cont add-item-field-cont temp-btn-settings" onClick={onAddBtnClick}>
-                    <Add className="btn-svg temp-btn-settings" />
+                <div className="flex items-center" onClick={onAddBtnClick}>
+                    <Add className="cursor-pointer fill-gray-400 hover:fill-gray-500" />
                 </div>
             </div>
 
@@ -299,7 +301,7 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
                 onBlur={blurHandler}
                 value={name}
                 type="text"
-                className="item-field-input"
+                className="pl-2"
                 onChange={inputChangeHandler}
             />
             {included && (
@@ -308,7 +310,7 @@ const ColumnFieldSettingItem: React.FC<ColumnFieldSettingItemProps> = ({
                 </span>
             )}
             <button className="delete-field-item temp-btn-settings" onClick={onDeleteBtnClick}>
-                <Cancel className="btn-svg temp-btn-settings" />
+                <Cancel className="fill-gray-400 hover:fill-gray-500 cursor-pointer" />
             </button>
         </div>
     );

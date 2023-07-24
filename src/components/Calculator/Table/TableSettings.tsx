@@ -8,7 +8,6 @@ import { IColumnProps, ColumnFields } from "Firebase/TypesInterface";
 
 // assets and styles
 import { Settings } from "./svg";
-import "./Settings/TableSettings.css";
 
 interface ITableSettingsProps<T extends { id: string }> {
     columns: Column<T>[];
@@ -50,17 +49,18 @@ const TableSettings = <T extends { id: string }>({
         document.addEventListener("click", handleOutsideClick);
 
         return () => document.removeEventListener("click", handleOutsideClick);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [container]);
 
     return (
-        <div ref={container} className="settings-cont">
+        <div ref={container} className="flex justify-center relative">
             <button className="table-btns settings" onClick={() => setDisplayMenu((state) => !state)}>
-                <Settings />
+                <Settings className="h-6 w-6 fill-gray-400 hover:fill-gray-500 cursor-pointer" />
             </button>
             {displayMenu && (
-                <div className="settings-menu">
-                    <h3>Table Settings</h3>
-                    <div className="table-settings-cont">
+                <div className="p-6 right-0 top-16 z-10 bg-white absolute border border-gray-300 shadow-md rounded-md">
+                    <h3 className="mb-3">Table Settings</h3>
+                    <div className="">
                         <TableColumns
                             columns={columns}
                             setEnableOutsideClick={setEnableOutsideClick}

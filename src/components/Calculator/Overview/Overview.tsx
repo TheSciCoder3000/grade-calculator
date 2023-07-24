@@ -69,7 +69,7 @@ const CaluclatorOverview: React.FC<CalculatorOverviewProps> = ({ userData }) => 
     const TableFunctions = useTableFunctions(TableColumns, yearId, semId);
 
     return (
-        <div className="px-32 py-12">
+        <div className="px-44 py-12">
             {uid && (AuthStatus || process.env.REACT_APP_DEMO_MODE === "DEMO") ? (
                 <>
                     <h1 className="font-medium text-5xl pb-8">Course Overview</h1>
