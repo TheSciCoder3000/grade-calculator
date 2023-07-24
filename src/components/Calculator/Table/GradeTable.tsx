@@ -14,7 +14,6 @@ import { Column } from "react-table";
 // env and styles
 import { Trash } from "./svg";
 import SortIcon from "./SortIcon";
-import "./Table.css";
 import { TableFunctionReturnType } from "../Overview/utils";
 
 interface ITableProps<T extends {}> {
@@ -70,7 +69,7 @@ const GradeTable = <T extends ISubjects>({
     };
 
     return (
-        <div className="py-10">
+        <div className="py-10 space-y-3">
             {/* ============================== Table Controls ============================== */}
             <div className="flex justify-end space-x-3">
                 <button
@@ -88,75 +87,79 @@ const GradeTable = <T extends ISubjects>({
             </div>
 
             {/* ============================== Main table ============================== */}
-            <table {...getTableProps({ className: "calculator__table" })}>
-                {/* +++++++++++++++++++++ Table Header +++++++++++++++++++++ */}
-                <thead>
-                    {headerGroups.map((headerGroup, indx) => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map((column, indx) => (
-                                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                    <div className="table-data-cont">
-                                        {column.render("Header")}
-                                        <span>
-                                            {column.id !== "selection" && (
-                                                <SortIcon
-                                                    key={indx}
-                                                    sort={
-                                                        column.isSorted
-                                                            ? column.isSortedDesc
-                                                                ? "desc"
-                                                                : "asc"
-                                                            : ""
-                                                    }
-                                                />
-                                            )}
-                                        </span>
-                                    </div>
-                                </th>
-                            ))}
-
-                            {/* used to remove the whitespace */}
-                            <th></th>
-                        </tr>
-                    ))}
-                </thead>
-
-                {/* +++++++++++++++++++++ Table Body +++++++++++++++++++++ */}
-                <tbody {...getTableBodyProps()}>
-                    {rows.length > 0 ? (
-                        rows.map((row, indx) => (
-                            <TableRow
-                                key={indx}
-                                row={row}
-                                indx={indx}
-                                prepareRow={prepareRow}
-                                addSubjectHandler={() => addRowHandler(indx + 1)}
-                                updateSubjectHandler={updateRowHandler}
-                            />
-                        ))
-                    ) : (
-                        <tr>
-                            <td className="no-subjects-row" colSpan={3} onClick={() => addRowHandler()}>
-                                {/* TODO: modify to dynamically display the table item besides subjects */}+
-                                Add Subject
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-
-                {/* +++++++++++++++++++++ Table Footer +++++++++++++++++++++ */}
-                {data.length > 0 && (
-                    <tfoot>
-                        {footerGroups.map((footerGroup) => (
-                            <tr {...footerGroup.getFooterGroupProps()}>
-                                {footerGroup.headers.map((column) => (
-                                    <td {...column.getFooterProps()}>{column.render("Footer")}</td>
+            <div className="">
+                <table {...getTableProps({ className: "border-separate border-spacing-y-4 w-full" })}>
+                    {/* +++++++++++++++++++++ Table Header +++++++++++++++++++++ */}
+                    <thead className="h-12">
+                        {headerGroups.map((headerGroup, indx) => (
+                            <tr {...headerGroup.getHeaderGroupProps({
+                                className: "bg-green-500 text-white" 
+                            })}>
+                                {headerGroup.headers.map((column, indx) => (
+                                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                        <div className="flex pl-4 pr-4 items-center justify-between">
+                                            {column.render("Header")}
+                                            <span className="ml-4 fill-white">
+                                                {column.id !== "selection" && (
+                                                    <SortIcon
+                                                        key={indx}
+                                                        sort={
+                                                            column.isSorted
+                                                                ? column.isSortedDesc
+                                                                    ? "desc"
+                                                                    : "asc"
+                                                                : ""
+                                                        }
+                                                    />
+                                                )}
+                                            </span>
+                                        </div>
+                                    </th>
                                 ))}
+
+                                {/* used to remove the whitespace */}
+                                {/* <th></th> */}
                             </tr>
                         ))}
-                    </tfoot>
-                )}
-            </table>
+                    </thead>
+
+                    {/* +++++++++++++++++++++ Table Body +++++++++++++++++++++ */}
+                    <tbody {...getTableBodyProps({ className: "space-y-4" })}>
+                        {rows.length > 0 ? (
+                            rows.map((row, indx) => (
+                                <TableRow
+                                    key={indx}
+                                    row={row}
+                                    indx={indx}
+                                    prepareRow={prepareRow}
+                                    addSubjectHandler={() => addRowHandler(indx + 1)}
+                                    updateSubjectHandler={updateRowHandler}
+                                />
+                            ))
+                        ) : (
+                            <tr>
+                                <td className="no-subjects-row" colSpan={3} onClick={() => addRowHandler()}>
+                                    {/* TODO: modify to dynamically display the table item besides subjects */}+
+                                    Add Subject
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+
+                    {/* +++++++++++++++++++++ Table Footer +++++++++++++++++++++ */}
+                    {data.length > 0 && (
+                        <tfoot>
+                            {footerGroups.map((footerGroup) => (
+                                <tr {...footerGroup.getFooterGroupProps()}>
+                                    {footerGroup.headers.map((column) => (
+                                        <td {...column.getFooterProps({ className: "pl-4 pt-4 border-t-2" })}>{column.render("Footer")}</td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tfoot>
+                    )}
+                </table>
+            </div>
         </div>
     );
 };

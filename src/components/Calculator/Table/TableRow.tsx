@@ -89,10 +89,10 @@ const TableRow = <T extends { id: string }>({
     };
 
     return (
-        <tr {...row.getRowProps()}>
+        <tr {...row.getRowProps({ className: "group h-14 relative shadow rounded-md" })}>
             {row.cells.map((cell) => {
                 return (
-                    <td {...cell.getCellProps()}>
+                    <td {...cell.getCellProps({ className: "pl-4 relative z-10 border-gray-300 first:border-l first:rounded-l-md [&:nth-last-child(2)]:border-r [&:nth-last-child(2)]:rounded-r-md border-y" })}>
                         {editMode && cell.column.id !== "selection" ? (
                             <EditCell cell={cell} onChange={onCellChange} />
                         ) : (
@@ -101,25 +101,25 @@ const TableRow = <T extends { id: string }>({
                     </td>
                 );
             })}
-            <td className="row-controls">
+            <td className="left-[-3.7rem] h-full right-0 absolute box-border">
                 {!editMode ? (
-                    <div className="main-controls">
-                        <button onClick={addSubjectHandler} className="row-add-subject">
+                    <div className="hidden group-hover:flex items-center h-full space-x-4">
+                        <button onClick={addSubjectHandler} className="text-gray-500 hover:text-gray-400">
                             +
                         </button>
-                        <button onClick={() => setEditMode(true)} className="row-edit-subject">
+                        <button onClick={() => setEditMode(true)} className="fill-gray-500 hover:fill-gray-400">
                             <Edit />
                         </button>
                     </div>
                 ) : (
-                    <>
-                        <button onClick={() => SaveChangesHandler()} className="row-save-subject">
+                    <div className="flex items-center h-full space-x-2">
+                        <button onClick={() => SaveChangesHandler()} className="fill-green-600 hover:fill-green-400">
                             <Save />
                         </button>
-                        <button onClick={resetRowFields} className="cancel-edit">
+                        <button onClick={resetRowFields} className="fill-red-500 hover:fill-red-400">
                             <Cancel />
                         </button>
-                    </>
+                    </div>
                 )}
             </td>
         </tr>
