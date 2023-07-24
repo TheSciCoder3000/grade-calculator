@@ -73,11 +73,11 @@ const GradeTable = <T extends ISubjects>({
             {/* ============================== Table Controls ============================== */}
             <div className="flex justify-end space-x-3">
                 <button
-                    className=""
+                    className="fill-gray-400 hover:fill-gray-500 cursor-pointer disabled:cursor-not-allowed disabled:fill-gray-300"
                     disabled={selectedFlatRows.length === 0}
                     onClick={onSubjectsDelete}
                 >
-                    <Trash className="h-6 w-6 fill-gray-400 hover:fill-gray-500 cursor-pointer" />
+                    <Trash className="h-6 w-6" />
                 </button>
                 <TableSettings
                     columns={columns}

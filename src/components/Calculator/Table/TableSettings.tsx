@@ -58,7 +58,7 @@ const TableSettings = <T extends { id: string }>({
                 <Settings className="h-6 w-6 fill-gray-400 hover:fill-gray-500 cursor-pointer" />
             </button>
             {displayMenu && (
-                <div className="p-6 right-0 top-16 z-10 bg-white absolute border border-gray-300 shadow-md rounded-md">
+                <div className="p-6 right-0 top-16 z-10 bg-white absolute border border-gray-300 shadow-md rounded-md z-20">
                     <h3 className="mb-3">Table Settings</h3>
                     <div className="">
                         <TableColumns
